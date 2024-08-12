@@ -36,7 +36,7 @@ controller:
     - job-dsl:latest # 1.87
     - pipeline-aws:latest # (displayed as `Pipeline: AWS Steps`) # used to list ECR images. (pending replacement with aws-cli pod template)
     - github:latest # github webhook
-    - pipeline-stage-view:latest
+    #- pipeline-stage-view:latest # check. not being displayed
   installLatestPlugins: true # set to `false` to attempt it from breaking even when pinning plugin versions (not guaranteed)
   # pending plugin ver pinning which working combination
   JCasC:
