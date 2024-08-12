@@ -1,0 +1,87 @@
+# Django
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: django
+  namespace: django
+  labels:
+    app: django
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: django
+  template:
+    metadata:
+      labels:
+        app: django
+    spec:
+      containers:
+        - name: django-production-kustomize
+#          livenessProbe: # pending
+#            tcpSocket:
+#              port: 3306
+#            initialDelaySeconds: 12
+#            periodSeconds: 10
+#          readinessProbe:
+#            exec:
+#              command: [ "mysql", "-h", "127.0.0.1", "-e", "SELECT 1" ]
+#            initialDelaySeconds: 12
+#            periodSeconds: 10
+          image: django-production-kustomize # defined in kustomization.yaml, dynamically updated by ArgoCD image updater
+          imagePullPolicy: Always
+          envFrom: # This loads all the secrets as ENV variables
+            - secretRef:
+                name: django-secrets # ExternalSecret name (not keys)
+          ports:
+            - containerPort: 8000 # Match the port exposed in your Dockerfile (django)
+          volumeMounts:
+            - mountPath: "/static"
+              name: staticfiles
+      volumes:
+        - name: staticfiles
+          persistentVolumeClaim:
+            claimName: staticfiles-pvc
+      serviceAccountName: django
+      nodeSelector:
+        role: "django" # defined in tf, eks module (node groups)
+---
+# nginx
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx
+  namespace: django
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:1.27.0 # pending. make dynamic with configmap/kustomize
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - mountPath: /etc/nginx/conf.d/default.conf # /etc/nginx/conf.d/default.conf
+              subPath: default.conf
+              name: nginx-config
+              readOnly: true
+            - mountPath: /static
+              name: staticfiles
+      volumes:
+        - name: staticfiles
+          persistentVolumeClaim:
+            claimName: staticfiles-pvc
+        - name: nginx-config
+          configMap:
+            name: nginx-config # reference to configMapGenerator is kustomization.yaml
+      serviceAccountName: django # check
+      nodeSelector:
+        role: "django" # defined in tf, eks module (node groups)

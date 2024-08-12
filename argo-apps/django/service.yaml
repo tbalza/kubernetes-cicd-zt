@@ -1,0 +1,31 @@
+# Django service (gunicorn)
+apiVersion: v1
+kind: Service
+metadata:
+  name: django
+  namespace: django # check if redundant
+  labels:
+    app: django
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8000
+      targetPort: 8000
+  selector:
+    app: django
+---
+# nginx Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx
+  namespace: django # check if redundant
+  labels:
+    app: nginx
+spec:
+  type: ClusterIP
+  ports:
+    - port: 80
+      targetPort: 80
+  selector:
+    app: nginx

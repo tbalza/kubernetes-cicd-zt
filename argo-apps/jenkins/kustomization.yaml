@@ -1,0 +1,43 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: jenkins # crucial for configMapGenerator
+
+helmCharts:
+  - name: jenkins
+    repo: https://charts.jenkins.io
+    version: 5.3.1 # Chart v5.3.1, App 2.452.2 # Chart v5.1.6, App v2.440.3 (check values.yaml image: tag:)
+    releaseName: jenkins
+    namespace: jenkins
+    includeCRDs: true # check if necessary ( as it should be defined in values.yaml)
+#    valuesMerge: merge # how to treat valuesInline with respect to Values. Legal values: ‘merge’, ‘override’, ‘replace’. Defaults to ‘override’.
+    valuesFile: values.yaml
+#    additionalValuesFiles:
+#    - casc-config-h.yaml
+
+resources:
+  - ingress.yaml # upstream helm ingress is stringent/finicky. kustomize is going to patch environments anyway
+  - secrets.yaml
+  - serviceaccount.yaml
+#  - application.yaml
+
+configMapGenerator:
+  - name: jenkins-scripts
+    files:
+    - Jenkinsfile.groovy # pending. check SCM Sync Configuration Plugin, which can help version control Jenkins job configurations.
+
+#replacements:
+#  - source:
+#      kind: ConfigMap
+#      name: aws-account
+#      namespace: jenkins
+#      fieldPath: data.aws-account
+#    targets:
+#      - select:
+#          kind: ServiceAccount
+#          name: jenkins
+#        fieldPaths:
+#          - metadata.annotations.eks\.amazonaws\.com/role-arn
+#        options:
+#          delimiter: ":"
+#          index: 5 #

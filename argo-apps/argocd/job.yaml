@@ -1,0 +1,29 @@
+## Reset repo server and redis, in order for EnvFrom to take effect inside the plugin container (that contains envsubst). ${variable} substitutions currently fail without this
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: restart-argo-cd-argocd-redis-argocd-redis
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/hook: Sync
+    argocd.argoproj.io/hook-delete-policy: HookSucceeded
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  template:
+    spec:
+      serviceAccountName: argocd-application-controller
+      containers:
+      - name: kubectl-restart
+        image: bitnami/kubectl:latest
+        imagePullPolicy: IfNotPresent
+        command: # currently both repo server and redis need to be restarted for envFrom to take effect. (Repo server restart is done elsewhere, in the plugin container in /argocd/values.yaml)
+        - /bin/sh
+        - -c
+        - |
+          kubectl rollout restart deployment argo-cd-argocd-redis -n argocd;
+          kubectl rollout restart deployment argo-cd-argocd-applicationset-controller -n argocd
+          sleep 15
+      restartPolicy: Never
+# kubectl rollout restart deployment argo-cd-argocd-repo-server -n argocd;
+# kubectl rollout restart deployment argo-cd-argocd-applicationset-controller -n argocd
+# kubectl rollout restart deployment argo-cd-argocd-server -n argocd;

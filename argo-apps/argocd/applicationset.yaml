@@ -1,0 +1,76 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: cluster-addons
+  namespace: argocd
+spec:
+  preservedFields:
+    annotations:
+      - "argocd-image-updater.argoproj.io/image-list" # workaround to abstract annotation outside appset and allow cmp substitution # see /django/job.yaml
+  goTemplate: true
+  goTemplateOptions: ["missingkey=error"]
+  generators:
+    - git:
+        repoURL: https://github.com/tbalza/kubernetes-cicd.git # git@github.com:tbalza/kubernetes-cicd.git
+        revision: HEAD # Branch for git write back? # check
+        directories:
+          - path: argo-apps/*
+  strategy:
+    type: RollingSync # Sync ArgoCD first (along with envsubst plugin and restart job that makes env available). Afterward, sync the rest of the apps so that env substitution works
+    rollingSync:
+      steps: # These are executed sequentially from top to bottom. Everything that is labeled `syncorder=argocd` first, then everything that is not `argocd` (NotIn operator) at the same time
+        - matchExpressions:
+            - key: syncorder # Label defined in appset template:,metadata:,labels:
+              operator: In
+              values:
+                - argocd
+        - matchExpressions:
+            - key: syncorder
+              operator: NotIn
+              values:
+                - argocd
+  template:
+    metadata:
+      name: '{{.path.basename}}'
+      labels:
+        syncorder: '{{.path.basename}}' # Label for rollingSync matchExpressions
+      annotations: # Image list has `app name` prepended before an `=` (django) and the ecr repo. Corresponding annotations are prepended with the same app name (django.xxx)
+        #argocd-image-updater.argoproj.io/image-list: "django=$ARGOCD_AWS_ECR_REPO/django-production" # This substitution is abstracted with /django/job.yaml, argocd, cmp, image updater, are not streamlined to work together
+        argocd-image-updater.argoproj.io/django.update-strategy: "newest-build"
+        argocd-image-updater.argoproj.io/django.kustomize.image-name: django-production-kustomize
+        argocd-image-updater.argoproj.io/write-back-method: git:secret:argocd/argocd-secrets # secret:<namespace>/<secret> # <secret> refers to ExternalSecret name not they key. (must contain keys `username` `password`)
+        argocd-image-updater.argoproj.io/write-back-target: kustomization
+        argocd-image-updater.argoproj.io/git-branch: main # Where the git writeback will be created
+        argocd-image-updater.argoproj.io/refresh: hard
+    spec:
+      project: "default"
+      source:
+        repoURL: https://github.com/tbalza/kubernetes-cicd.git # git@github.com:tbalza/kubernetes-cicd.git # check
+        targetRevision: HEAD
+        path: '{{.path.path}}'
+        plugin: # maybe disabling this allows for git writeback (instead of kustomization)? use discover instead? # image updater kustomization writeback ignores this
+          name: substitution
+      destination:
+        server: https://kubernetes.default.svc # pending make dynamic from repo files
+        namespace: '{{.path.basename}}'
+      ignoreDifferences: # argocd diff customization, meant for django, calculating structured merge diff: error building typed value from live resource: .status.lastPhaseTransitionTime: field not declared in schema
+        - kind: PersistentVolume # (custom diffing) fixes syncing error: .status.lastPhaseTransitionTime: field not declared in schema # https://github.com/argoproj/argo-cd/issues/16640 (related to django PV)
+          jsonPointers:
+            - /spec/claimRef/resourceVersion
+            - /spec/claimRef/uid
+            - /status/lastPhaseTransitionTime
+      syncPolicy:
+        automated:
+          selfHeal: true
+          prune: true # (disable when testing cmp plugin) enables the deletion of resources that are no longer in source
+        retry:
+          limit: 5
+          backoff:
+            duration: 5s
+            maxDuration: 5m0s
+            factor: 2
+        syncOptions:
+        - CreateNamespace=true
+        - ServerSideApply=true
+        - ServerSideDiff=true
+        - RespectIgnoreDifferences=true # (custom diffing) fixes syncing error: .status.lastPhaseTransitionTime: field not declared in schema (related to django PV)

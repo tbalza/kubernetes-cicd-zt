@@ -1,0 +1,161 @@
+controller:
+#  containerEnvFrom: # loads all the secrets in one go as ENV instead of using https://external-secrets.io/v0.4.2/examples-jenkins-kubernetes-credentials/ or kubernetes-credentials-provider-plugin
+#    - secretRef:
+#        name: jenkins-secrets # loads the ENV in the controller, not the agent
+#  scriptApproval:
+#    - "staticMethod org.codehaus.groovy.runtime.DefaultGroovyMethods dump java.lang.Object" # required for "dump" in ecr plugin
+  nodeSelector:
+    role: ci-cd
+  sidecars:
+    configAutoReload:
+      enabled: false # require pod restart for config change. false allows to view current temporary jcasc
+#  image:
+#    repository: "jenkins/jenkins"
+#    tag: 2.452.2 # Chart v5.3.1, App 2.452.2 # Chart v5.1.6, App v2.440.3 (chart ver is defined in kustomization.yaml)
+  javaOpts: "-Xmx1536m -Xms512m -Dcasc.jenkins.config=/var/jenkins_home/casc_configs -Dorg.csanchez.jenkins.plugins.kubernetes.clients.cacheExpiration=60" # -Dcasc.jenkins.config=/var/jenkins_home/casc_configs prevent memory limit issues, define jcasc config path
+  admin:
+    username: "admin" # check
+    password: "pass" # check
+  resources:
+    requests:
+      cpu: "500m"
+      memory: "1Gi"
+    limits:
+      cpu: "1000m"
+      memory: "1Gi"
+  service:
+    port: 8080
+  installPlugins:
+    - kubernetes:latest # 4203.v1dd44f5b_1cf9
+    - workflow-aggregator:latest # (displayed as `Pipeline`)# 596.v8c21c963d92d
+    - git:latest # 5.2.1
+    - configuration-as-code:latest  # 1775.v810dc950b_514
+    - ansible:latest # 307.va_1f3ef06575a_
+    - docker-workflow:latest # (displayed as `Docker Pipeline`) # 580.vc0c340686b_54
+    - credentials:latest # not activated by default 1337.v60b_d7b_c7b_c9f
+    - job-dsl:latest # 1.87
+    - pipeline-aws:latest # (displayed as `Pipeline: AWS Steps`) # used to list ECR images. (pending replacement with aws-cli pod template)
+    - github:latest # github webhook
+  installLatestPlugins: true # set to `false` to attempt it from breaking even when pinning plugin versions (not guaranteed)
+  # pending plugin ver pinning which working combination
+  JCasC:
+    enabled: true
+    defaultConfig: true # `false` required with custom config (conflicting/duplicate definitions crashes jenkins install)
+    overwriteConfiguration: false # related to PVC. requires pod restart (or sidecars: configAutoReload: )
+    configScripts: # initiates `build-django` pipeline located in custom directory (itself loaded to volume via configmap in kustomize)
+      job-dsl: | # pending # mount and make into jcasc, also iterate all configs in the directory
+        jobs:
+          - script: >
+              pipelineJob('build-django') {
+                definition {
+                  cps {
+                    script(new File('/var/jenkins_home/groovy_scripts/Jenkinsfile.groovy').text)
+                    sandbox(true)
+                  }
+                }
+              }
+  initScripts: # triggers the `build-django` pipeline to be executed on first launch
+    triggerBuildDjango: |-
+      import jenkins.model.Jenkins
+      import hudson.model.Job
+      import hudson.model.Cause.UserIdCause
+
+      def job = Jenkins.instance.getItemByFullName('build-django', Job.class)
+      if (job) {
+          job.scheduleBuild(0, new UserIdCause())
+          println("Scheduled 'build-django' job at startup.")
+      } else {
+          println("Job 'build-django' not found.")
+      }
+  serviceType: ClusterIP
+  ingress: # If you are using SSL termination on the ALB, with a self-signed certificate, you need also to build a custom inbound-agent base image with the CA certificate.
+    enabled: false # disabled in chart, supplied by kustomize as a resource
+persistence:
+  enabled: true #
+  storageClass: "gp3"
+  size: "9Gi"
+  accessMode: "ReadWriteOnce" # RWO can be mounted as read-write by a single node. ReadWriteMany for HA/efs
+  #existingClaim: jenkins
+  # https://github.com/jenkinsci/helm-charts/issues/659
+  # https://github.com/jenkinsci/helm-charts/issues/64
+  # ref: https://kubernetes.io/docs/concepts/storage/volume-pvc-datasource/
+  # -- Existing data source to clone PVC from
+  volumes: # mount local repo pipeline script to jenkins, have jcasc read/configure it afterward
+  - name: jenkins-groovy-scripts # arbitrary name
+    configMap:
+      name: jenkins-scripts  # This should match the generated ConfigMap (kustomization.yaml)
+  mounts:
+  - mountPath: /var/jenkins_home/groovy_scripts
+    name: jenkins-groovy-scripts # arbitrary name
+    readOnly: true
+agent:
+  podName: default # default # Agent Pod base name
+  args: "" # must leave blank as kubernetes plugin provides these as env variables. default populated values break this setup
+  defaultsProviderTemplate: "" # default: blank # The name of the pod template to use for providing default values
+  workingDir: "/home/jenkins/agent" # default
+  nodeUsageMode: "NORMAL" # default
+  TTYEnabled: true
+  namespace: jenkins # where agents are launched
+  privileged: false # Agent privileged container # default: false
+#  nodeSelector: # breaks install. might not be related to ec2 instance, and break agent connection
+#    role: ci-cd
+  websocket: true # (websocket and directConnection are mutually exclusive)
+  directConnection: false #  (websocket and directConnection are mutually exclusive)
+  resources:
+    requests:
+      cpu: "512m"
+      memory: "512Mi"
+      # ephemeralStorage:
+    limits:
+      cpu: "1000m"
+      memory: "1Gi"
+  additionalContainers: # this adds kaniko to the default pod template (which already has jnlp required by kubernetes plugin)
+    - sideContainerName: "kaniko"
+      image:
+        repository: "gcr.io/kaniko-project/executor" # debug release required for tty
+        tag: "v1.23.1-debug"
+      command: "sleep" # required
+      args: "9999999" # required
+      privileged: false
+      ttyEnabled: true
+#    - sideContainerName: "aws-cli" # adding this additional container makes agent crash, possibly resource related
+#      image:
+#        repository: "amazon/aws-cli"
+#        tag: "latest"
+#      command: "echo"
+#      args: "9999999"
+#      privileged: false
+#      ttyEnabled: true
+  secretEnvVars: # pending. this will be to be taken out of the chart when testing environments
+    - key: ECR_REPO
+      secretKey: ECR_REPO
+      secretName: jenkins-secrets
+      optional: true
+    - key: ECR_REPO_NAME
+      secretKey: ECR_REPO_NAME
+      secretName: jenkins-secrets
+      optional: true
+    - key: REGION
+      secretKey: REGION
+      secretName: jenkins-secrets
+      optional: true
+    - key: REPO_URL
+      secretKey: REPO_URL
+      secretName: jenkins-secrets
+      optional: true
+    - key: GITHUB_USER
+      secretKey: GITHUB_USER
+      secretName: jenkins-secrets
+      optional: true
+    - key: GITHUB_TOKEN
+      secretKey: GITHUB_TOKEN
+      secretName: jenkins-secrets
+      optional: true
+
+serviceAccount:
+  create: false
+  name: jenkins
+
+serviceAccountAgent:
+  create: false # defines serviceAccount in agents without creating a new one (setting the name below)
+  name: jenkins # necessary for agent pod to connect to controller

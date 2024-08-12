@@ -1,0 +1,29 @@
+# Django
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: staticfiles-pvc
+  namespace: django # Pending. check if redundant due to applicationSet and remove on all files
+spec:
+  storageClassName: "gp3"
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 10Gi
+  volumeName: staticfiles-pv
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: staticfiles-pv
+  namespace: django
+spec:
+  storageClassName: "gp3"
+  capacity:
+    storage: 10Gi
+  persistentVolumeReclaimPolicy: Delete # retain for production
+  accessModes:
+    - ReadWriteMany
+  hostPath:
+    path: /static

@@ -1,0 +1,26 @@
+## Part of ArgoCD Image Updater configuration
+## Adds annotation outside ApplicationSet, since it doesn't allow ${ARGOCD_AWS_ECR_REPO} replacement
+## See /argocd/applicationset.yaml `preservedFields` definition also required for this workaround
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: post-sync-annotations-job
+  annotations:
+    argocd.argoproj.io/hook: Sync
+    argocd.argoproj.io/hook-delete-policy: HookSucceeded
+spec:
+  template:
+    spec:
+      serviceAccountName: django
+      containers:
+      - name: kubectl
+        image: bitnami/kubectl:latest
+        imagePullPolicy: IfNotPresent
+        command:
+          - /bin/sh
+          - -c
+          - |
+            kubectl patch application "django" -n argocd --type=merge \
+            -p "{\"metadata\":{\"annotations\":{\"argocd-image-updater.argoproj.io/image-list\":\"django=${ARGOCD_AWS_ECR_REPO}/django-production\"}}}"
+      restartPolicy: Never
+

@@ -1,0 +1,45 @@
+#apiVersion: rbac.authorization.k8s.io/v1
+#kind: ClusterRole
+#metadata:
+#  name: image-updater-cluster-role
+#rules:
+#- apiGroups: ["apps"]
+#  resources: ["deployments"]
+#  verbs: ["get", "list", "watch", "update", "patch"]
+#
+#---
+#apiVersion: rbac.authorization.k8s.io/v1
+#kind: ClusterRoleBinding
+#metadata:
+#  name: image-updater-cluster-rolebinding
+#subjects:
+#- kind: ServiceAccount
+#  name: argocd-image-updater
+#  namespace: argocd
+#roleRef:
+#  kind: ClusterRole
+#  name: image-updater-cluster-role
+#  apiGroup: rbac.authorization.k8s.io
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: image-updater-all-access
+rules:
+- apiGroups: ["*"]  # Allows access to all API groups
+  resources: ["*"]  # Allows access to all resources
+  verbs: ["*"]      # Allows all actions
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: image-updater-all-access-binding
+subjects:
+- kind: ServiceAccount
+  name: argocd-image-updater
+  namespace: argocd
+roleRef:
+  kind: ClusterRole
+  name: image-updater-all-access
+  apiGroup: rbac.authorization.k8s.io

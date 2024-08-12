@@ -1,0 +1,67 @@
+alertmanager:
+  serviceAccount:
+    annotations:
+      eks.amazonaws.com/role-arn: "arn:aws:iam::350206045032:role/PrometheusRole" # check , make cluster and account id dynamic
+  alertmanagerSpec:
+    nodeSelector:
+      role: ci-cd
+
+kubeStateMetrics:
+  serviceAccount:
+    annotations:
+      eks.amazonaws.com/role-arn: "arn:aws:iam::350206045032:role/PrometheusRole" # check , make cluster and account id dynamic
+kube-state-metrics:
+  nodeSelector:
+    role: ci-cd
+
+nodeExporter: # check service account not needed
+  serviceAccount: # check service account not needed
+    annotations:
+      eks.amazonaws.com/role-arn: "arn:aws:iam::350206045032:role/PrometheusRole" # check , make cluster and account id dynamic
+prometheus-node-exporter:
+  nodeSelector:
+    role: ci-cd
+
+grafana:
+  adminPassword: test123
+  serviceAccount:
+    annotations:
+      eks.amazonaws.com/role-arn: "arn:aws:iam::350206045032:role/PrometheusRole" # check , make cluster and account id dynamic
+  nodeSelector:
+    role: ci-cd
+
+prometheus:
+  serviceAccount:
+    annotations:
+      eks.amazonaws.com/role-arn: "arn:aws:iam::350206045032:role/PrometheusRole" # check , make cluster and account id dynamic
+  prometheusSpec:
+    nodeSelector:
+      role: ci-cd
+
+prometheusOperator:
+  serviceAccount:
+    annotations:
+      eks.amazonaws.com/role-arn: "arn:aws:iam::350206045032:role/PrometheusRole" # check , make cluster and account id dynamic
+  deployment:
+    serviceAccount:
+      annotations:
+        eks.amazonaws.com/role-arn: "arn:aws:iam::350206045032:role/PrometheusRole" # check , make cluster and account id dynamic
+  admissionWebhooks:
+    failurePolicy: Ignore # check
+  nodeSelector:
+      role: ci-cd
+
+# Control plane is managed by EKS hence the following are disabled
+defaultRules:
+  rules:
+    etcd: false
+    kubeScheduler: false
+    kubeControllerManager: false
+kubeControllerManager:
+  enabled: false
+kubeEtcd:
+  enabled: false
+kubeScheduler:
+  enabled: false
+
+

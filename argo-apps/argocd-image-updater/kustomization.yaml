@@ -1,0 +1,28 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: argocd
+
+helmCharts:
+  - name: argocd-image-updater
+    repo: https://argoproj.github.io/argo-helm
+    version: 0.11.0 # Chart 0.11.0, App 0.14.0 #Chart 0.10.2, App v0.13.1
+    releaseName: argocd-image-updater
+    namespace: argocd
+    includeCRDs: false
+    valuesFile: values.yaml
+
+resources:
+  - rbac.yaml
+  - secrets.yaml
+  - serviceaccount.yaml
+
+# adding patches to things that can't be disabled via the upstream chart
+patches:
+  - path: config.yaml
+    target:
+      group: ""
+      version: v1
+      kind: ConfigMap
+      name: argocd-image-updater-config
+      namespace: argocd

@@ -1,0 +1,35 @@
+## Cert manager is not currently supported. Waiting on an AWS feature request to allow it to import custom certs via api
+#apiVersion: cert-manager.io/v1
+#kind: Certificate
+#metadata:
+#  name: argocd-server-cert
+#  namespace: argocd  # Same namespace as your Ingress resource
+#spec:
+#  secretName: argocd-server-tls  # The name of the secret where cert-manager will store the certificate
+#  issuerRef:
+#    name: letsencrypt-prod-django
+#    kind: ClusterIssuer
+#  dnsNames:
+#  - argocd.tbalza.net
+#---
+#apiVersion: cert-manager.io/v1
+#kind: ClusterIssuer
+#metadata:
+#  name: letsencrypt-prod-django
+#spec:
+#  acme:
+#    # The ACME server URL for Let's Encrypt Production Environment
+#    server: https://acme-v02.api.letsencrypt.org/directory # https://acme-staging-v02.api.letsencrypt.org/directory
+#    # Email address used for ACME registration and recovery contact
+#    email: email@email.email
+#    # Secret resource used to store the ACME account private key
+#    privateKeySecretRef:
+#      name: letsencrypt-prod-django
+#    # Configure the DNS-01 provider to use the Cloudflare API
+#    solvers:
+#    - dns01:
+#        cnameStrategy: Follow
+#        cloudflare:
+#          apiTokenSecretRef:
+#            name: cloudflare-api-token  # Name of the Kubernetes secret (set in ExternalDNS tf helm install)
+#            key: api-token  # Key under which the API token is stored (set in ExternalDNS tf helm install)

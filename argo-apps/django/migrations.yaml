@@ -1,0 +1,54 @@
+#apiVersion: batch/v1
+#kind: Job
+#metadata:
+#  name: django-db-migrations
+#  namespace: django-app
+#spec:
+#  ttlSecondsAfterFinished: 100
+#  activeDeadlineSeconds: 60
+#
+#  template:
+#    spec:
+#      containers:
+#        - name: migration-container
+#          image: mukulmantosh/django-kubernetes:1.0
+#          command: ['python', 'manage.py', 'migrate']
+#          imagePullPolicy: Always
+#          envFrom:
+#            - configMapRef:
+#                name: app-cm
+#          ports:
+#            - containerPort: 8000
+#      restartPolicy: OnFailure
+#  backoffLimit: 15
+#---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: django-staticfiles
+  namespace: django-app
+spec:
+  ttlSecondsAfterFinished: 100
+  activeDeadlineSeconds: 60
+
+  template:
+    spec:
+      volumes:
+        - name: staticfiles
+          persistentVolumeClaim:
+            claimName: staticfiles-pvc
+      containers:
+        - name: staticfiles-container
+          image: mukulmantosh/django-kubernetes:1.0
+          command: ['python', 'manage.py', 'collectstatic', '--noinput']
+          imagePullPolicy: Always
+          envFrom:
+            - configMapRef:
+                name: app-cm
+          ports:
+            - containerPort: 8000
+          volumeMounts:
+            - mountPath: "/data/static"
+              name: staticfiles
+      restartPolicy: OnFailure
+  backoffLimit: 3

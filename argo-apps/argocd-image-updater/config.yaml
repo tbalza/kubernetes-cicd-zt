@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: argocd-image-updater-config
+  namespace: argocd
+data:
+  kube.events: 'false'
+  log.level: "trace"
+  registries.conf: |
+    registries:
+      - api_url: https://${ARGOCD_AWS_ECR_REPO}
+        credentials: ext:/scripts/ecr-login.sh
+        credsexpire: 6h
+        default: true
+        insecure: false
+        name: ECR
+        ping: true
+        prefix: ${ARGOCD_AWS_ECR_REPO}
+        tagsortmode: none

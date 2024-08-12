@@ -1,0 +1,21 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: django # crucial for configMapGenerator
+resources:
+- deployment.yaml
+- ingress.yaml
+- pvc.yaml
+- secrets.yaml
+- service.yaml
+- serviceaccount.yaml
+- job.yaml # workaround for applicationset not supporting env substitution, using `preservedFields` in the appset
+- rbac.yaml
+configMapGenerator:
+- name: nginx-config
+  files:
+  - ../../django-app/nginx/default.conf # load the nginx default.conf from the django project directory
+# the newName: def below has a seemingly hardcoded string, but is updated by image updater dynamically, since it has access to the repo. # pending . abstract from main kustomization.yaml
+images: # argocd image-updater # required for argocd to sync
+- name: django-production-kustomize
+  newName: 350206045032.dkr.ecr.us-east-1.amazonaws.com/django-production
+  newTag: 16784e48e2a99b8c8b0ba0ad3b85cfbff73fd0fb

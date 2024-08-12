@@ -1,0 +1,14 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: argo-cd-argocd-repo-server
+  namespace: argocd
+spec:
+  template:
+    spec:
+      initContainers:
+      - name: copyutil # copyutil
+        envFrom:
+        - secretRef:
+            name: argocd-secrets-global
+            optional: true

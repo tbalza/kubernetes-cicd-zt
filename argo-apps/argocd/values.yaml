@@ -1,0 +1,91 @@
+crds:
+  keep: false # Delete CRDs on chart uninstall
+
+global:
+  domain: argocd.tbalza.net # Used for ingresses, certificates, SSO, notifications, etc. (blank allows all domains) # check if it can be replaced by ingress
+#  env:
+#    - name: ARGOCD_SYNC_WAVE_DELAY
+#      value: 15
+#  image:
+#    tag: "v2.11.4"
+  nodeSelector:
+    role: ci-cd
+
+configs:
+#  cm: # Needed if not using plugin
+#    kustomize.buildOptions: "--load-restrictor LoadRestrictionsNone --enable-helm" # Enable Kustomize to install helm charts
+  params:
+    server.insecure: true # Necessary when SSL termination is handled by ALB
+    applicationsetcontroller.enable.progressive.syncs: true # ApplicationSet compatible with Progressive Syncs. (SyncWave must use app of apps)
+    applicationsetcontroller.default.application.progressing.timeout: 600 # When using rollingSync, prevent sync timeout error with kube prometheus stack (default 300 seconds)
+  cmp: # ArgoCD cmp "env substitution" plugin. Needed since kustomize can't retrieve remote values (env/secrets/configmaps) for its own installation (only for resulting pods etc.)
+    create: true
+    plugins: # Plugin yaml files to be added to argocd-cmp-cm
+      substitution:
+        generate:
+          command: ["/bin/sh", "-c"] # ["/bin/sh"] # kustomize build --load-restrictor LoadRestrictionsNone --enable-helm --output /tmp | envsubst "$AVAILABLE_VARS"
+          args: # --output /tmp
+            - |
+              AVAILABLE_VARS=$(env | cut -d "=" -f 1 | awk '{print "$"$1}' | tr "\n" " ")
+              kustomize build --load-restrictor LoadRestrictionsNone --enable-helm | envsubst "$AVAILABLE_VARS"
+        preserveFileMode: true # by default cmp resets file mode
+        allowConcurrency: true
+
+server:
+  ingress: # Working helm ingress with externalDNS as per https://github.com/argoproj/argo-helm/tree/main/charts/argo-cd # no grpc warning errors
+    enabled: false # Configured with ingress.yaml
+#  annotations:
+#    argocd.argoproj.io/sync-wave: "1"
+
+applicationSet:
+  enabled: true
+
+dex:
+  enabled: false # This is for SSO
+
+repoServer:
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"
+  rbac: # check. when restricting, remember restart for deployment argo-cd-argocd-repo-server must be allowed (for the job, that restarts and allows for env to be loaded)
+     - apiGroups:
+       - "*"
+       resources:
+       - "*"
+       verbs:
+       - "*"
+
+  extraContainers:
+    - name: substitution
+      command: [ "/bin/sh", "-c" ]
+      args: # restart argocd-cmp-server (via kill -9) for envFrom to become effective
+        - |
+          /var/run/argocd/argocd-cmp-server
+          sleep 5
+          SERVER_PID=$(ps aux | grep '[a]rgocd-cmp-server' | awk '{print $2}')
+          kill -9 $SERVER_PID
+      envFrom: # this loads all the secrets as ENV variables in the cmp plugin container
+        - secretRef:
+            name: argocd-secrets-global
+            optional: true
+      image: tbalza/envsubst:latest # pending replace with generic image, install kustomize, helm, envsubst # quay.io/argoproj/argocd # '{{ default .Values.global.image.repository .Values.repoServer.image.repository }}:{{ default (include "argo-cd.defaultTag" .) .Values.repoServer.image.tag }}'
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 999
+        allowPrivilegeEscalation: true # check
+      volumeMounts:
+        - mountPath: /var/run/argocd
+          name: var-files
+        - mountPath: /home/argocd/cmp-server/plugins
+          name: plugins
+        - mountPath: /home/argocd/cmp-server/config/plugin.yaml
+          subPath: substitution.yaml  # Maps the specific config file for this plugin
+          name: argocd-cmp-cm
+        - mountPath: /tmp
+          name: cmp-tmp
+
+  volumes:
+    - name: argocd-cmp-cm
+      configMap:
+        name: argocd-cmp-cm
+    - name: cmp-tmp # scratch space for any temporary processing
+      emptyDir: {}

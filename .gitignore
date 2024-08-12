@@ -1,0 +1,15 @@
+*.tfstate
+*.tfstate.backup
+*.tfstate.lock.info
+*.tfvars
+.terraform.lock.hcl
+.terraform/
+.DS_Store
+.idea/
+working*
+venv/
+*.pyc
+__pycache__/
+db.sqlite3
+*.swp
+.env
