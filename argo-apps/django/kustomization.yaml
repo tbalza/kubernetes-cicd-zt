@@ -13,7 +13,7 @@ resources:
 configMapGenerator:
 - name: nginx-config
   files:
-  - ../../django-app/nginx/default.conf # load the nginx default.conf from the django project directory
+  - ../../django-todo/nginx/default.conf # load the nginx default.conf from the django project directory
 # the newName: def below has a seemingly hardcoded string, but is updated by image updater dynamically, since it has access to the repo. # pending . abstract from main kustomization.yaml
 images: # argocd image-updater # required for argocd to sync
 - name: django-production-kustomize
