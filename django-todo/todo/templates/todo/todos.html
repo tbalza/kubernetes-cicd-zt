@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tailwind Todo</title>
+</head>
+<body class="bg-gray-50">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="py-6">
+            <h1 class="text-3xl font-bold text-gray-900">Tailwind Todo</h1>
+            <p class="mt-2 text-sm text-gray-600">Manage your tasks efficiently and effortlessly.</p>
+        </div>
+        <div class="mt-4">
+            <form
+                class="flex items-center space-x-4 mb-6"
+                hx-post="/add-todo/"
+                hx-target="#todos"
+                hx-swap="afterend"
+            >
+                <input type="text" name="title" class="flex-1 p-4 bg-white border border-gray-300 rounded-lg shadow-sm" placeholder="Add a new task">
+                <button class="px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700 shadow">Add</button>
+            </form>
+        </div>
+        <div class="bg-white shadow rounded-lg divide-y divide-gray-200">
+            <div class="p-4 grid grid-cols-6 gap-4">
+                <div class="col-span-5">
+                    <p class="text-sm font-semibold text-gray-900">Title</p>
+                </div>
+                <div class="col-span-1 text-right">
+                    <p class="text-sm font-semibold text-gray-900">Actions</p>
+                </div>
+            </div>
+            <div id="todos" class="divide-y divide-gray-200">
+                {% for todo in todos %}
+                    {% include 'todo/partials/todo.html' %}
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/htmx.org@1.6.1"></script>
+    <script>
+        document.body.addEventListener('htmx:configRequest', (event) => {
+            event.detail.headers['X-CSRFToken'] = '{{ csrf_token }}';
+        });
+        document.body.addEventListener('htmx:afterRequest', (event) => {
+            document.querySelector("input").value = '';
+        });
+    </script>
+</body>
+</html>

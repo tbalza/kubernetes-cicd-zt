@@ -1,0 +1,8 @@
+<form
+    hx-post="/edit/{{ todo.id }}/"
+    hx-target="closest article"
+    hx-swap="outerHTML"
+    class="flex items-center"
+>
+    <input class="px-4 text-sm text-gray-900 rounded-sm" style="min-width: 0; width: 100%; background-color: transparent;" name="title" type="text" value="{{ todo.title }}" autofocus>
+</form>
