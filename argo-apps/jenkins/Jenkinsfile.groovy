@@ -88,8 +88,8 @@ pipeline {
             steps {
                 container('kaniko') {
                     sh """
-                    /kaniko/executor --dockerfile /home/jenkins/agent/workspace/build-django/django-app/Dockerfile \
-                                      --context /home/jenkins/agent/workspace/build-django/django-app/ \
+                    /kaniko/executor --dockerfile /home/jenkins/agent/workspace/build-django/django-todo/Dockerfile \
+                                      --context /home/jenkins/agent/workspace/build-django/django-todo/ \
                                       --destination ${ECR_REPO}:${env.GIT_COMMIT} \
                                       --cache=true
                     """
