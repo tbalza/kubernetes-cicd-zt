@@ -21,7 +21,7 @@ locals {
   rds_user   = "django"
   rds_dbname = "postgres"
   rds_port   = 5432 # postgres default
-  repo_url   = "https://github.com/tbalza/kubernetes-cicd.git"
+  repo_url   = "https://github.com/tbalza/kubernetes-cicd-zt.git"
 
   # SSM Parameter values
   parameters = {
