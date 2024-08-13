@@ -64,7 +64,7 @@ pipeline {
                 container('jnlp') {
                     script {
                         if (env.LATEST_ECR_COMMIT) {
-                            def changes = sh(script: "git diff --name-only ${env.LATEST_ECR_COMMIT} ${env.GIT_COMMIT} | grep '^django-app/' || true", returnStdout: true).trim()
+                            def changes = sh(script: "git diff --name-only ${env.LATEST_ECR_COMMIT} ${env.GIT_COMMIT} | grep '^django-todo/' || true", returnStdout: true).trim()
                             echo "Git diff completed between ${env.LATEST_ECR_COMMIT} and ${env.GIT_COMMIT}."
                             if (changes.isEmpty()) {
                                 echo "No changes in the Django directory since the last ECR image commit. No build needed."
