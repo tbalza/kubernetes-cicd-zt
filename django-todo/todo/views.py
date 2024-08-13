@@ -44,4 +44,4 @@ def delete_todo(request, pk):
     todo = Todo.objects.get(pk=pk)
     todo.delete()
 
-    return HttpResponse()  #
+    return HttpResponse()
