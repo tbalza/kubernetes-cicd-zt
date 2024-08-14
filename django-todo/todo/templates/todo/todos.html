@@ -44,7 +44,7 @@
     <script src="https://unpkg.com/htmx.org@1.6.1"></script>
     <script>
     document.body.addEventListener('htmx:configRequest', (event) => {
-        // get the CSRF token from the hidden input
+        // get the CSRF token from the hidden input.
         event.detail.headers['X-CSRFToken'] = document.querySelector('[name=csrfmiddlewaretoken]').value;
     });
     document.body.addEventListener('htmx:afterRequest', (event) => {
