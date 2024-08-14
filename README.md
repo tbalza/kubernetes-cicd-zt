@@ -1,3 +1,6 @@
+jenkins webhook
+
+
 sudo dscacheutil -flushcache; sudo killall -HUP mDNSResponder
 
 rm ~/.kube/config
