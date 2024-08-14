@@ -43,12 +43,20 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/htmx.org@1.6.1"></script>
     <script>
-    document.body.addEventListener('htmx:configRequest', (event) => {
-        // get the CSRF token from the hidden input.
-        event.detail.headers['X-CSRFToken'] = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    document.body.addEventListener('htmx:configRequest', function(event) {
+    let csrfToken = document.querySelector('input[name="csrfmiddlewaretoken"]').value;
+    if (csrfToken) {
+        event.detail.headers['X-CSRFToken'] = csrfToken;
+    } else {
+        console.error('CSRF token not found');
+    }
     });
-    document.body.addEventListener('htmx:afterRequest', (event) => {
-        document.querySelector("input[name='title']").value = '';  // clear the input field after request
+
+    document.body.addEventListener('htmx:afterRequest', function(event) {
+        let inputField = document.querySelector("input[name='title']");
+        if (inputField) {
+            inputField.value = '';  // clear the text input field
+        }
     });
 </script>
 
