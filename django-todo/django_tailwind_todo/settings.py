@@ -50,6 +50,8 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+CSRF_COOKIE_SECURE = True
+
 ROOT_URLCONF = 'django_tailwind_todo.urls'
 
 TEMPLATES = [
