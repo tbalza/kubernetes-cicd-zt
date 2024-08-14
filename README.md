@@ -1,5 +1,8 @@
 jenkins webhook
 
+helm repo update
+
+tree -I '.terraform|venv'
 
 sudo dscacheutil -flushcache; sudo killall -HUP mDNSResponder
 

@@ -55,7 +55,7 @@ provider "kubectl" {
 
 # Dynamically load values from argocd's kustomization.yaml
 locals {
-  argocd_config = yamldecode(file("../../${path.module}/argo-apps/argocd/kustomization.yaml"))
+  argocd_config = yamldecode(file("../../argo-apps/argocd/kustomization.yaml"))
 
   # IDE may show "unresolved reference" even though it's linked correctly in tf.
   argocd_helm_chart = local.argocd_config.helmCharts[0] # Access the first (or only) element in the list
@@ -84,7 +84,7 @@ resource "helm_release" "argo_cd" {
 
   create_namespace = true
 # "${tostring(data.terraform_remote_state.eks.outputs.ecr_repo_url)}"
-  values = [file("../../${path.module}/argo-apps/argocd/values.yaml")]
+  values = [file("../../argo-apps/argocd/values.yaml")]
 #  values = [
 #    file("../../${path.module}/argo-apps/argocd/values.yaml"),
 #    <<-EOT
@@ -119,7 +119,7 @@ resource "helm_release" "argo_cd" {
 ## Kustomize uses helmChart for 3rd party charts with local repo overrides (values.yaml) and load additional k8s manifests
 
 resource "kubectl_manifest" "example_applicationset" {
-  yaml_body = file("../../${path.module}/argo-apps/argocd/applicationset.yaml")
+  yaml_body = file("../../argo-apps/argocd/applicationset.yaml")
 
   depends_on = [
     helm_release.argo_cd # kubectl_manifest.kustomize_patch
