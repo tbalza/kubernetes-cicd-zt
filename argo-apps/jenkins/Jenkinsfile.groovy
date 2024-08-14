@@ -29,7 +29,7 @@ pipeline {
             steps {
                 container('jnlp') {
                     script {
-                        def images = ecrListImages(repositoryName: '${ECR_REPO_NAME}') // pending make dynamic
+                        def images = ecrListImages(repositoryName: "${ECR_REPO_NAME}") // pending make dynamic
                         def tagList = []
 
                         if (images) {

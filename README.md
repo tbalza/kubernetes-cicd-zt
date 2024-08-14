@@ -110,6 +110,7 @@ kubectl get svc -n argocd
 
 Access argocd cli tool: port-forwarded the argo server to localhost port 8080
                             kubectl port-forward svc/argo-cd-argocd-server -n argocd 8080:443
+                            kubectl port-forward svc/jenkins -n jenkins 8181:8080
 
 argocd login localhost:8080 --username admin --password PASSWORD
 WARNING: server certificate had error: x509: “Argo CD” certificate is not trusted. Proceed insecurely (y/n)? y
