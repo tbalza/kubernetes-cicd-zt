@@ -25,7 +25,24 @@ pipeline {
                 }
             }
         }
-        stage('Check ECR for Latest Image Commit') { // pipeline-aws plugin outputs ecr images in a non-standard way, that needs to be filtered
+        stage('Check Commit Author') {
+            steps {
+                container('jnlp') {
+                    script {
+                        env.GIT_AUTHOR = sh(script: "git show -s --format='%an' ${env.GIT_COMMIT}", returnStdout: true).trim()
+                        if (env.GIT_AUTHOR == 'argocd-image-updater') {
+                            echo "Commit by argocd-image-updater, skipping further actions."
+                            // Marking no build needed
+                            env.BUILD_NEEDED = 'false'
+                        }
+                    }
+                }
+            }
+        }
+        stage('Check ECR for Latest Image Commit') {
+            when {
+                expression { env.BUILD_NEEDED != 'false' }
+            }
             steps {
                 container('jnlp') {
                     script {
@@ -59,7 +76,10 @@ pipeline {
                 }
             }
         }
-        stage('Check for Django Changes') { // check the diff of the the commit id (which is the name of image tag) vs. the current comment and check for changes in django
+        stage('Check for Django Changes') {
+            when {
+                expression { env.BUILD_NEEDED == 'true' }
+            }
             steps {
                 container('jnlp') {
                     script {
