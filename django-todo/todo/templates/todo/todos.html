@@ -18,7 +18,6 @@
                 hx-target="#todos"
                 hx-swap="afterend"
             >
-                {% csrf_token %}
                 <input type="text" name="title" class="flex-1 p-4 bg-white border border-gray-300 rounded-lg shadow-sm" placeholder="Add a new task">
                 <button class="px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700 shadow">Add</button>
             </form>
@@ -43,14 +42,12 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/htmx.org@1.6.1"></script>
     <script>
-    document.body.addEventListener('htmx:configRequest', (event) => {
-        // get the CSRF token from the hidden input.
-        event.detail.headers['X-CSRFToken'] = document.querySelector('[name=csrfmiddlewaretoken]').value;
-    });
-    document.body.addEventListener('htmx:afterRequest', (event) => {
-        document.querySelector("input[name='title']").value = '';  // clear the input field after request
-    });
-</script>
-
+        document.body.addEventListener('htmx:configRequest', (event) => {
+            event.detail.headers['X-CSRFToken'] = '{{% csrf_token %}}';
+        });
+        document.body.addEventListener('htmx:afterRequest', (event) => {
+            document.querySelector("input").value = '';
+        });
+    </script>
 </body>
 </html>
