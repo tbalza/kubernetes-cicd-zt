@@ -19,4 +19,4 @@ configMapGenerator:
 images:
 - name: django-production-kustomize
   newName: 350206045032.dkr.ecr.us-east-1.amazonaws.com/django-production3
-  newTag: db03b10b444b1444e9f94d3c7292ef88417ca8ee
+  newTag: df230d58245454f984fc97bbddeeaa14b3e6d153
