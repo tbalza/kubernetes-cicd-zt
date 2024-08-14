@@ -246,6 +246,14 @@ module "eks" {
   cluster_endpoint_public_access  = true
   cluster_endpoint_private_access = true
 
+  # Control Plane Logging
+  # logs cloudwatch
+  #cluster_enabled_log_types              = ["api", "audit", "authenticator", "controllerManager", "scheduler"]
+  #cloudwatch_log_group_retention_in_days = 1
+  #cloudwatch_log_group_kms_key_id        = var.kms_key_arn
+  create_cloudwatch_log_group             = false
+  cloudwatch_log_group_class              = "INFREQUENT_ACCESS"
+
   enable_irsa = true
 
   # To add the current caller identity as an administrator
@@ -427,7 +435,7 @@ module "eks" {
 
       ebs_optimized           = true
       disable_api_termination = false
-      enable_monitoring       = true # Check
+      enable_monitoring       = false # Check # cloudwatch
 
       block_device_mappings = {
         xvda = {
@@ -513,7 +521,8 @@ module "eks" {
 
       ebs_optimized           = true
       disable_api_termination = false
-      enable_monitoring       = true # Check
+      enable_monitoring       = false # Check cloudwatch
+      #cloudwatch_log_group_class = "INFREQUENT_ACCESS" # Check cloudwatch
 
       block_device_mappings = {
         xvdb = {
@@ -2177,10 +2186,10 @@ module "db" {
   skip_final_snapshot     = true
   deletion_protection     = false
 
-  performance_insights_enabled          = true
+  performance_insights_enabled          = false # check cloudwatch
   performance_insights_retention_period = 7
-  create_monitoring_role                = true
-  monitoring_interval                   = 60
+  create_monitoring_role                = false
+  monitoring_interval                   = 0 # 0 disables collecting enhanced metrics
   monitoring_role_name                  = "example-monitoring-role-name"
   monitoring_role_use_name_prefix       = true
   monitoring_role_description           = "Description for monitoring role"
