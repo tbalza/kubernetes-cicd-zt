@@ -27,6 +27,10 @@ DEBUG = os.getenv('DEBUG')
 
 ALLOWED_HOSTS = [f".{os.getenv('DOMAIN')}"]  # prepend dot to allow subdomains
 
+CSRF_COOKIE_SECURE = False
+CSRF_FAILURE_VIEW = 'django.views.csrf.csrf_failure'
+
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')  # ALB SSL termination
 
 # Application definition
 
@@ -49,8 +53,6 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
-
-CSRF_COOKIE_SECURE = True
 
 ROOT_URLCONF = 'django_tailwind_todo.urls'
 
