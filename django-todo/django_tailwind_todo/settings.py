@@ -25,11 +25,9 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG')
 
-ALLOWED_HOSTS = ["*"]  # ALLOWED_HOSTS = [f".{os.getenv('DOMAIN')}"] # prepend dot to allow subdomains
+ALLOWED_HOSTS = ["*"] # pending middleware # ALLOWED_HOSTS = [f".{os.getenv('DOMAIN')}"] # prepend dot to allow subdomains
 
-#CSRF_COOKIE_SECURE = False
 CSRF_TRUSTED_ORIGINS = [f'https://django.{os.getenv("DOMAIN")}']
-#CSRF_COOKIE_DOMAIN = 'django.tbalza.net'
 
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')  # ALB SSL termination
 
