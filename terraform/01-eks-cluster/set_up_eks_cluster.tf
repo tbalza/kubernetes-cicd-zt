@@ -31,6 +31,10 @@ locals {
       value = local.domain
     }
 
+    "django_debug" = {
+      value = "FALSE"
+    }
+
     "region" = {
       value = local.region
     }

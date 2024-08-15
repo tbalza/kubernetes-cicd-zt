@@ -61,17 +61,6 @@ locals {
   argocd_helm_chart = local.argocd_config.helmCharts[0] # Access the first (or only) element in the list
 }
 
-#output "argocd_helm_chart" {
-#  value = local.argocd_helm_chart
-#}
-
-## Create namespace
-#resource "kubernetes_namespace" "argo_cd" {
-#  metadata {
-#    name = "argocd"
-#  }
-#}
-
 resource "helm_release" "argo_cd" {
 
   # IDE may show "unresolved reference" even though it's linked correctly in tf.
