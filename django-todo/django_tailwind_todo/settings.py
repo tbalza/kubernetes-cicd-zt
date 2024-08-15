@@ -25,7 +25,7 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG')
 
-ALLOWED_HOSTS = ["*"]  # ALLOWED_HOSTS = [f".{os.getenv('DOMAIN')}"] # prepend dot to allow subdomains
+ALLOWED_HOSTS = [f".{os.getenv('DOMAIN')}"]  # ALLOWED_HOSTS = [f".{os.getenv('DOMAIN')}"] # prepend dot to allow subdomains
 
 CSRF_COOKIE_SECURE = False
 CSRF_FAILURE_VIEW = 'django.views.csrf.csrf_failure'
