@@ -30,7 +30,7 @@ ALLOWED_HOSTS = [f".{os.getenv('DOMAIN')}"]  # prepend dot to allow subdomains
 CSRF_COOKIE_SECURE = False
 CSRF_FAILURE_VIEW = 'django.views.csrf.csrf_failure'
 
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')  # ALB SSL termination
+#SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')  # ALB SSL termination
 
 # Application definition
 
