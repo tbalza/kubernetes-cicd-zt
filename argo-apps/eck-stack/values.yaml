@@ -3,7 +3,7 @@ eck-elasticsearch:
   annotations:
     eck.k8s.elastic.co/license: basic
   fullnameOverride: elasticsearch # must be reference in eck-kibana: elasticsearchRef:
-  nodeSets: # check indentations for nodeSets, they are different in the documentation examples
+  nodeSets:
   - name: default
     count: 1 # number of replicas
     config:
@@ -44,7 +44,7 @@ eck-kibana:
     http:
       tls:
         selfSignedCertificate:
-          disabled: true # disable HTTPS to account for ALB SSL termination
+          disabled: true # disable tls to account for ALB SSL termination
     count: 1 # number of replicas
     elasticsearchRef:
       name: elasticsearch # must match eck-elasticsearch: fullnameOverride:
@@ -57,7 +57,7 @@ eck-kibana:
 #                value: "--max-old-space-size=2048"
             resources:
               requests:
-                memory: 1Gi # Default 1Gi # check
+                memory: 1Gi
                 cpu: .5
               limits:
                 memory: 2.5Gi
