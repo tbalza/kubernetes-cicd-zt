@@ -1,4 +1,6 @@
 eck-elasticsearch:
+  telemetry:
+    disabled: true
   enabled: true
   annotations:
     eck.k8s.elastic.co/license: basic
@@ -35,6 +37,8 @@ eck-elasticsearch:
           storageClassName: gp3
 
 eck-kibana:
+  telemetry:
+    disabled: true
   enabled: true
   annotations:
     eck.k8s.elastic.co/license: basic
