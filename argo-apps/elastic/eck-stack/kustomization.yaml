@@ -1,14 +1,14 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
-namespace: elastic-stack # crucial for configMapGenerator # stop
+namespace: elastic # crucial for configMapGenerator # stop
 
 helmCharts:
   - name: eck-stack
     repo: https://helm.elastic.co
     version: 2.14.0 # (Chart 2.14.0, App 2.14.0)
     releaseName: eck-stack
-    namespace: elastic-stack
+    namespace: elastic
     includeCRDs: true
     valuesFile: values.yaml
 

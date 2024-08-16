@@ -5,7 +5,7 @@ eck-elasticsearch:
   fullnameOverride: elasticsearch # must be reference in eck-kibana: elasticsearchRef:
   nodeSets: # check indentations for nodeSets, they are different in the documentation examples
   - name: default
-    count: 1 # min ?
+    count: 1 # 3 min ?
     config:
         # Comment out when setting the vm.max_map_count via initContainer, as these are mutually exclusive.
         # For production workloads, it is strongly recommended to increase the kernel setting vm.max_map_count to 262144
@@ -13,18 +13,18 @@ eck-elasticsearch:
         # ref: https://www.elastic.co/guide/en/cloud-on-k8s/current/k8s-virtual-memory.html
         #
       node.store.allow_mmap: false
-      xpack.security.authc: # # Enable anonymous access to allow GCLB health probes to succeed # Ingress?
-        anonymous:
-          username: anon
-          roles: monitoring_user
+#      xpack.security.authc: # # Enable anonymous access to allow GCLB health probes to succeed # Ingress?
+#        anonymous:
+#          username: anon
+#          roles: monitoring_user
     podTemplate:
       spec:
         containers:
           - name: elasticsearch
             resources:
-#              requests:
-#                memory: 0.5Gi # Default 1Gi # check
-#                cpu: 0.5
+              requests:
+                memory: 0.6Gi # Default 1Gi # check
+                cpu: 0.6
               limits:
                 memory: 1Gi # check
                 cpu: 1
