@@ -1,0 +1,31 @@
+# resources define the container resource limits for the operator.
+resources:
+  limits:
+    cpu: 1
+    memory: 1Gi
+  requests:
+    cpu: 100m
+    memory: 150Mi
+
+#global:
+#  kubeVersion: "1.29"
+
+config:
+  logVerbosity: "-2" # -2 errors only, -1 Errors and warnings, 0 Errors, warnings, and information
+  metrics:
+    port: "0" # Set to 0 to disable metrics reporting.
+  # array of regular expressions of node labels which are allowed to be copied as annotations on Elasticsearch Pods.
+  exposedNodeLabels: [ "topology.kubernetes.io/.*", "failure-domain.beta.kubernetes.io/.*" ]
+
+telemetry:
+  disabled: true
+
+nodeSelector:
+  role: "ci-cd"
+
+serviceAccount:
+  create: false
+  automountServiceAccountToken: true
+#  annotations:
+#    eks.amazonaws.com/role-arn: "arn:aws:iam::${ARGOCD_AWS_ACCOUNT}:role/ElasticRole"
+  name: "eck-operator"

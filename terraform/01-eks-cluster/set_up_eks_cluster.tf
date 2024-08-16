@@ -579,6 +579,20 @@ module "eks" {
   # this creates serviceAccounts for each entry (in namespace "default"?)
   access_entries = {
 
+    eck-operator = {
+      principal_arn     = aws_iam_role.elastic_operator.arn
+      kubernetes_groups = []
+
+      policy_associations = {
+        admin_policy = {
+          policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy" # check
+          access_scope = {
+            type = "cluster" # check
+          }
+        }
+      }
+    }
+
     external-dns = {
       principal_arn     = aws_iam_role.external_dns.arn
       kubernetes_groups = []
@@ -719,6 +733,37 @@ module "eks" {
 #}
 
 ## STS
+
+resource "aws_iam_role" "elastic_operator" {
+  name = "ElasticRole"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Action = "sts:AssumeRole",
+        Principal = {
+          Service = "eks.amazonaws.com"
+        },
+      },
+      # External Secrets Operator reqs (jwt auth)
+      {
+        Effect = "Allow",
+        Action = "sts:AssumeRoleWithWebIdentity",
+        Principal = {
+          Federated = module.eks.oidc_provider_arn
+        },
+        Condition = {
+          StringEquals = {
+            "${replace(module.eks.cluster_oidc_issuer_url, "https://", "")}:sub" : "system:serviceaccount:elastic-system:eck-operator" # "namespace:service-account-name"
+          }
+        }
+      },
+    ]
+  })
+}
+
 
 resource "aws_iam_role" "argocd_repo" {
   name = "ArgoCDrepoRole"
