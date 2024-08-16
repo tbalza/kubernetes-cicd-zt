@@ -21,7 +21,7 @@ telemetry:
   disabled: true
 
 nodeSelector:
-  role: "django" # ci-cd
+  role: "django" # this should go in its own nodegroup, but for the purpose of POC assigning group with enough memory
 
 serviceAccount:
   create: false
