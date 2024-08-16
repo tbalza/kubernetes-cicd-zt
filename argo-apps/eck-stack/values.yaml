@@ -3,66 +3,60 @@ eck-elasticsearch:
   annotations:
     eck.k8s.elastic.co/license: basic
   fullnameOverride: elasticsearch # must be reference in eck-kibana: elasticsearchRef:
-  nodeSets: # check indentations for nodeSets, they are different in the documentation examples
-  - name: default
-    count: 1 # 3 min ?
-    config:
-        # Comment out when setting the vm.max_map_count via initContainer, as these are mutually exclusive.
-        # For production workloads, it is strongly recommended to increase the kernel setting vm.max_map_count to 262144
-        # and leave node.store.allow_mmap unset.
-        # ref: https://www.elastic.co/guide/en/cloud-on-k8s/current/k8s-virtual-memory.html
-        #
-      node.store.allow_mmap: false
+#  nodeSets: # check indentations for nodeSets, they are different in the documentation examples
+#  - name: default
+#    count: 1 # 3 min ?
+#    config:
+#      node.store.allow_mmap: false # vm.max_map_count via initContainer # vm.max_map_count to 262144 # https://www.elastic.co/guide/en/cloud-on-k8s/current/k8s-virtual-memory.html
 #      xpack.security.authc: # # Enable anonymous access to allow GCLB health probes to succeed # Ingress?
 #        anonymous:
 #          username: anon
 #          roles: monitoring_user
-    podTemplate:
-      spec:
-        containers:
-          - name: elasticsearch
-            resources:
-              requests:
-                memory: 0.6Gi # Default 1Gi # check
-                cpu: 0.6
-              limits:
-                memory: 1Gi # check
-                cpu: 1
-    volumeClaimTemplates:
-      - metadata:
-          name: elasticsearch-data
-        spec:
-          accessModes:
-            - ReadWriteOnce
-          resources:
-            requests:
-              storage: 10Gi
-          storageClassName: gp3
-
+#    podTemplate:
+#      spec:
+#        containers:
+#          - name: elasticsearch
+#            resources:
+#              requests:
+#                memory: 0.6Gi # Default 1Gi # check
+#                cpu: 0.6
+#              limits:
+#                memory: 1Gi # check
+#                cpu: 1
+#    volumeClaimTemplates:
+#      - metadata:
+#          name: elasticsearch-data
+#        spec:
+#          accessModes:
+#            - ReadWriteOnce
+#          resources:
+#            requests:
+#              storage: 10Gi
+#          storageClassName: gp3
 
 eck-kibana:
   enabled: true
   annotations:
     eck.k8s.elastic.co/license: basic
   #fullnameOverride: kibana
-  spec:
-    count: 1 # number of replicas
-    elasticsearchRef:
-      name: elasticsearch # must match eck-elasticsearch: fullnameOverride:
-    podTemplate:
-      spec:
-        containers:
-          - name: kibana
-            env:
-              - name: NODE_OPTIONS
-                value: "--max-old-space-size=2048"
-            resources:
-              requests:
-                memory: 0.5Gi # Default 1Gi # check
-                cpu: 0.5
-              limits:
-                memory: 2.5Gi
-                cpu: 2
+#  spec:
+#    count: 1 # number of replicas
+#    elasticsearchRef:
+#      name: elasticsearch # must match eck-elasticsearch: fullnameOverride:
+#    podTemplate:
+#      spec:
+#        containers:
+#          - name: kibana
+#            env:
+#              - name: NODE_OPTIONS
+#                value: "--max-old-space-size=2048"
+#            resources:
+#              requests:
+#                memory: 0.5Gi # Default 1Gi # check
+#                cpu: 0.5
+#              limits:
+#                memory: 2.5Gi
+#                cpu: 2
 
 eck-agent:
   enabled: false
