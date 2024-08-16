@@ -21,7 +21,7 @@ telemetry:
   disabled: true
 
 nodeSelector:
-  role: "ci-cd"
+  role: "django" # ci-cd
 
 serviceAccount:
   create: false
