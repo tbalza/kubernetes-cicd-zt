@@ -41,6 +41,10 @@ eck-kibana:
     eck.k8s.elastic.co/license: basic
   fullnameOverride: kibana
   spec:
+    http:
+      tls:
+        selfSignedCertificate:
+          disabled: true
     count: 1 # number of replicas
     elasticsearchRef:
       name: elasticsearch # must match eck-elasticsearch: fullnameOverride:
