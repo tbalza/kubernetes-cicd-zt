@@ -41,6 +41,8 @@ eck-kibana:
     eck.k8s.elastic.co/license: basic
   fullnameOverride: kibana
   spec:
+    config:
+      telemetry.optIn: false
     http:
       tls:
         selfSignedCertificate:
