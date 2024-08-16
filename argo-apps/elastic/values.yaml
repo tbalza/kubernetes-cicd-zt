@@ -26,6 +26,4 @@ nodeSelector:
 serviceAccount:
   create: false
   automountServiceAccountToken: true
-#  annotations:
-#    eks.amazonaws.com/role-arn: "arn:aws:iam::${ARGOCD_AWS_ACCOUNT}:role/ElasticRole"
   name: "eck-operator"
