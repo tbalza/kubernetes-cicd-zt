@@ -8,7 +8,7 @@ eck-elasticsearch:
     count: 1 # 3 min ?
     config:
       node.store.allow_mmap: false # vm.max_map_count via initContainer # vm.max_map_count to 262144 # https://www.elastic.co/guide/en/cloud-on-k8s/current/k8s-virtual-memory.html
-      xpack.security.authc: # # Enable anonymous access to allow GCLB health probes to succeed # Ingress?
+      xpack.security.authc: # Enable anonymous access to allow GCLB health probes to succeed # Ingress?
         anonymous:
           username: anon
           roles: monitoring_user
