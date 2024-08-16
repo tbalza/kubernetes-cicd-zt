@@ -27,4 +27,4 @@ spec:
           service:
             name: kibana-kb-http
             port:
-              number: 80
+              number: 5601
