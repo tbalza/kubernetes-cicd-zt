@@ -14,7 +14,7 @@ fluentbit:
       cpu: 10m
       memory: 25Mi
   serviceAccountAnnotations: {} # Specify additional custom annotations for fluentbit-serviceaccount
-  logLevel: "ERROR"
+  logLevel: "-2"
 
   nodeSelector:
     role: "django" # this should go in its own nodegroup, but for the purpose of POC assigning group with enough memory
