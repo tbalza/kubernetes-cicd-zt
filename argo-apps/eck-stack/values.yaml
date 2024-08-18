@@ -16,13 +16,10 @@ eck-elasticsearch:
       xpack.security.enabled: false # Enable security features
       xpack.security.http.ssl: # Enable encryption for HTTP API client connections, such as Kibana, Logstash, and Agents
         enabled: false
-        keystore.path: certs/http.p12
       xpack.security.transport.ssl: # Enable encryption and mutual authentication between cluster nodes
-        enabled: false
-        verification_mode: certificate
-        keystore.path: certs/transport.p12
-        truststore.path: certs/transport.p12
+        enabled: true # should be set to true even though http.ssl is set to false
       elasticsearch.ssl.verificationMode: none
+      # don't forget to change your protocol field for readinessProbe to http, and also change protocol for elasticsearch in kibana chart to http.
 
     podTemplate:
       spec:
@@ -55,6 +52,7 @@ eck-kibana:
     config:
       telemetry.optIn: false
       telemetry.allowChangingOptInStatus: false
+      server.publicBaseUrl: https://kibana.tbalza.net # pending
     http:
       tls:
         selfSignedCertificate:
