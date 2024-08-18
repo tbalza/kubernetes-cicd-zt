@@ -13,16 +13,5 @@ helmCharts:
     valuesFile: values.yaml
 
 resources: # https://github.com/fluent/fluent-operator/tree/master/manifests/logging-stack
-#  - fluentbit-fluentBit.yaml
-#  - fluentbitconfig-fluentBitConfig.yaml
-#  - input-tail.yaml
-#  - input-systemd.yaml
-#  - filter-kubernetes.yaml
-#  - filter-systemd.yaml
   - output-elasticsearch.yaml
-#  - output-forward.yaml
-#  - output-kafka.yaml
-#  - filter-containerd.yaml
-#  - fluentbit-containerd-config.yaml
-#  - systemd-lua-config.yaml
   - serviceaccount.yaml
