@@ -103,7 +103,7 @@ fluentbit:
       # https://github.com/fluent/fluent-operator/blob/master/charts/fluent-operator/templates/fluentbit-containerd-config.yaml
       enable: true
     systemd:
-      enable: true
+      enable: false
 
   # removes the hostPath mounts for varlibcontainers, varlogs and systemd.
   disableLogVolumes: false
