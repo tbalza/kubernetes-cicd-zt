@@ -13,6 +13,17 @@ eck-elasticsearch:
         anonymous:
           username: anon
           roles: monitoring_user
+      xpack.security.enabled: false # Enable security features
+      xpack.security.http.ssl: # Enable encryption for HTTP API client connections, such as Kibana, Logstash, and Agents
+        enabled: false
+        keystore.path: certs/http.p12
+      xpack.security.transport.ssl: # Enable encryption and mutual authentication between cluster nodes
+        enabled: false
+        verification_mode: certificate
+        keystore.path: certs/transport.p12
+        truststore.path: certs/transport.p12
+      elasticsearch.ssl.verificationMode: none
+
     podTemplate:
       spec:
         containers:
