@@ -17,5 +17,5 @@ spec:
     logstashFormat: true
     timeKey: "@timestamp"
     index: "fluent-bit"
-    httpUser: elastic
-    httpPassword: y4Q4xwzD6IE5PS3iO3464lH6 # ${HTTP_PASSWORD} # testing hardcoded key before making it dynamic
+    httpUser: "elastic"
+    httpPassword: "y4Q4xwzD6IE5PS3iO3464lH6" # ${HTTP_PASSWORD} # testing hardcoded key before making it dynamic

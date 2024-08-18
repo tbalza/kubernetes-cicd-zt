@@ -764,7 +764,7 @@ module "fluentbit_irsa_role" {
   oidc_providers = {
     main = {
       provider_arn               = module.eks.oidc_provider_arn #data.terraform_remote_state.k8s-cluster.outputs.cluster_oidc_provider_arn
-      namespace_service_accounts = ["fluent:fluentbit"] # ["${var.fluentbit_namespace}:${var.fluentbit_service_account_name}"]
+      namespace_service_accounts = ["fluent:fluent-bit"] # ["${var.fluentbit_namespace}:${var.fluentbit_service_account_name}"]
     }
   }
 }
