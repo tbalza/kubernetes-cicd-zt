@@ -43,6 +43,7 @@ eck-kibana:
   spec:
     config:
       telemetry.optIn: false
+      telemetry.allowChangingOptInStatus: false
     http:
       tls:
         selfSignedCertificate:
