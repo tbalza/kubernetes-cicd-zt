@@ -58,7 +58,7 @@ fluentbit:
     #      path: ""
     #      bufferSize: "4KB"
       index: "fluent-bit"
-      httpUser:
+      httpUser: #  OIDC/JWT https://www.elastic.co/guide/en/cloud-on-k8s/master/k8s-auth-config-using-stack-config-policy.html
         valueFrom:
           secretKeyRef:
             name: elasticsearch-es-elastic-user  # The secret name
