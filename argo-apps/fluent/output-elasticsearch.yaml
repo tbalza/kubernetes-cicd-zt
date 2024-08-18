@@ -18,8 +18,13 @@ spec:
     timeKey: "@timestamp"
     index: "fluent-bit"
     #httpUser: "elastic"
+    httpUser:
+      valueFrom:
+        secretKeyRef:
+          name: elasticsearch-es-elastic-user  # The secret name
+          key: username  # The key within the secret holding the password
     httpPassword:
       valueFrom:
         secretKeyRef:
           name: elasticsearch-es-elastic-user  # The secret name
-          key: elastic  # The key within the secret holding the password
+          key: password  # The key within the secret holding the password
