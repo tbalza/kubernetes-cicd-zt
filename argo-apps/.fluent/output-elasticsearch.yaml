@@ -18,4 +18,4 @@ spec:
     timeKey: "@timestamp"
     index: "fluent-bit"
     httpUser: elastic
-    httpPassword: ${variable}
+    httpPassword: ${HTTP_PASSWORD} # ${HTTP_PASSWORD}

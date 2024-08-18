@@ -1,0 +1,45 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: fluent-all-access
+rules:
+- apiGroups: ["*"]  # Allows access to all API groups
+  resources: ["*"]  # Allows access to all resources
+  verbs: ["*"]      # Allows all actions
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: fluent-all-access-binding
+subjects:
+- kind: ServiceAccount
+  name: fluentbit
+  namespace: fluent
+roleRef:
+  kind: ClusterRole
+  name: fluent-all-access
+  apiGroup: rbac.authorization.k8s.io
+#---
+#apiVersion: rbac.authorization.k8s.io/v1
+#kind: Role
+#metadata:
+#  namespace: eck-stack
+#  name: fluent-read-secrets
+#rules:
+#- apiGroups: [""]
+#  resources: ["secrets"]
+#  verbs: ["get", "list"]
+#---
+#apiVersion: rbac.authorization.k8s.io/v1
+#kind: RoleBinding
+#metadata:
+#  name: fluent-read-secrets-binding
+#  namespace: eck-stack
+#subjects:
+#- kind: ServiceAccount
+#  name: fluentbit
+#  namespace: fluent
+#roleRef:
+#  kind: Role
+#  name: fluent-read-secrets
+#  apiGroup: rbac.authorization.k8s.io
