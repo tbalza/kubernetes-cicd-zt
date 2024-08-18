@@ -28,3 +28,4 @@ spec:
         secretKeyRef:
           name: elasticsearch-es-elastic-user  # The secret name
           key: password  # The key within the secret holding the password
+    replaceDots: true
