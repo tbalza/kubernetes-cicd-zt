@@ -13,6 +13,6 @@ helmCharts:
     valuesFile: values.yaml
 
 resources: # https://github.com/fluent/fluent-operator/tree/master/manifests/logging-stack
-  - output-elasticsearch.yaml
+#  - output-elasticsearch.yaml
 #  - serviceaccount.yaml
   - rbac.yaml

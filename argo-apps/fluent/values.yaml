@@ -47,7 +47,7 @@ fluentbit:
 
   output:
     es:
-      enable: false # true
+      enable: true # true
       host: elasticsearch-es-http.eck-stack.svc # elasticsearch-logging-data.kubesphere-logging-system.svc
       port: 9200
       logstashPrefix: ks-logstash-log
@@ -58,9 +58,21 @@ fluentbit:
     #      path: ""
     #      bufferSize: "4KB"
       index: "fluent-bit"
+      httpUser:
+        valueFrom:
+          secretKeyRef:
+            name: elasticsearch-es-elastic-user  # The secret name
+            key: username  # The key within the secret holding the password
+      httpPassword:
+        valueFrom:
+          secretKeyRef:
+            name: elasticsearch-es-elastic-user  # The secret name
+            key: password  # The key within the secret holding the password
 #      httpUser: elastic
 #      httpPassword:
       logstashFormat: true
+      replaceDots: true
+      enableTLS: false
     #      replaceDots: false
     #      enableTLS: false
     #      writeOperation: upsert
