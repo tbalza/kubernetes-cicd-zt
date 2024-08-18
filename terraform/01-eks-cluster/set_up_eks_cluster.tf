@@ -10,7 +10,7 @@ data "aws_availability_zones" "available" {}
 # aws kubernetes v1.29
 
 locals {
-  name            = "django-production3" # cluster name
+  name            = "django-production" # cluster name
   cluster_version = "1.29"               # 1.29
   region          = "us-east-1"
   domain          = "tbalza.net"
@@ -576,8 +576,22 @@ module "eks" {
 
 
 
-  # this creates serviceAccounts for each entry (in namespace "default"?)
+  # check
   access_entries = {
+
+    fluent-operator = {
+      principal_arn     = module.fluentbit_irsa_role.iam_role_arn # aws_iam_role.fluent_operator.arn
+      kubernetes_groups = []
+
+      policy_associations = {
+        admin_policy = {
+          policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy" # check
+          access_scope = {
+            type = "cluster" # check
+          }
+        }
+      }
+    }
 
     eck-operator = {
       principal_arn     = aws_iam_role.elastic_operator.arn
@@ -733,6 +747,60 @@ module "eks" {
 #}
 
 ## STS
+
+# pending check access entries
+# pending implement workspaces
+# pending implement remote state
+
+# https://stackoverflow.com/questions/77439459/configure-iam-for-fluent-bit-on-aws-eks
+# https://github.com/terraform-aws-modules/terraform-aws-iam/tree/master/examples/iam-role-for-service-accounts-eks
+
+module "fluentbit_irsa_role" {
+  source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
+  version = "5.11.1"
+
+  role_name = "fluent_operator" # "company-k8s-fluentbit-cloudwatch-irsa-role-${terraform.workspace}"
+
+  oidc_providers = {
+    main = {
+      provider_arn               = module.eks.oidc_provider_arn #data.terraform_remote_state.k8s-cluster.outputs.cluster_oidc_provider_arn
+      namespace_service_accounts = ["fluent:fluentbit"] # ["${var.fluentbit_namespace}:${var.fluentbit_service_account_name}"]
+    }
+  }
+}
+
+resource "aws_iam_policy" "fluent_logs_policy" {
+  name = "fluentbit-policy"
+
+  description = "Role use to create logs from K8S to elasticsearch"
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Action = [
+          "ec2:DescribeTags",
+          "logs:PutLogEvents",
+          #"cloudwatch:PutMetricData",
+          "logs:DescribeLogStreams",
+          "logs:DescribeLogGroups",
+          "logs:CreateLogStream",
+          "logs:CreateLogGroup"
+        ],
+        Effect   = "Allow",
+        Resource = "*"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_policy_attachment" "attach_fluent_logs_policy" {
+  name       = "attach-fluent-logs-policy"
+  policy_arn = aws_iam_policy.fluent_logs_policy.arn
+  roles      = [module.fluentbit_irsa_role.iam_role_name]
+}
+
+##############
 
 resource "aws_iam_role" "elastic_operator" {
   name = "ElasticRole"

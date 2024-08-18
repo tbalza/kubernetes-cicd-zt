@@ -1,0 +1,274 @@
+# Set this to containerd or crio if you want to collect CRI format logs
+containerRuntime: containerd
+#  If you want to deploy a default Fluent Bit pipeline (including Fluent Bit Input, Filter, and output) to collect Kubernetes logs, you'll need to set the Kubernetes parameter to true
+# see https://github.com/fluent/fluent-operator/tree/master/manifests/logging-stack
+Kubernetes: true
+
+operator:
+  nodeSelector:
+    role: "django" # this should go in its own nodegroup, but for the purpose of POC assigning group with enough memory
+
+fluentbit:
+  # Installs a sub chart carrying the CRDs for the fluent-bit controller. The sub chart is enabled by default.
+  # fluentbit resources. If you do want to specify resources, adjust them as necessary
+  # You can adjust it based on the log volume.
+  resources:
+    limits:
+      cpu: 500m
+      memory: 200Mi
+    requests:
+      cpu: 10m
+      memory: 25Mi
+  # Specify additional custom annotations for fluentbit-serviceaccount
+  serviceAccountAnnotations: {}
+  logLevel: "ERROR"
+
+  nodeSelector:
+    role: "django" # this should go in its own nodegroup, but for the purpose of POC assigning group with enough memory
+  # Node tolerations applied to Fluent Bit pods. Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
+  tolerations:
+    - operator: Exists
+  # Priority Class applied to Fluent Bit pods. Ref: https://kubernetes.io/docs/concepts/scheduling-eviction/pod-priority-preemption/#priorityclass
+  priorityClassName: ""
+  # Environment variables that can be passed to fluentbit pods
+  envVars: []
+  #  - name: FOO
+  #    value: "bar"
+  schedulerName: ""
+
+  # Remove the above empty volumes and volumesMounts, and then set additionalVolumes and additionalVolumesMounts as below if you want to collect node exporter metrics
+  # additionalVolumes:
+  #   - name: hostProc
+  #     hostPath:
+  #       path: /proc/
+  #   - name: hostSys
+  #     hostPath:
+  #       path: /sys/
+  # Uncomment the code if you intend to create the volume for buffer storage in case the storage type "filesystem" is being used in the configuration of the fluentbit service.
+  #   - name: hostBuffer
+  #     hostPath:
+  #       path: /tmp/fluent-bit-buffer
+  # additionalVolumesMounts:
+  #   - mountPath: /host/sys
+  #     mountPropagation: HostToContainer
+  #     name: hostSys
+  #     readOnly: true
+  #   - mountPath: /host/proc
+  #     mountPropagation: HostToContainer
+  #     name: hostProc
+  #     readOnly: true
+  # Uncomment the code if you intend to mount the volume for buffer storage in case the storage type "filesystem" is being used in the configuration of the fluentbit service.
+  #   - mountPath: /host/fluent-bit-buffer
+  #     mountPropagation: HostToContainer
+  #     name: hostBuffer
+
+
+  namespaceFluentBitCfgSelector: {}
+
+  # Set a limit of memory that Tail plugin can use when appending data to the Engine.
+  # You can find more details here: https://docs.fluentbit.io/manual/pipeline/inputs/tail#config
+  # If the limit is reach, it will be paused; when the data is flushed it resumes.
+  # if the inbound traffic is less than 2.4Mbps, setting memBufLimit to 5MB is enough
+  # if the inbound traffic is less than 4.0Mbps, setting memBufLimit to 10MB is enough
+  # if the inbound traffic is less than 13.64Mbps, setting memBufLimit to 50MB is enough
+  input:
+    tail:
+      enable: true
+      refreshIntervalSeconds: 10
+      memBufLimit: 100MB
+      bufferMaxSize: ""
+      path: "/var/log/containers/*.log"
+      skipLongLines: true
+      readFromHead: false
+      # Use storageType as "filesystem" if you want to use filesystem as the buffering mechanism for tail input.
+      storageType: memory
+      pauseOnChunksOverlimit: "off"
+      # multiline.parser
+      # multilineParser: "docker, cri"
+    systemd:
+      enable: true
+      systemdFilter:
+        enable: true
+        filters: []
+      path: "/var/log/journal"
+      includeKubelet: true
+      stripUnderscores: "off"
+      # Use storageType as "filesystem" if you want to use filesystem as the buffering mechanism for systemd input.
+      storageType: memory
+      pauseOnChunksOverlimit: "off"
+    nodeExporterMetrics: {}
+    # uncomment below nodeExporterMetrics section if you want to collect node exporter metrics
+  #   nodeExporterMetrics:
+  #     tag: node_metrics
+  #     scrapeInterval: 15s
+  #     path:
+  #       procfs: /host/proc
+  #       sysfs: /host/sys
+    fluentBitMetrics: {}
+    # uncomment below fluentBitMetrics section if you want to collect fluentBit metrics
+#    fluentBitMetrics:
+#      scrapeInterval: "2"
+#      scrapeOnStart: true
+#      tag: "fb.metrics"
+
+  # Configure the output plugin parameter in FluentBit.
+  # You can set enable to true to output logs to the specified location.
+  output:
+    #  You can find more supported output plugins here: https://github.com/fluent/fluent-operator/tree/master/docs/plugins/fluentbit/output
+    es:
+      enable: true
+      host: elasticsearch-logging-data.eck-stack.svc # elasticsearch-logging-data.kubesphere-logging-system.svc
+      port: 9200
+      logstashPrefix: ks-logstash-log
+      bufferSize: 20MB
+      traceError: true # handling and debugging in the context of logs, not about forwarding trace data.
+      logstashPrefixKey: ks-logstash-log
+    #      suppressTypeName: "On"
+    #      path: ""
+    #      bufferSize: "4KB"
+      index: "fluent-bit"
+    #      httpUser:
+    #      httpPassword:
+      logstashFormat: true
+    #      replaceDots: false
+    #      enableTLS: false
+    #      writeOperation: upsert
+    #      tls:
+    #        verify: On
+    #        debug: 1
+    #        caFile: "<Absolute path to CA certificate file>"
+    #        caPath: "<Absolute path to scan for certificate files>"
+    #        crtFile: "<Absolute path to private Key file>"
+    #        keyFile: "<Absolute path to private Key file>"
+    #        keyPassword:
+    #        vhost: "<Hostname to be used for TLS SNI extension>"
+    stdout:
+      enable: false
+    # Uncomment the following section to enable Prometheus metrics exporter.
+    prometheusMetricsExporter: {}
+#    prometheusMetricsExporter:
+#      match: "fb.metrics"
+#      metricsExporter:
+#        host: "0.0.0.0"
+#        port: 2020
+#        addLabels:
+#          app: "fluentbit"
+
+    # Loki fluentbit ClusterOutput, to be encapsulated in fluentbit config
+    # See https://github.com/fluent/fluent-operator/blob/master/docs/plugins/fluentbit/output/loki.md
+    # See https://docs.fluentbit.io/manual/pipeline/outputs/loki
+
+  service:
+    storage: {}
+# Remove the above storage section and uncomment below section if you want to configure file-system as storage for buffer
+#    storage:
+#      path: "/host/fluent-bit-buffer/"
+#      backlogMemLimit: "50MB"
+#      checksum: "off"
+#      deleteIrrecoverableChunks: "on"
+#      maxChunksUp: 128
+#      metrics: "on"
+#      sync: normal
+
+  # Configure the default filters in FluentBit.
+  # The `filter` will filter and parse the collected log information and output the logs into a uniform format. You can choose whether to turn this on or not.
+  filter:
+    multiline:
+      enable: false
+      keyContent: log
+      # emitterMemBufLimit 120 (MB)
+      emitterMemBufLimit: 120
+      parsers:
+        - go
+        - python
+        - java
+        #  use custom multiline parser need set .Values.parsers.javaMultiline.enable = true
+        # - java-multiline
+    kubernetes:
+      enable: true
+      labels: false
+      annotations: false
+    containerd:
+      # This is customized lua containerd log format converter, you can refer here:
+      # https://github.com/fluent/fluent-operator/blob/master/charts/fluent-operator/templates/fluentbit-clusterfilter-containerd.yaml
+      # https://github.com/fluent/fluent-operator/blob/master/charts/fluent-operator/templates/fluentbit-containerd-config.yaml
+      enable: true
+    systemd:
+      enable: true
+
+  kubeedge:
+    enable: false
+    prometheusRemoteWrite:
+      # Change the host to the address of a cloud-side Prometheus-compatible server that can receive Prometheus remote write data
+      host: "<cloud-prometheus-service-host>"
+      # Change the port to the port of a cloud-side Prometheus-compatible server that can receive Prometheus remote write data
+      port: "<cloud-prometheus-service-port>"
+
+  # removes the hostPath mounts for varlibcontainers, varlogs and systemd.
+  disableLogVolumes: false
+
+  parsers:
+    javaMultiline:
+    # use in filter for parser generic springboot multiline log format
+      enable: false
+
+fluentd:
+  # Installs a sub chart carrying the CRDs for the fluentd controller. The sub chart is enabled by default.
+  crdsEnable: true
+  enable: false
+  name: fluentd
+  # Valid modes include "collector" and "agent".
+  # The "collector" mode will deploy Fluentd as a StatefulSet as before.
+  # The new "agent" mode will deploy Fluentd as a DaemonSet.
+  mode: "collector"
+  port: 24224
+  image:
+    repository: "ghcr.io/fluent/fluent-operator/fluentd"
+    tag: "v1.17.0"
+  # Numbers of the Fluentd instance
+  # Applicable when the mode is "collector", and will be ignored when the mode is "agent"
+  replicas: 1
+  forward:
+    port: 24224
+  watchedNamespaces:
+    - kube-system
+    - default
+  resources:
+    limits:
+      cpu: 500m
+      memory: 500Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+  schedulerName: ""
+  # Environment variables that can be passed to fluentd pods
+  envVars: []
+  #  - name: FOO
+  #    value: "bar"
+  ## Reference to one or more secrets to be used when pulling images
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+  # Pod security context for Fluentd pod. Ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
+  podSecurityContext: {}
+  # Container security context for Fluentd container. Ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
+  securityContext: {}
+  imagePullSecrets: []
+  # - name: "image-pull-secret"
+  logLevel: ""
+  priorityClassName: ""
+  extras: {}
+  # Configure the output plugin parameter in Fluentd.
+  # Fluentd is disabled by default, if you enable it make sure to also set up an output to use.
+  output:
+    es:
+      enable: false
+      host: elasticsearch-logging-data.kubesphere-logging-system.svc
+      port: 9200
+      logstashPrefix: ks-logstash-log
+      buffer:
+        enable: false
+        type: file
+        path: /buffers/es
+
+nameOverride: ""
+fullnameOverride: ""
+namespaceOverride: ""
