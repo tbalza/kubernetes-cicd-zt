@@ -15,4 +15,4 @@ helmCharts:
 resources: # https://github.com/fluent/fluent-operator/tree/master/manifests/logging-stack
 #  - output-elasticsearch.yaml
 #  - serviceaccount.yaml
-  - rbac.yaml
+#  - rbac.yaml
