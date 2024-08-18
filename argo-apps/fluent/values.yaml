@@ -69,7 +69,7 @@ fluentbit:
             name: elasticsearch-es-elastic-user  # The secret name
             key: password  # The key within the secret holding the password
       logstashFormat: true
-      replaceDots: true
+      #replaceDots: true
       enableTLS: false
     #      writeOperation: upsert
 
