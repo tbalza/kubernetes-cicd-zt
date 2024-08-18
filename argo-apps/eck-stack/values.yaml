@@ -3,6 +3,10 @@ eck-elasticsearch:
   annotations:
     eck.k8s.elastic.co/license: basic
   fullnameOverride: elasticsearch # must be reference in eck-kibana: elasticsearchRef:
+  http: # check
+    tls:
+      selfSignedCertificate:
+        disabled: true
   nodeSets:
   - name: default
     count: 1 # number of replicas
@@ -14,8 +18,8 @@ eck-elasticsearch:
           username: anon
           roles: monitoring_user
 #      xpack.security.enabled: false # Enable security features
-#      xpack.security.http.ssl: # Enable encryption for HTTP API client connections, such as Kibana, Logstash, and Agents
-#        enabled: false
+      xpack.security.http.ssl: # Enable encryption for HTTP API client connections, such as Kibana, Logstash, and Agents
+        enabled: false
 #      xpack.security.transport.ssl: # Enable encryption and mutual authentication between cluster nodes
 #        enabled: true # should be set to true even though http.ssl is set to false
 #      elasticsearch.ssl.verificationMode: none
@@ -24,6 +28,9 @@ eck-elasticsearch:
     podTemplate:
       spec:
         containers:
+#          - env:
+#              - name: ES_JAVA_OPTS
+#                value: "-Xms1g -Xmx1g"
           - name: elasticsearch
             resources:
               requests:
