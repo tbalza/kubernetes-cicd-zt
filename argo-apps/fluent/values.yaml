@@ -54,7 +54,7 @@ fluentbit:
       bufferSize: 20MB
       traceError: true # handling and debugging in the context of logs, not about forwarding trace data.
       logstashPrefixKey: ks-logstash-log
-    #      suppressTypeName: "On"
+      suppressTypeName: "On"
     #      path: ""
     #      bufferSize: "4KB"
       index: "fluent-bit"
