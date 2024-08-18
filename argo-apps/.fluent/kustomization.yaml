@@ -12,14 +12,14 @@ helmCharts:
     includeCRDs: true
     valuesFile: values.yaml
 
-resources:
+resources: # https://github.com/fluent/fluent-operator/tree/master/manifests/logging-stack
 #  - fluentbit-fluentBit.yaml
 #  - fluentbitconfig-fluentBitConfig.yaml
 #  - input-tail.yaml
 #  - input-systemd.yaml
 #  - filter-kubernetes.yaml
 #  - filter-systemd.yaml
-#  - output-elasticsearch.yaml
+  - output-elasticsearch.yaml
 #  - output-forward.yaml
 #  - output-kafka.yaml
 #  - filter-containerd.yaml

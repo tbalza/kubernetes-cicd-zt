@@ -35,7 +35,7 @@ fluentbit:
       storageType: memory # # Use storageType as "filesystem" if you want to use filesystem as the buffering mechanism for tail input.
       pauseOnChunksOverlimit: "off"
     systemd:
-      enable: true
+      enable: false
       systemdFilter:
         enable: true
         filters: [] #??
@@ -47,7 +47,7 @@ fluentbit:
 
   output:
     es:
-      enable: true
+      enable: false # true
       host: elasticsearch-es-http.eck-stack.svc # elasticsearch-logging-data.kubesphere-logging-system.svc
       port: 9200
       logstashPrefix: ks-logstash-log
@@ -58,8 +58,8 @@ fluentbit:
     #      path: ""
     #      bufferSize: "4KB"
       index: "fluent-bit"
-    #      httpUser:
-    #      httpPassword:
+#      httpUser: elastic
+#      httpPassword:
       logstashFormat: true
     #      replaceDots: false
     #      enableTLS: false
