@@ -73,8 +73,6 @@ fluentbit:
     #        keyFile: "<Absolute path to private Key file>"
     #        keyPassword:
     #        vhost: "<Hostname to be used for TLS SNI extension>"
-    stdout:
-      enable: false
 
     # Loki fluentbit ClusterOutput, to be encapsulated in fluentbit config
     # See https://github.com/fluent/fluent-operator/blob/master/docs/plugins/fluentbit/output/loki.md
@@ -83,17 +81,6 @@ fluentbit:
   # Configure the default filters in FluentBit.
   # The `filter` will filter and parse the collected log information and output the logs into a uniform format. You can choose whether to turn this on or not.
   filter:
-    multiline:
-      enable: false
-      keyContent: log
-      # emitterMemBufLimit 120 (MB)
-      emitterMemBufLimit: 120
-      parsers:
-        - go
-        - python
-        - java
-        #  use custom multiline parser need set .Values.parsers.javaMultiline.enable = true
-        # - java-multiline
     kubernetes:
       enable: true
       labels: false
