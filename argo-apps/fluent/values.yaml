@@ -48,7 +48,7 @@ fluentbit:
   output:
     es:
       enable: true # true
-      host: elasticsearch-es-http.eck-stack.svc # elasticsearch-logging-data.kubesphere-logging-system.svc
+      host: elasticsearch-es-http.eck-stack.svc # http://elasticsearch-es-http.eck-stack.svc:9200/
       port: 9200
       logstashPrefix: ks-logstash-log
       bufferSize: 20MB
@@ -68,27 +68,10 @@ fluentbit:
           secretKeyRef:
             name: elasticsearch-es-elastic-user  # The secret name
             key: password  # The key within the secret holding the password
-#      httpUser: elastic
-#      httpPassword:
       logstashFormat: true
       replaceDots: true
       enableTLS: false
-    #      replaceDots: false
-    #      enableTLS: false
     #      writeOperation: upsert
-    #      tls:
-    #        verify: On
-    #        debug: 1
-    #        caFile: "<Absolute path to CA certificate file>"
-    #        caPath: "<Absolute path to scan for certificate files>"
-    #        crtFile: "<Absolute path to private Key file>"
-    #        keyFile: "<Absolute path to private Key file>"
-    #        keyPassword:
-    #        vhost: "<Hostname to be used for TLS SNI extension>"
-
-    # Loki fluentbit ClusterOutput, to be encapsulated in fluentbit config
-    # See https://github.com/fluent/fluent-operator/blob/master/docs/plugins/fluentbit/output/loki.md
-    # See https://docs.fluentbit.io/manual/pipeline/outputs/loki
 
   # Configure the default filters in FluentBit.
   # The `filter` will filter and parse the collected log information and output the logs into a uniform format. You can choose whether to turn this on or not.

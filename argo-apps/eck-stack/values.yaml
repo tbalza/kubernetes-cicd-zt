@@ -3,7 +3,7 @@ eck-elasticsearch:
   annotations:
     eck.k8s.elastic.co/license: basic
   fullnameOverride: elasticsearch # must be reference in eck-kibana: elasticsearchRef:
-  http: # check
+  http: # disable tls to account for ALB SSL termination
     tls:
       selfSignedCertificate:
         disabled: true
