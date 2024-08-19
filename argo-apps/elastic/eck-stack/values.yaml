@@ -2,6 +2,7 @@ eck-elasticsearch:
   enabled: true
   annotations:
     eck.k8s.elastic.co/license: basic
+    argocd.argoproj.io/sync-wave: "3"
   fullnameOverride: elasticsearch # must be reference in eck-kibana: elasticsearchRef:
   http: # disable tls to account for ALB SSL termination
     tls:
@@ -62,6 +63,7 @@ eck-kibana:
   enabled: true
   annotations:
     eck.k8s.elastic.co/license: basic
+    argocd.argoproj.io/sync-wave: "4"
   fullnameOverride: kibana
   spec:
     config:

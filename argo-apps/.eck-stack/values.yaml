@@ -34,9 +34,9 @@ eck-elasticsearch:
     podTemplate:
       spec:
         containers:
-          - env:
-              - name: ES_JAVA_OPTS
-                value: "-Xms1g -Xmx1g"
+#          - env:
+#              - name: ES_JAVA_OPTS
+#                value: "-Xms1g -Xmx1g"
 #              - name: ELASTIC_PASSWORD
 #                value: ${ELASTIC_PASSWORD}
           - name: elasticsearch
