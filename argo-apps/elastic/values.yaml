@@ -20,7 +20,7 @@ telemetry:
 nodeSelector:
   role: "django" # this should go in its own nodegroup, but for the purpose of POC assigning group with enough memory
 
-automountServiceAccountToken: true # Automount API credentials for the Service Account into the pod.
+#automountServiceAccountToken: true # Automount API credentials for the Service Account into the pod.
 
 serviceAccount: # 350206045032
   create: true # false
