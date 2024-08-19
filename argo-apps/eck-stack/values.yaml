@@ -2,14 +2,15 @@ eck-elasticsearch:
   enabled: true
   annotations:
     eck.k8s.elastic.co/license: basic
+    #argocd.argoproj.io/sync-wave: "3"
   fullnameOverride: elasticsearch # must be reference in eck-kibana: elasticsearchRef:
   http: # disable tls to account for ALB SSL termination
     tls:
       selfSignedCertificate:
         disabled: true
-  auth:
-    fileRealm: # set elastic user's password https://www.elastic.co/guide/en/cloud-on-k8s/current/k8s-users-and-roles.html#k8s_file_realm
-    - secretName: elastic-secrets # password set as SSM parameter in tf
+#  auth:
+#    fileRealm: # set elastic user's password https://www.elastic.co/guide/en/cloud-on-k8s/current/k8s-users-and-roles.html#k8s_file_realm
+#    - secretName: elastic-secrets # password set as SSM parameter in tf
   nodeSets:
   - name: default
     count: 1 # number of replicas
@@ -17,16 +18,16 @@ eck-elasticsearch:
       node.store.allow_mmap: false # vm.max_map_count via initContainer # vm.max_map_count to 262144 # https://www.elastic.co/guide/en/cloud-on-k8s/current/k8s-virtual-memory.html
       #telemetry.optIn: false
       #action.auto_create_index: "sync-marker-*"
-#      xpack.security.authc: # Enable anonymous access to allow GCLB health probes to succeed # Ingress?
-#        anonymous:
-#          username: anon
-#          roles: monitoring_user # roles: superuser
+      xpack.security.authc: # Enable anonymous access to allow GCLB health probes to succeed # Ingress?
+        anonymous:
+          username: anon
+          roles: monitoring_user # roles: superuser
           #authz_exception: false
 #      xpack.security.enabled: false # Enable security features # https://www.elastic.co/guide/en/cloud-on-k8s/master/k8s-reserved-settings.html
-      #xpack.security.http.ssl: # Enable encryption for HTTP API client connections, such as Kibana, Logstash, and Agents
-        #enabled: false
-#      xpack.security.transport.ssl: # Enable encryption and mutual authentication between cluster nodes
-#        enabled: true # should be set to true even though http.ssl is set to false
+      xpack.security.http.ssl: # Enable encryption for HTTP API client connections, such as Kibana, Logstash, and Agents
+        enabled: false
+      xpack.security.transport.ssl: # Enable encryption and mutual authentication between cluster nodes
+        enabled: true # should be set to true even though http.ssl is set to false
 #      elasticsearch.ssl.verificationMode: none
       # don't forget to change your protocol field for readinessProbe to http, and also change protocol for elasticsearch in kibana chart to http.
       # https://www.elastic.co/guide/en/cloud-on-k8s/master/k8s-reserved-settings.html
@@ -62,6 +63,7 @@ eck-kibana:
   enabled: true
   annotations:
     eck.k8s.elastic.co/license: basic
+    #argocd.argoproj.io/sync-wave: "3"
   fullnameOverride: kibana
   spec:
     config:
