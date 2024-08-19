@@ -7,9 +7,6 @@ resources:
     cpu: 100m
     memory: 150Mi
 
-#global:
-#  kubeVersion: "1.29"
-
 config:
   logVerbosity: "-2" # -2 errors only, -1 Errors and warnings, 0 Errors, warnings, and information
   metrics:
@@ -23,7 +20,9 @@ telemetry:
 nodeSelector:
   role: "django" # this should go in its own nodegroup, but for the purpose of POC assigning group with enough memory
 
+automountServiceAccountToken: true # Automount API credentials for the Service Account into the pod.
+
 serviceAccount:
   create: false
-  automountServiceAccountToken: true
+  automountServiceAccountToken: true # Specifies whether a service account should automount API credentials.
   name: "eck-operator"

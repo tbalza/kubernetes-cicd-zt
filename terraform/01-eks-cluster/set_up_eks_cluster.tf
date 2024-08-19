@@ -31,6 +31,10 @@ locals {
       value = local.domain
     }
 
+    "elastic_api_password" = {
+      value = "n11111111111111111111111" # testing string before random generation
+    }
+
     "django_debug" = {
       value = "FALSE"
     }
@@ -1744,6 +1748,50 @@ resource "helm_release" "external_secrets" {
     helm_release.aws_load_balancer_controller,
     module.eks # important
   ]
+}
+
+# Fluent
+resource "aws_iam_policy" "fluent_ssm_read" { # check
+  name = "SSM-for-fluent"
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [{
+      Effect = "Allow",
+      "Action" : [
+        "ssm:GetParameter*",
+        "ssm:ListTagsForResource", # check
+        "ssm:DescribeParameters"   # check
+      ],
+      Resource = "arn:aws:ssm:${local.region}:${data.aws_caller_identity.current.account_id}:parameter/*" # check .limit scope accordingly. SSM is region specific
+    }]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "fluent_read_attach" { # check
+  role       = [module.fluentbit_irsa_role.iam_role_name]
+  policy_arn = aws_iam_policy.fluent_ssm_read.arn
+}
+
+# Elastic
+resource "aws_iam_policy" "elastic_ssm_read" { # check
+  name = "SSM-for-elastic"
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [{
+      Effect = "Allow",
+      "Action" : [
+        "ssm:GetParameter*",
+        "ssm:ListTagsForResource", # check
+        "ssm:DescribeParameters"   # check
+      ],
+      Resource = "arn:aws:ssm:${local.region}:${data.aws_caller_identity.current.account_id}:parameter/*" # check .limit scope accordingly. SSM is region specific
+    }]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "elastic_read_attach" { # check
+  role       = aws_iam_role.elastic_operator.name
+  policy_arn = aws_iam_policy.elastic_ssm_read.arn
 }
 
 # Jenkins

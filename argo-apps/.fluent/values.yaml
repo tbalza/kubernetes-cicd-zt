@@ -1,9 +1,12 @@
-containerRuntime: containerd
+containerRuntime: containerd # CRIO?
 Kubernetes: true
 
 operator:
   nodeSelector:
     role: "django" # this should go in its own nodegroup, but for the purpose of POC assigning group with enough memory
+  disableComponentControllers:
+    fluentd:
+      crdsEnable: false
 
 fluentbit:
   resources:
@@ -26,6 +29,9 @@ fluentbit:
   input:
     tail:
       enable: true
+      # excludePath: /var/log/containers/utils_default_utils-*.log # # Exclude logs from util pod
+      # parser: docker   #If it is a containerd environment, then this item should be set to cri
+      multilineParser: "cri" # "docker, cri"
       refreshIntervalSeconds: 10
       memBufLimit: 5MB # limit of memory that Tail plugin can use when appending data to the Engine.
       bufferMaxSize: ""
@@ -33,45 +39,51 @@ fluentbit:
       skipLongLines: true
       readFromHead: false
       storageType: memory # # Use storageType as "filesystem" if you want to use filesystem as the buffering mechanism for tail input.
-      pauseOnChunksOverlimit: "off"
+      pauseOnChunksOverlimit: "off" # default: "off"
+
     systemd:
       enable: false
       systemdFilter:
         enable: true
-        filters: [] #??
+        filters:
+          - _SYSTEMD_UNIT=kubelet.service
       path: "/var/log/journal"
       includeKubelet: true
-      stripUnderscores: "off"
+      stripUnderscores: "off" # on?
       storageType: memory # Use storageType as "filesystem" if you want to use filesystem as the buffering mechanism for systemd input.
       pauseOnChunksOverlimit: "off"
 
   output:
     es:
       enable: true # true
+      #timeKey: "@timestamp"
+      enableTLS: false
+      tls:
+        verify: Off
       host: elasticsearch-es-http.eck-stack.svc # http://elasticsearch-es-http.eck-stack.svc:9200/
       port: 9200
-      logstashPrefix: ks-logstash-log
-      bufferSize: 20MB
-      traceError: true # handling and debugging in the context of logs, not about forwarding trace data.
-      logstashPrefixKey: ks-logstash-log
-      suppressTypeName: "On"
-    #      path: ""
-    #      bufferSize: "4KB"
+      bufferSize: "5MB" # 20MB # "4KB"
+      logstashPrefix: logstash # # ks-logstash-log
+      logstashPrefixKey: logstash # ks-logstash-log
+      traceError: true # to debug fluentbit connection with es API (not about forwarding trace data in general)
+      #traceOutput: true # to debug fluentbit connection with es API (not about forwarding trace data in general)
+      logstashFormat: true # True/False, On,Off
+      replaceDots: true
+      writeOperation: create # create # upsert. Id_Key or Generate_ID needed for upsert. (default create)
+      suppressTypeName: "On" # crucial for es 8.x and newer, _type not supported
+      type: "doc" # crucial for es 8.x and newer, _type not supported
+      #path: ""
       index: "fluent-bit"
-      httpUser: #  OIDC/JWT https://www.elastic.co/guide/en/cloud-on-k8s/master/k8s-auth-config-using-stack-config-policy.html
+      httpUser: #  es X-pack access
         valueFrom:
           secretKeyRef:
-            name: elasticsearch-es-elastic-user  # The secret name
-            key: username  # The key within the secret holding the password
+            name: elastic-secrets # `elastic-secrets` is created twice for fluent and eck namespace, they refer to the same SSM parameter
+            key: username # name of they key, not actual value
       httpPassword:
         valueFrom:
           secretKeyRef:
-            name: elasticsearch-es-elastic-user  # The secret name
-            key: password  # The key within the secret holding the password
-      logstashFormat: true
-      #replaceDots: true
-      enableTLS: false
-    #      writeOperation: upsert
+            name: elastic-secrets
+            key: password # name of they key, not actual value
 
   # Configure the default filters in FluentBit.
   # The `filter` will filter and parse the collected log information and output the logs into a uniform format. You can choose whether to turn this on or not.
