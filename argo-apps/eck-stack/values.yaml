@@ -8,8 +8,8 @@ eck-elasticsearch:
       selfSignedCertificate:
         disabled: true
   auth:
-    fileRealm:
-    - secretName: elastic-user-password
+    fileRealm: # set elastic user's password https://www.elastic.co/guide/en/cloud-on-k8s/current/k8s-users-and-roles.html#k8s_file_realm
+    - secretName: elastic-user-password # password set as SSM parameter in tf
   nodeSets:
   - name: default
     count: 1 # number of replicas
@@ -37,8 +37,8 @@ eck-elasticsearch:
           - env:
               - name: ES_JAVA_OPTS
                 value: "-Xms1g -Xmx1g"
-              - name: ELASTIC_PASSWORD # here or env in operator?
-                value: ${ELASTIC_PASSWORD}
+#              - name: ELASTIC_PASSWORD
+#                value: ${ELASTIC_PASSWORD}
           - name: elasticsearch
             resources:
               requests:

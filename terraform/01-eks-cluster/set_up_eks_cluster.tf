@@ -1768,7 +1768,7 @@ resource "aws_iam_policy" "fluent_ssm_read" { # check
 }
 
 resource "aws_iam_role_policy_attachment" "fluent_read_attach" { # check
-  role       = [module.fluentbit_irsa_role.iam_role_name]
+  role       = module.fluentbit_irsa_role.iam_role_name
   policy_arn = aws_iam_policy.fluent_ssm_read.arn
 }
 
