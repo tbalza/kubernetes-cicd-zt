@@ -27,4 +27,4 @@ serviceAccount: # 350206045032
   annotations:
     eks.amazonaws.com/role-arn: "arn:aws:iam::350206045032:role/ElasticRole"
   automountServiceAccountToken: true # Specifies whether a service account should automount API credentials.
-  #name: "eck-operator"
+  name: "elastic-operator"

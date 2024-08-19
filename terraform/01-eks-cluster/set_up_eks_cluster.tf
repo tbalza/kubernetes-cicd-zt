@@ -35,6 +35,14 @@ locals {
       value = "n11111111111111111111111" # testing string before random generation
     }
 
+    "elastic_api_username" = {
+      value = "elastic" # testing string before random generation
+    }
+
+    "elastic_api_roles" = {
+      value = "superuser" # testing string before random generation
+    }
+
     "django_debug" = {
       value = "FALSE"
     }
