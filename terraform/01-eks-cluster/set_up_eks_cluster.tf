@@ -828,7 +828,7 @@ resource "aws_iam_role" "elastic_operator" {
         },
         Condition = {
           StringEquals = {
-            "${replace(module.eks.cluster_oidc_issuer_url, "https://", "")}:sub" : "system:serviceaccount:elastic-system:eck-operator" # "namespace:service-account-name"
+            "${replace(module.eks.cluster_oidc_issuer_url, "https://", "")}:sub" : "system:serviceaccount:elastic:eck-operator" # "namespace:service-account-name"
           }
         }
       },
@@ -836,6 +836,7 @@ resource "aws_iam_role" "elastic_operator" {
   })
 }
 
+##########
 
 resource "aws_iam_role" "argocd_repo" {
   name = "ArgoCDrepoRole"
