@@ -14,6 +14,7 @@ helmCharts:
 
 resources:
   - secrets.yaml
+  - eck-stack/
 #  - serviceaccount.yaml
 
 
