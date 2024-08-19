@@ -22,7 +22,9 @@ nodeSelector:
 
 automountServiceAccountToken: true # Automount API credentials for the Service Account into the pod.
 
-serviceAccount:
-  create: false
+serviceAccount: # 350206045032
+  create: true # false
+  annotations:
+    eks.amazonaws.com/role-arn: "arn:aws:iam::350206045032:role/ElasticRole"
   automountServiceAccountToken: true # Specifies whether a service account should automount API credentials.
-  name: "eck-operator"
+  #name: "eck-operator"
