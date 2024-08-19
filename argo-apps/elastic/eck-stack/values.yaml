@@ -63,7 +63,7 @@ eck-kibana:
   enabled: true
   annotations:
     eck.k8s.elastic.co/license: basic
-    argocd.argoproj.io/sync-wave: "4"
+    argocd.argoproj.io/sync-wave: "3"
   fullnameOverride: kibana
   spec:
     config:
