@@ -26,9 +26,9 @@ eck-elasticsearch:
 #      xpack.security.enabled: false # Enable security features # https://www.elastic.co/guide/en/cloud-on-k8s/master/k8s-reserved-settings.html
       xpack.security.http.ssl: # Enable encryption for HTTP API client connections, such as Kibana, Logstash, and Agents
         enabled: false
-#      xpack.security.transport.ssl: # Enable encryption and mutual authentication between cluster nodes
-#        enabled: true # should be set to true even though http.ssl is set to false
-      elasticsearch.ssl.verificationMode: none
+      xpack.security.transport.ssl: # Enable encryption and mutual authentication between cluster nodes
+        enabled: true # should be set to true even though http.ssl is set to false
+#      elasticsearch.ssl.verificationMode: none
       # don't forget to change your protocol field for readinessProbe to http, and also change protocol for elasticsearch in kibana chart to http.
       # https://www.elastic.co/guide/en/cloud-on-k8s/master/k8s-reserved-settings.html
 
