@@ -13,7 +13,6 @@ helmCharts:
     valuesFile: values.yaml
 
 resources:
-#  - ingress.yaml
   - secrets.yaml
 #  - serviceaccount.yaml
 
