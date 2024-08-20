@@ -591,8 +591,22 @@ module "eks" {
   # check
   access_entries = {
 
-    fluent-operator = {
+    fluent-operator = { # change for fluent-bit
       principal_arn     = module.fluentbit_irsa_role.iam_role_arn # aws_iam_role.fluent_operator.arn
+      kubernetes_groups = []
+
+      policy_associations = {
+        admin_policy = {
+          policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy" # check
+          access_scope = {
+            type = "cluster" # check
+          }
+        }
+      }
+    }
+
+    fluent-operator2 = { # change for fluent-bit
+      principal_arn     = module.fluentbit_irsa_role2.iam_role_arn # aws_iam_role.fluent_operator.arn
       kubernetes_groups = []
 
       policy_associations = {
@@ -795,36 +809,50 @@ module "fluentbit_irsa_role" {
   }
 }
 
-resource "aws_iam_policy" "fluent_logs_policy" {
-  name = "fluentbit-policy"
+module "fluentbit_irsa_role2" {
+  source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
+  version = "5.11.1"
 
-  description = "Role use to create logs from K8S to elasticsearch"
+  role_name = "fluent_operator2" # "company-k8s-fluentbit-cloudwatch-irsa-role-${terraform.workspace}"
 
-  policy = jsonencode({
-    Version = "2012-10-17",
-    Statement = [
-      {
-        Action = [
-          "ec2:DescribeTags",
-          "logs:PutLogEvents",
-          #"cloudwatch:PutMetricData",
-          "logs:DescribeLogStreams",
-          "logs:DescribeLogGroups",
-          "logs:CreateLogStream",
-          "logs:CreateLogGroup"
-        ],
-        Effect   = "Allow",
-        Resource = "*"
-      }
-    ]
-  })
+  oidc_providers = {
+    main = {
+      provider_arn               = module.eks.oidc_provider_arn #data.terraform_remote_state.k8s-cluster.outputs.cluster_oidc_provider_arn
+      namespace_service_accounts = ["fluent:fluent-operator"] # ["${var.fluentbit_namespace}:${var.fluentbit_service_account_name}"]
+    }
+  }
 }
 
-resource "aws_iam_policy_attachment" "attach_fluent_logs_policy" {
-  name       = "attach-fluent-logs-policy"
-  policy_arn = aws_iam_policy.fluent_logs_policy.arn
-  roles      = [module.fluentbit_irsa_role.iam_role_name]
-}
+#resource "aws_iam_policy" "fluent_logs_policy" {
+#  name = "fluentbit-policy"
+#
+#  description = "Role use to create logs from K8S to elasticsearch"
+#
+#  policy = jsonencode({
+#    Version = "2012-10-17",
+#    Statement = [
+#      {
+#        Action = [
+#          "ec2:DescribeTags",
+#          "logs:PutLogEvents",
+#          #"cloudwatch:PutMetricData",
+#          "logs:DescribeLogStreams",
+#          "logs:DescribeLogGroups",
+#          "logs:CreateLogStream",
+#          "logs:CreateLogGroup"
+#        ],
+#        Effect   = "Allow",
+#        Resource = "*"
+#      }
+#    ]
+#  })
+#}
+#
+#resource "aws_iam_policy_attachment" "attach_fluent_logs_policy" {
+#  name       = "attach-fluent-logs-policy"
+#  policy_arn = aws_iam_policy.fluent_logs_policy.arn
+#  roles      = [module.fluentbit_irsa_role.iam_role_name]
+#}
 
 ##############
 
@@ -1804,7 +1832,7 @@ resource "helm_release" "external_secrets" {
   ]
 }
 
-# Fluent
+# Fluentbit
 resource "aws_iam_policy" "fluent_ssm_read" { # check
   name = "SSM-for-fluent"
   policy = jsonencode({
