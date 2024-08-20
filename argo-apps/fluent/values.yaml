@@ -20,6 +20,13 @@ fluentbit:
     eks.amazonaws.com/role-arn: "arn:aws:iam::350206045032:role/FluentRole" # this annotation is ignored by default
   logLevel: "error"
 
+#  rbacRules:
+#    - apiGroups:
+#        - ''
+#      resources:
+#        - events
+#      verbs:
+#        - list
   nodeSelector:
     role: "django" # this should go in its own nodegroup, but for the purpose of POC assigning group with enough memory
   tolerations:

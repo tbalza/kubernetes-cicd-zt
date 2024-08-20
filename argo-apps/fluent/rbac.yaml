@@ -13,7 +13,7 @@ metadata:
   name: fluent-all-access-binding
 subjects:
 - kind: ServiceAccount
-  name: fluentbit
+  name: fluent-bit
   namespace: fluent
 roleRef:
   kind: ClusterRole
