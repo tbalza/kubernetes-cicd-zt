@@ -12,9 +12,9 @@ helmCharts:
     includeCRDs: true
     valuesFile: values.yaml
 
-#resources:
+resources:
 #  - secrets.yaml
 #  - eck-stack/
-#  - serviceaccount.yaml # loaded via values.yaml for now
+  - serviceaccount.yaml # loaded via values.yaml for now
 
 

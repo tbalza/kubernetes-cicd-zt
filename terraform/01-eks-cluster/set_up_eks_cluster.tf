@@ -605,8 +605,22 @@ module "eks" {
       }
     }
 
-    eck-operator = {
+    eck-operator = { # change to eck-stack
       principal_arn     = aws_iam_role.elastic_operator.arn
+      kubernetes_groups = []
+
+      policy_associations = {
+        admin_policy = {
+          policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy" # check
+          access_scope = {
+            type = "cluster" # check
+          }
+        }
+      }
+    }
+
+    eck-operator2 = {
+      principal_arn     = aws_iam_role.elastic_operator2.arn
       kubernetes_groups = []
 
       policy_associations = {
@@ -837,6 +851,37 @@ resource "aws_iam_role" "elastic_operator" {
         Condition = {
           StringEquals = {
             "${replace(module.eks.cluster_oidc_issuer_url, "https://", "")}:sub" : "system:serviceaccount:eck-stack:eck-pass" # "namespace:service-account-name"
+          }
+        }
+      },
+    ]
+  })
+}
+
+
+resource "aws_iam_role" "elastic_operator2" {
+  name = "ElasticRole2"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Action = "sts:AssumeRole",
+        Principal = {
+          Service = "eks.amazonaws.com"
+        },
+      },
+      # External Secrets Operator reqs (jwt auth)
+      {
+        Effect = "Allow",
+        Action = "sts:AssumeRoleWithWebIdentity",
+        Principal = {
+          Federated = module.eks.oidc_provider_arn
+        },
+        Condition = {
+          StringEquals = {
+            "${replace(module.eks.cluster_oidc_issuer_url, "https://", "")}:sub" : "system:serviceaccount:elastic:elastic-operator" # "namespace:service-account-name"
           }
         }
       },
@@ -1781,7 +1826,7 @@ resource "aws_iam_role_policy_attachment" "fluent_read_attach" { # check
   policy_arn = aws_iam_policy.fluent_ssm_read.arn
 }
 
-# Elastic
+# Elastic eck-pass
 resource "aws_iam_policy" "elastic_ssm_read" { # check
   name = "SSM-for-elastic"
   policy = jsonencode({
