@@ -7,6 +7,8 @@ operator:
 #  disableComponentControllers:
 #    fluentd:
 #      crdsEnable: false # ? "error": "incorrect value for `-disable-component-controllers` and it will not be proceeded (possible values are: fluent-bit, fluentd)"
+  annotations:
+    eks.amazonaws.com/role-arn: "arn:aws:iam::350206045032:role/FluentRole"
 
 fluentbit:
   resources:
