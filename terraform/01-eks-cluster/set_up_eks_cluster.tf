@@ -11,7 +11,7 @@ data "aws_availability_zones" "available" {}
 
 locals {
   name            = "django-production" # cluster name
-  cluster_version = "1.29"               # 1.29
+  cluster_version = "1.29"              # 1.29
   region          = "us-east-1"
   domain          = "tbalza.net"
 
@@ -129,7 +129,7 @@ locals {
       value = local.name
     }
 
-    "argo_cd_aws_ecr_repo" = { # check
+    "argo_cd_aws_ecr_repo" = {                         # check
       value = split("/", module.ecr.repository_url)[0] # retains only the ecr domain <ecr domain>/<repo name>
     }
 
@@ -267,8 +267,8 @@ module "eks" {
   #cluster_enabled_log_types              = ["api", "audit", "authenticator", "controllerManager", "scheduler"]
   #cloudwatch_log_group_retention_in_days = 1
   #cloudwatch_log_group_kms_key_id        = var.kms_key_arn
-  create_cloudwatch_log_group             = false
-  cloudwatch_log_group_class              = "INFREQUENT_ACCESS"
+  create_cloudwatch_log_group = false
+  cloudwatch_log_group_class  = "INFREQUENT_ACCESS"
 
   enable_irsa = true
 
@@ -310,17 +310,23 @@ module "eks" {
       resolve_conflicts_on_update = "OVERWRITE"
       resolve_conflicts_on_create = "OVERWRITE"
       service_account_role_arn    = module.ebs_csi_driver_irsa.iam_role_arn
-      addon_version               = "v1.30.0-eksbuild.1"
-      #      configuration_values = jsonencode({
-      #        storageClasses = [
-      #          {
-      #            name = "gp2"
-      #            annotations = {
-      #              "storageclass.kubernetes.io/is-default-class" = "false"
-      #            }
-      #          }
-      #        ]
-      #      })
+      addon_version               = "v1.30.0-eksbuild.1" # v1.6.2-eksbuild.0
+      configuration_values = jsonencode({
+        #        storageClasses = [
+        #          {
+        #            name = "gp2"
+        #            annotations = {
+        #              "storageclass.kubernetes.io/is-default-class" = "false"
+        #            }
+        #          }
+        #        ]
+        sidecars : { # https://github.com/kubernetes-sigs/aws-ebs-csi-driver/issues/1447 # pending
+          snapshotter : {
+            forceEnable : false
+          }
+        }
+
+      })
     }
   }
 
@@ -605,7 +611,7 @@ module "eks" {
       }
     }
 
-    fluent-operator2 = { # change for fluent-bit
+    fluent-operator2 = {                                    # change for fluent-bit
       principal_arn     = aws_iam_role.fluent_operator2.arn # aws_iam_role.fluent_operator.arn
       kubernetes_groups = []
 
