@@ -4,10 +4,12 @@ eck-elasticsearch:
     eck.k8s.elastic.co/license: basic
     #argocd.argoproj.io/sync-wave: "3"
   fullnameOverride: elasticsearch # must be reference in eck-kibana: elasticsearchRef:
+  #secureSettings:
   http: # disable tls to account for ALB SSL termination
     tls:
       selfSignedCertificate:
         disabled: true
+  #serviceAccountName: elastic-operator
   auth:
     fileRealm: # set elastic user's password https://www.elastic.co/guide/en/cloud-on-k8s/current/k8s-users-and-roles.html#k8s_file_realm
     - secretName: elastic-secrets # password set as SSM parameter in tf
@@ -34,6 +36,8 @@ eck-elasticsearch:
 
     podTemplate:
       spec:
+        #serviceAccountName: elastic-operator
+        #automountServiceAccountToken: true
         containers:
 #          - env:
 #              - name: ES_JAVA_OPTS
