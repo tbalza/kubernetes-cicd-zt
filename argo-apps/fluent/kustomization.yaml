@@ -49,6 +49,8 @@ patches:
       annotations:
         eks.amazonaws.com/role-arn: "arn:aws:iam::350206045032:role/FluentRoleFOOBAR"
   target:
+    group: ""
+    version: v1
     kind: ServiceAccount
     name: fluent-operator
     namespace: fluent
