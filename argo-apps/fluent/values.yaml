@@ -81,11 +81,13 @@ fluentbit:
           secretKeyRef:
             name: elastic-secrets # `elastic-secrets` is created twice for fluent and eck namespace, they refer to the same SSM parameters
             key: username # name of they key, not actual value
+            optional: true
       httpPassword:
         valueFrom:
           secretKeyRef:
             name: elastic-secrets
             key: password # name of they key, not actual value
+            optional: true
 
   # Configure the default filters in FluentBit.
   # The `filter` will filter and parse the collected log information and output the logs into a uniform format. You can choose whether to turn this on or not.
