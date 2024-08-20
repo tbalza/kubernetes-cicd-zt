@@ -29,16 +29,16 @@ resources: # https://github.com/fluent/fluent-operator/tree/master/manifests/log
 #      namespace: fluent
 
 
-patches:
-- patch: |-
-    - op: add
-      path: /metadata/annotations/eks.amazonaws.com~1role-arn
-      value: "arn:aws:iam::350206045032:role/FluentRole"
-  target:
-    group: v1
-    kind: ServiceAccount
-    name: fluent-operator
-    namespace: fluent
+#patches:
+#- patch: |-
+#    - op: add
+#      path: /metadata/annotations/eks.amazonaws.com~1role-arn
+#      value: "arn:aws:iam::350206045032:role/FluentRole"
+#  target:
+#    group: v1
+#    kind: ServiceAccount
+#    name: fluent-operator
+#    namespace: fluent
 
 #patches:
 #- patch: |-
