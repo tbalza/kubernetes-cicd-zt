@@ -57,7 +57,6 @@ fluentbit:
   output:
     es:
       enable: true # true
-      #timeKey: "@timestamp"
       enableTLS: false
       tls:
         verify: Off
