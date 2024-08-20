@@ -11,10 +11,19 @@ helmCharts:
     namespace: fluent
     includeCRDs: true
     valuesFile: values.yaml
-    valuesMerge: merge
 
 resources: # https://github.com/fluent/fluent-operator/tree/master/manifests/logging-stack
 #  - output-elasticsearch.yaml
-  - serviceaccount.yaml # check name of created serviceAccount first
+#  - serviceaccount.yaml # check name of created serviceAccount first
   - secrets.yaml
   - rbac.yaml
+
+# adding patches to things that can't be disabled via the upstream chart
+patches:
+  - path: sa.yaml
+    target:
+      group: ""
+      version: v1
+      kind: ServiceAccount
+      name: fluent-operator
+      namespace: fluent
