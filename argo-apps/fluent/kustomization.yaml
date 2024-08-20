@@ -28,7 +28,6 @@ resources: # https://github.com/fluent/fluent-operator/tree/master/manifests/log
 #      name: fluent-operator
 #      namespace: fluent
 
-
 #patches:
 #- patch: |-
 #    - op: add
