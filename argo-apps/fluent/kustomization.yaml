@@ -14,6 +14,6 @@ helmCharts:
 
 resources: # https://github.com/fluent/fluent-operator/tree/master/manifests/logging-stack
 #  - output-elasticsearch.yaml
-  - serviceaccount.yaml # check name of created serviceAccount first
+#  - serviceaccount.yaml # check name of created serviceAccount first
   - secrets.yaml
 #  - rbac.yaml
