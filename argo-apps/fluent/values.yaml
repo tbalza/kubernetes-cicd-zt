@@ -4,9 +4,9 @@ Kubernetes: true
 operator:
   nodeSelector:
     role: "django" # this should go in its own nodegroup, but for the purpose of POC assigning group with enough memory
-  disableComponentControllers:
-    fluentd:
-      crdsEnable: false # ? "error": "incorrect value for `-disable-component-controllers` and it will not be proceeded (possible values are: fluent-bit, fluentd)"
+#  disableComponentControllers:
+#    fluentd:
+#      crdsEnable: false # ? "error": "incorrect value for `-disable-component-controllers` and it will not be proceeded (possible values are: fluent-bit, fluentd)"
 
 fluentbit:
   resources:
