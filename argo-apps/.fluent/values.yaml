@@ -16,7 +16,8 @@ fluentbit:
     requests:
       cpu: 10m
       memory: 25Mi
-  serviceAccountAnnotations: {} # Specify additional custom annotations for fluentbit-serviceaccount
+  serviceAccountAnnotations:
+    eks.amazonaws.com/role-arn: "arn:aws:iam::350206045032:role/FluentRole"
   logLevel: "error"
 
   nodeSelector:
@@ -74,10 +75,10 @@ fluentbit:
       type: "doc" # crucial for es 8.x and newer, _type not supported
       #path: ""
       index: "fluent-bit"
-      httpUser: #  es X-pack access
+      httpUser: #  elasticsearch API access creds ("x-pack")
         valueFrom:
           secretKeyRef:
-            name: elastic-secrets # `elastic-secrets` is created twice for fluent and eck namespace, they refer to the same SSM parameter
+            name: elastic-secrets # `elastic-secrets` is created twice for fluent and eck namespace, they refer to the same SSM parameters
             key: username # name of they key, not actual value
       httpPassword:
         valueFrom:

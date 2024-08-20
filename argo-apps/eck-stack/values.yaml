@@ -2,7 +2,6 @@ eck-elasticsearch:
   enabled: true
   annotations:
     eck.k8s.elastic.co/license: basic
-    #argocd.argoproj.io/sync-wave: "3"
   fullnameOverride: elasticsearch # must be reference in eck-kibana: elasticsearchRef:
   #secureSettings:
   http: # disable tls to account for ALB SSL termination
@@ -26,8 +25,8 @@ eck-elasticsearch:
 #          roles: monitoring_user # roles: superuser
           #authz_exception: false
 #      xpack.security.enabled: false # Enable security features # https://www.elastic.co/guide/en/cloud-on-k8s/master/k8s-reserved-settings.html
-#      xpack.security.http.ssl: # Enable encryption for HTTP API client connections, such as Kibana, Logstash, and Agents
-#        enabled: false
+      xpack.security.http.ssl.enabled: false # Enable encryption for HTTP API client connections, such as Kibana, Logstash, and Agents
+##        enabled: false
 #      xpack.security.transport.ssl: # Enable encryption and mutual authentication between cluster nodes
 #        enabled: true # should be set to true even though http.ssl is set to false
 #      elasticsearch.ssl.verificationMode: none
@@ -50,8 +49,6 @@ eck-elasticsearch:
 #            env:
 #                - name: ES_JAVA_OPTS
 #                  value: "-Xms1g -Xmx1g"
-#                - name: ELASTIC_PASSWORD
-#                  value: ${ELASTIC_PASSWORD}
     volumeClaimTemplates:
       - metadata:
           name: elasticsearch-data
@@ -67,7 +64,6 @@ eck-kibana:
   enabled: true
   annotations:
     eck.k8s.elastic.co/license: basic
-    #argocd.argoproj.io/sync-wave: "3"
   fullnameOverride: kibana
   spec:
     elasticsearchRef:

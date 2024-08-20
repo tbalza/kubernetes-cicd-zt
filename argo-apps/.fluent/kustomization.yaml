@@ -12,7 +12,8 @@ helmCharts:
     includeCRDs: true
     valuesFile: values.yaml
 
-#resources: # https://github.com/fluent/fluent-operator/tree/master/manifests/logging-stack
+resources: # https://github.com/fluent/fluent-operator/tree/master/manifests/logging-stack
 #  - output-elasticsearch.yaml
 #  - serviceaccount.yaml # check name of created serviceAccount first
+  - secrets.yaml
 #  - rbac.yaml
