@@ -15,6 +15,6 @@ helmCharts:
 resources:
   - ingress.yaml
   - secrets.yaml
-#  - serviceaccount.yaml # eck-operator sets serviceAccount?
+  - serviceaccount.yaml
 
 
