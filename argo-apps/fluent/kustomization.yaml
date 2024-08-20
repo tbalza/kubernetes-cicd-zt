@@ -33,7 +33,7 @@ patches:
 - patch: |-
     - op: add
       path: /metadata/annotations/eks.amazonaws.com~1role-arn
-      value: "arn:aws:iam::350206045032:role/FluentRole2"
+      value: "arn:aws:iam::350206045032:role/FluentRole"
   target:
     group: v1
     kind: ServiceAccount
