@@ -1854,6 +1854,28 @@ resource "aws_iam_role_policy_attachment" "fluent_read_attach" { # check
   policy_arn = aws_iam_policy.fluent_ssm_read.arn
 }
 
+# Fluent operator
+resource "aws_iam_policy" "fluent2_ssm_read" { # check
+  name = "SSM-for-fluent2"
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [{
+      Effect = "Allow",
+      "Action" : [
+        "ssm:GetParameter*",
+        "ssm:ListTagsForResource", # check
+        "ssm:DescribeParameters"   # check
+      ],
+      Resource = "arn:aws:ssm:${local.region}:${data.aws_caller_identity.current.account_id}:parameter/*" # check .limit scope accordingly. SSM is region specific
+    }]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "fluent_read2_attach" { # check
+  role       = module.fluentbit_irsa_role2.iam_role_name
+  policy_arn = aws_iam_policy.fluent2_ssm_read.arn
+}
+
 # Elastic eck-pass
 resource "aws_iam_policy" "elastic_ssm_read" { # check
   name = "SSM-for-elastic"

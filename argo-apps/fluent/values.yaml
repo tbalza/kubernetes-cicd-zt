@@ -16,8 +16,8 @@ fluentbit:
     requests:
       cpu: 10m
       memory: 25Mi
-  serviceAccountAnnotations: # serviceAccount created by default is `fluent-operator` and `fluent-bit`
-    eks.amazonaws.com/role-arn: "arn:aws:iam::350206045032:role/FluentRole"
+#  serviceAccountAnnotations: # serviceAccount created by default is `fluent-operator` (`fluent-bit` is now applied by default, annotation is not applied)
+#    eks.amazonaws.com/role-arn: "arn:aws:iam::350206045032:role/FluentRole" # this annotation is ignored by default
   logLevel: "error"
 
   nodeSelector:
