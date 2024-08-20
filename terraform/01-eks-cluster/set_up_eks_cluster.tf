@@ -591,8 +591,8 @@ module "eks" {
   # check
   access_entries = {
 
-    fluent-operator = { # change for fluent-bit
-      principal_arn     = module.fluentbit_irsa_role.iam_role_arn # aws_iam_role.fluent_operator.arn
+    fluent-operator = {
+      principal_arn     = aws_iam_role.fluent_operator.arn # aws_iam_role.fluent_operator.arn
       kubernetes_groups = []
 
       policy_associations = {
@@ -606,7 +606,7 @@ module "eks" {
     }
 
     fluent-operator2 = { # change for fluent-bit
-      principal_arn     = module.fluentbit_irsa_role2.iam_role_arn # aws_iam_role.fluent_operator.arn
+      principal_arn     = aws_iam_role.fluent_operator2.arn # aws_iam_role.fluent_operator.arn
       kubernetes_groups = []
 
       policy_associations = {
@@ -795,33 +795,33 @@ module "eks" {
 # https://stackoverflow.com/questions/77439459/configure-iam-for-fluent-bit-on-aws-eks
 # https://github.com/terraform-aws-modules/terraform-aws-iam/tree/master/examples/iam-role-for-service-accounts-eks
 
-module "fluentbit_irsa_role" {
-  source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
-  version = "5.11.1"
-
-  role_name = "fluent_operator" # "company-k8s-fluentbit-cloudwatch-irsa-role-${terraform.workspace}"
-
-  oidc_providers = {
-    main = {
-      provider_arn               = module.eks.oidc_provider_arn #data.terraform_remote_state.k8s-cluster.outputs.cluster_oidc_provider_arn
-      namespace_service_accounts = ["fluent:fluent-bit"] # ["${var.fluentbit_namespace}:${var.fluentbit_service_account_name}"]
-    }
-  }
-}
-
-module "fluentbit_irsa_role2" {
-  source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
-  version = "5.11.1"
-
-  role_name = "fluent_operator2" # "company-k8s-fluentbit-cloudwatch-irsa-role-${terraform.workspace}"
-
-  oidc_providers = {
-    main = {
-      provider_arn               = module.eks.oidc_provider_arn #data.terraform_remote_state.k8s-cluster.outputs.cluster_oidc_provider_arn
-      namespace_service_accounts = ["fluent:fluent-operator"] # ["${var.fluentbit_namespace}:${var.fluentbit_service_account_name}"]
-    }
-  }
-}
+#module "fluentbit_irsa_role" {
+#  source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
+#  version = "5.11.1"
+#
+#  role_name = "fluent_operator" # "company-k8s-fluentbit-cloudwatch-irsa-role-${terraform.workspace}"
+#
+#  oidc_providers = {
+#    main = {
+#      provider_arn               = module.eks.oidc_provider_arn #data.terraform_remote_state.k8s-cluster.outputs.cluster_oidc_provider_arn
+#      namespace_service_accounts = ["fluent:fluent-bit"] # ["${var.fluentbit_namespace}:${var.fluentbit_service_account_name}"]
+#    }
+#  }
+#}
+#
+#module "fluentbit_irsa_role2" {
+#  source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
+#  version = "5.11.1"
+#
+#  role_name = "fluent_operator2" # "company-k8s-fluentbit-cloudwatch-irsa-role-${terraform.workspace}"
+#
+#  oidc_providers = {
+#    main = {
+#      provider_arn               = module.eks.oidc_provider_arn #data.terraform_remote_state.k8s-cluster.outputs.cluster_oidc_provider_arn
+#      namespace_service_accounts = ["fluent:fluent-operator"] # ["${var.fluentbit_namespace}:${var.fluentbit_service_account_name}"]
+#    }
+#  }
+#}
 
 #resource "aws_iam_policy" "fluent_logs_policy" {
 #  name = "fluentbit-policy"
@@ -853,6 +853,69 @@ module "fluentbit_irsa_role2" {
 #  policy_arn = aws_iam_policy.fluent_logs_policy.arn
 #  roles      = [module.fluentbit_irsa_role.iam_role_name]
 #}
+
+#############
+# fluent
+
+resource "aws_iam_role" "fluent_operator" {
+  name = "FluentRole"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Action = "sts:AssumeRole",
+        Principal = {
+          Service = "eks.amazonaws.com"
+        },
+      },
+      # External Secrets Operator reqs (jwt auth)
+      {
+        Effect = "Allow",
+        Action = "sts:AssumeRoleWithWebIdentity",
+        Principal = {
+          Federated = module.eks.oidc_provider_arn
+        },
+        Condition = {
+          StringEquals = {
+            "${replace(module.eks.cluster_oidc_issuer_url, "https://", "")}:sub" : "system:serviceaccount:fluent:fluent-operator" # "namespace:service-account-name"
+          }
+        }
+      },
+    ]
+  })
+}
+
+resource "aws_iam_role" "fluent_operator2" {
+  name = "FluentRole2"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Action = "sts:AssumeRole",
+        Principal = {
+          Service = "eks.amazonaws.com"
+        },
+      },
+      # External Secrets Operator reqs (jwt auth)
+      {
+        Effect = "Allow",
+        Action = "sts:AssumeRoleWithWebIdentity",
+        Principal = {
+          Federated = module.eks.oidc_provider_arn
+        },
+        Condition = {
+          StringEquals = {
+            "${replace(module.eks.cluster_oidc_issuer_url, "https://", "")}:sub" : "system:serviceaccount:fluent:fluent-bit" # "namespace:service-account-name"
+          }
+        }
+      },
+    ]
+  })
+}
 
 ##############
 
@@ -1832,7 +1895,7 @@ resource "helm_release" "external_secrets" {
   ]
 }
 
-# Fluentbit
+# Fluent operator
 resource "aws_iam_policy" "fluent_ssm_read" { # check
   name = "SSM-for-fluent"
   policy = jsonencode({
@@ -1850,11 +1913,11 @@ resource "aws_iam_policy" "fluent_ssm_read" { # check
 }
 
 resource "aws_iam_role_policy_attachment" "fluent_read_attach" { # check
-  role       = module.fluentbit_irsa_role.iam_role_name
+  role       = aws_iam_role.fluent_operator.name
   policy_arn = aws_iam_policy.fluent_ssm_read.arn
 }
 
-# Fluent operator
+# Fluent bit
 resource "aws_iam_policy" "fluent2_ssm_read" { # check
   name = "SSM-for-fluent2"
   policy = jsonencode({
@@ -1872,7 +1935,7 @@ resource "aws_iam_policy" "fluent2_ssm_read" { # check
 }
 
 resource "aws_iam_role_policy_attachment" "fluent_read2_attach" { # check
-  role       = module.fluentbit_irsa_role2.iam_role_name
+  role       = aws_iam_role.fluent_operator2.name
   policy_arn = aws_iam_policy.fluent2_ssm_read.arn
 }
 
