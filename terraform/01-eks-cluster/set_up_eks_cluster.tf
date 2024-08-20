@@ -32,15 +32,15 @@ locals {
     }
 
     "elastic_api_password" = {
-      value = "n11111111111111111111111" # testing string before random generation
+      value = random_password.elastic_password.result
     }
 
     "elastic_api_username" = {
-      value = "elastic" # testing string before random generation
+      value = "elastic" # pending move to argo-apps/elastic/secrets.yaml as "merge" in ExternalSecret
     }
 
     "elastic_api_roles" = {
-      value = "superuser" # testing string before random generation
+      value = "superuser" # pending move to argo-apps/elastic/secrets.yaml as "merge" in ExternalSecret
     }
 
     "django_debug" = {
@@ -2713,3 +2713,14 @@ output "db_instance_port" {
 #    #module.eks
 #  ]
 #}
+
+###############################################################################
+# Elasticsearch
+###############################################################################
+
+# Create es random password.
+resource "random_password" "elastic_password" {
+  length           = 28
+  special          = true
+  override_special = "!#$%&'()+,-.=?^_~" # special character whitelist
+}
