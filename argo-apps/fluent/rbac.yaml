@@ -19,6 +19,29 @@ roleRef:
   kind: ClusterRole
   name: fluent-all-access
   apiGroup: rbac.authorization.k8s.io
+### fluent2
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: fluent2-all-access
+rules:
+- apiGroups: ["*"]  # Allows access to all API groups
+  resources: ["*"]  # Allows access to all resources
+  verbs: ["*"]      # Allows all actions
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: fluent2-all-access-binding
+subjects:
+- kind: ServiceAccount
+  name: fluent-bit
+  namespace: fluent
+roleRef:
+  kind: ClusterRole
+  name: fluent2-all-access
+  apiGroup: rbac.authorization.k8s.io
 #--- # list current RBAC and incorporate
 #apiVersion: rbac.authorization.k8s.io/v1
 #kind: ClusterRole
