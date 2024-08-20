@@ -16,7 +16,6 @@ eck-elasticsearch:
   - name: default
     count: 1 # number of replicas
     config:
-      #index.number_of_replicas: 0 # yellow status
       node.store.allow_mmap: false # vm.max_map_count via initContainer # vm.max_map_count to 262144 # https://www.elastic.co/guide/en/cloud-on-k8s/current/k8s-virtual-memory.html
       #telemetry.optIn: false
       #action.auto_create_index: "sync-marker-*"
@@ -27,7 +26,7 @@ eck-elasticsearch:
           #authz_exception: false
 #      xpack.security.enabled: false # Enable security features # https://www.elastic.co/guide/en/cloud-on-k8s/master/k8s-reserved-settings.html
 
-      xpack.security.http.ssl.enabled: false # Enable encryption for HTTP API client connections, such as Kibana, Logstash, and Agents
+#      xpack.security.http.ssl.enabled: false # Enable encryption for HTTP API client connections, such as Kibana, Logstash, and Agents
 
 ##        enabled: false
 #      xpack.security.transport.ssl: # Enable encryption and mutual authentication between cluster nodes
