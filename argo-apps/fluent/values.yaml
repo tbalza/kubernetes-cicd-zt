@@ -17,7 +17,8 @@ fluentbit:
       cpu: 10m
       memory: 25Mi
   serviceAccountAnnotations:
-    eks.amazonaws.com/role-arn: "arn:aws:iam::350206045032:role/FluentRole2"
+    #eks.amazonaws.com/role-arn: "arn:aws:iam::350206045032:role/FluentRole2"
+    placeholder: "placeholder"
   logLevel: "error"
   nodeSelector:
     role: "django" # this should go in its own nodegroup, but for the purpose of POC assigning group with enough memory
