@@ -16,7 +16,7 @@ resources: # https://github.com/fluent/fluent-operator/tree/master/manifests/log
 #  - serviceaccount.yaml # check name of created serviceAccount first
   - secrets.yaml
   - rbac.yaml
-#  - job.yaml
+  - job.yaml
 
 # adding patches to things that can't be disabled via the upstream chart
 #patches:
