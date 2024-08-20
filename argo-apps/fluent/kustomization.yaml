@@ -19,11 +19,36 @@ resources: # https://github.com/fluent/fluent-operator/tree/master/manifests/log
   - rbac.yaml
 
 # adding patches to things that can't be disabled via the upstream chart
-patches:
-  - path: sa.yaml
-    target:
-      group: ""
-      version: v1
-      kind: ServiceAccount
-      name: fluent-operator
-      namespace: fluent
+#patches:
+#  - path: sa.yaml
+#    target:
+#      group: ""
+#      version: v1
+#      kind: ServiceAccount
+#      name: fluent-operator
+#      namespace: fluent
+
+
+#patches:
+#- patch: |-
+#    - op: add
+#      path: /metadata/annotations/eks.amazonaws.com~1role-arn
+#      value: "arn:aws:iam::350206045032:role/FluentRole2"
+#  target:
+#    group: v1
+#    kind: ServiceAccount
+#    name: fluent-operator
+#    namespace: fluent
+
+#patches:
+#- patch: |-
+#    apiVersion: v1
+#    kind: ServiceAccount
+#    metadata:
+#      name: fluent-operator
+#      annotations:
+#        eks.amazonaws.com/role-arn: "arn:aws:iam::350206045032:role/FluentRole2"
+#  target:
+#    kind: ServiceAccount
+#    name: fluent-operator
+#    namespace: fluent
