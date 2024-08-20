@@ -47,7 +47,7 @@ patches:
     metadata:
       name: fluent-operator
       annotations:
-        eks.amazonaws.com/role-arn: "arn:aws:iam::350206045032:role/FluentRole"
+        eks.amazonaws.com/role-arn: "arn:aws:iam::350206045032:role/FluentRoleFOOBAR"
   target:
     kind: ServiceAccount
     name: fluent-operator
