@@ -16,9 +16,9 @@ spec:
       - name: kubectl-fluent-pass
         image: bitnami/kubectl:latest
         imagePullPolicy: IfNotPresent
-        command: # can't get fluent operator serviceaccount to read passwords # ${ARGOCD_AWS_ACCOUNT}
+        command: # can't get fluent operator serviceaccount to read passwords # ${ARGOCD_AWS_ACCOUNT} # 350206045032
         - /bin/sh
         - -c
         - |
-          kubectl patch sa fluent-operator -n fluent --type='merge' -p='{"metadata": {"annotations": {"eks.amazonaws.com/role-arn": "arn:aws:iam::350206045032:role/FluentRole"}}}'
+          kubectl patch sa fluent-operator -n fluent --type='merge' -p='{"metadata": {"annotations": {"eks.amazonaws.com/role-arn": "arn:aws:iam::${ARGOCD_AWS_ACCOUNT}:role/FluentRole"}}}'
       restartPolicy: Never
