@@ -1,0 +1,24 @@
+## Reset repo server and redis, in order for EnvFrom to take effect inside the plugin container (that contains envsubst). ${variable} substitutions currently fail without this
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: make-fluentoperator-load-externalsecrets
+  namespace: fluent
+  annotations:
+    argocd.argoproj.io/hook: Sync
+    argocd.argoproj.io/hook-delete-policy: HookSucceeded
+    #argocd.argoproj.io/sync-wave: "1"
+spec:
+  template:
+    spec:
+      serviceAccountName: fluent-operator
+      containers:
+      - name: kubectl-fluent-pass
+        image: bitnami/kubectl:latest
+        imagePullPolicy: IfNotPresent
+        command: # can't get fluent operator serviceaccount to read passwords # ${ARGOCD_AWS_ACCOUNT}
+        - /bin/sh
+        - -c
+        - |
+          kubectl patch sa fluent-operator -n fluent --type='merge' -p='{"metadata": {"annotations": {"eks.amazonaws.com/role-arn": "arn:aws:iam::350206045032:role/FluentRole"}}}'
+      restartPolicy: Never
