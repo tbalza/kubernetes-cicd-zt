@@ -11,6 +11,7 @@ helmCharts:
     namespace: fluent
     includeCRDs: true
     valuesFile: values.yaml
+    valuesMerge: merge
 
 resources: # https://github.com/fluent/fluent-operator/tree/master/manifests/logging-stack
 #  - output-elasticsearch.yaml
