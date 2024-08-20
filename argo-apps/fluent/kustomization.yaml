@@ -52,16 +52,16 @@ resources: # https://github.com/fluent/fluent-operator/tree/master/manifests/log
 #    name: fluent-operator
 #    namespace: fluent
 
-patches:
-  - target:
-      group: ""
-      version: v1
-      kind: ServiceAccount
-      name: fluent-operator
-      namespace: fluent
-    patch: |-
-      apiVersion: v1
-      kind: ServiceAccount
-      metadata:
-        annotations:
-          eks.amazonaws.com/role-arn: "arn:aws:iam::350206045032:role/FluentRole"
+#patches:
+#  - target:
+#      group: ""
+#      version: v1
+#      kind: ServiceAccount
+#      name: fluent-operator
+#      namespace: fluent
+#    patch: |-
+#      apiVersion: v1
+#      kind: ServiceAccount
+#      metadata:
+#        annotations:
+#          eks.amazonaws.com/role-arn: "arn:aws:iam::350206045032:role/FluentRole"
