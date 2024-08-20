@@ -16,4 +16,4 @@ resources: # https://github.com/fluent/fluent-operator/tree/master/manifests/log
 #  - output-elasticsearch.yaml
 #  - serviceaccount.yaml # check name of created serviceAccount first
   - secrets.yaml
-  - rbac.yaml
+#  - rbac.yaml
