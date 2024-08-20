@@ -17,7 +17,7 @@ configs:
   params:
     server.insecure: true # Necessary when SSL termination is handled by ALB
     applicationsetcontroller.enable.progressive.syncs: true # ApplicationSet compatible with Progressive Syncs. (SyncWave must use app of apps)
-    applicationsetcontroller.default.application.progressing.timeout: 600 # When using rollingSync, prevent sync timeout error with kube prometheus stack (default 300 seconds)
+    applicationsetcontroller.default.application.progressing.timeout: 1200 # When using rollingSync, prevent sync timeout error with kube prometheus stack (default 300 seconds)
   cmp: # ArgoCD cmp "env substitution" plugin. Needed since kustomize can't retrieve remote values (env/secrets/configmaps) for its own installation (only for resulting pods etc.)
     create: true
     plugins: # Plugin yaml files to be added to argocd-cmp-cm
