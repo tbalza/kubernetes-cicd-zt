@@ -16,7 +16,7 @@ fluentbit:
     requests:
       cpu: 10m
       memory: 25Mi
-#  serviceAccountAnnotations:
+  serviceAccountAnnotations: {}
 #    eks.amazonaws.com/role-arn: "arn:aws:iam::350206045032:role/FluentRole2"
   logLevel: "error"
   nodeSelector:
