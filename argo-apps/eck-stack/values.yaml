@@ -10,7 +10,7 @@ eck-elasticsearch:
         disabled: true
   serviceAccountName: eck-pass
   nodeSelector:
-    role: "django"
+    role: "ci-cd"
   auth:
     fileRealm: # set elastic user's password https://www.elastic.co/guide/en/cloud-on-k8s/current/k8s-users-and-roles.html#k8s_file_realm
     - secretName: elastic-secrets # password set as SSM parameter in tf
@@ -62,7 +62,7 @@ eck-kibana:
     podTemplate:
       spec:
         nodeSelector:
-          role: "django"
+          role: "ci-cd"
         containers:
           - name: kibana
             env:

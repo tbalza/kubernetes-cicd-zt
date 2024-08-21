@@ -404,9 +404,9 @@ module "eks" {
       #ami_id                     = data.aws_ami.eks_default.image_id # check pin to specific version
       #enable_bootstrap_user_data = true # Must be set when using custom AMI i.e. AL2_x86_64, but only if you provide ami_id (not ami_type)
 
-      min_size     = 1
-      max_size     = 2
-      desired_size = 1
+      min_size     = 2
+      max_size     = 3
+      desired_size = 2
 
       capacity_type = "SPOT" # "ON_DEMAND" # SPOT instances nodes are created in random AZs without balance
 
