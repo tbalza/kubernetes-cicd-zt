@@ -13,8 +13,6 @@ helmCharts:
     valuesFile: values.yaml
 
 resources:
-#  - secrets.yaml
-#  - eck-stack/
-  - serviceaccount.yaml # loaded via values.yaml for now
+  - serviceaccount.yaml
   - eck-stack/
 
