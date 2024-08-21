@@ -1,4 +1,3 @@
-## Reset repo server and redis, in order for EnvFrom to take effect inside the plugin container (that contains envsubst). ${variable} substitutions currently fail without this
 apiVersion: batch/v1
 kind: Job
 metadata:
@@ -16,7 +15,7 @@ spec:
       - name: kubectl-fluent-pass
         image: bitnami/kubectl:latest
         imagePullPolicy: IfNotPresent
-        command: # can't get fluent operator serviceaccount to read passwords # ${ARGOCD_AWS_ACCOUNT} # 350206045032
+        command: # add fluent operator serviceAccount annotation
         - /bin/sh
         - -c
         - |
