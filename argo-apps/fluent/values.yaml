@@ -32,8 +32,8 @@ fluentbit:
       # excludePath: /var/log/containers/utils_default_utils-*.log # # Exclude logs from util pod
       # parser: docker   #If it is a containerd environment, then this item should be set to cri
       multilineParser: "cri" # "docker, cri"
-      refreshIntervalSeconds: 10
-      memBufLimit: 15MB # limit of memory that Tail plugin can use when appending data to the Engine.
+      refreshIntervalSeconds: 20
+      memBufLimit: 150MB # limit of memory that Tail plugin can use when appending data to the Engine.
       bufferMaxSize: ""
       path: "/var/log/containers/*.log"
       skipLongLines: true
@@ -42,7 +42,7 @@ fluentbit:
       pauseOnChunksOverlimit: "off" # default: "off"
 
     systemd:
-      enable: true
+      enable: false
       systemdFilter:
         enable: true
         filters:

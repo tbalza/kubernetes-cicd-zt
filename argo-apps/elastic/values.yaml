@@ -8,7 +8,7 @@ resources:
     memory: 150Mi
 
 config:
-  logVerbosity: "0" # -2 errors only, -1 Errors and warnings, 0 Errors, warnings, and information
+  logVerbosity: "-2" # -2 errors only, -1 Errors and warnings, 0 Errors, warnings, and information
   metrics:
     port: "0" # Set to 0 to disable metrics reporting.
   # array of regular expressions of node labels which are allowed to be copied as annotations on Elasticsearch Pods.
