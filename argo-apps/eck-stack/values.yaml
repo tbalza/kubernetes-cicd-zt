@@ -10,7 +10,7 @@ eck-elasticsearch:
         disabled: true
   serviceAccountName: eck-pass
   nodeSelector:
-    role: "ci-cd"
+    role: "django"
   auth:
     fileRealm: # set elastic user's password https://www.elastic.co/guide/en/cloud-on-k8s/current/k8s-users-and-roles.html#k8s_file_realm
     - secretName: elastic-secrets # password set as SSM parameter in tf
@@ -21,6 +21,8 @@ eck-elasticsearch:
       node.store.allow_mmap: false # vm.max_map_count via initContainer # vm.max_map_count to 262144 # https://www.elastic.co/guide/en/cloud-on-k8s/current/k8s-virtual-memory.html
     podTemplate:
       spec:
+        nodeSelector:
+          role: "django"
         containers:
           - name: elasticsearch
             resources:
@@ -62,7 +64,7 @@ eck-kibana:
     podTemplate:
       spec:
         nodeSelector:
-          role: "ci-cd"
+          role: "django" # should be in ci-cd, adjusting for POC purposes
         containers:
           - name: kibana
             env:
