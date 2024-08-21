@@ -16,5 +16,5 @@ resources:
 #  - secrets.yaml
 #  - eck-stack/
   - serviceaccount.yaml # loaded via values.yaml for now
-
+  - eck-stack/
 
