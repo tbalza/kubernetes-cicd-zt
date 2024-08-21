@@ -50,8 +50,8 @@ eck-kibana:
     config:
       telemetry.optIn: false
       telemetry.allowChangingOptInStatus: false
-      server.publicBaseUrl: https://kibana.tbalza.net # pending
-      # elasticsearch.hosts:
+      #server.publicBaseUrl: https://kibana.tbalza.net # pending
+      #elasticsearch.hosts:
     http:
       tls:
         selfSignedCertificate:
