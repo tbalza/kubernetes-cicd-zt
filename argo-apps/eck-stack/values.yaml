@@ -54,8 +54,6 @@ eck-kibana:
       telemetry.allowChangingOptInStatus: false
       #server.publicBaseUrl: https://kibana.tbalza.net # pending
       #elasticsearch.hosts:
-    nodeSelector:
-      role: "django"
     http:
       tls:
         selfSignedCertificate:
@@ -63,6 +61,8 @@ eck-kibana:
     count: 1 # number of replicas
     podTemplate:
       spec:
+        nodeSelector:
+          role: "django"
         containers:
           - name: kibana
             env:
