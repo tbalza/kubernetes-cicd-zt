@@ -9,6 +9,8 @@ eck-elasticsearch:
       selfSignedCertificate:
         disabled: true
   serviceAccountName: eck-pass
+  nodeSelector:
+    role: "django"
   auth:
     fileRealm: # set elastic user's password https://www.elastic.co/guide/en/cloud-on-k8s/current/k8s-users-and-roles.html#k8s_file_realm
     - secretName: elastic-secrets # password set as SSM parameter in tf
@@ -52,6 +54,8 @@ eck-kibana:
       telemetry.allowChangingOptInStatus: false
       #server.publicBaseUrl: https://kibana.tbalza.net # pending
       #elasticsearch.hosts:
+    nodeSelector:
+      role: "django"
     http:
       tls:
         selfSignedCertificate:
