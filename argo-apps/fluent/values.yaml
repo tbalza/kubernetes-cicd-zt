@@ -42,7 +42,7 @@ fluentbit:
       pauseOnChunksOverlimit: "off" # default: "off"
 
     systemd:
-      enable: false
+      enable: true
       systemdFilter:
         enable: true
         filters:
@@ -99,7 +99,7 @@ fluentbit:
       # https://github.com/fluent/fluent-operator/blob/master/charts/fluent-operator/templates/fluentbit-containerd-config.yaml
       enable: true
     systemd:
-      enable: false
+      enable: true
 
   # removes the hostPath mounts for varlibcontainers, varlogs and systemd.
   disableLogVolumes: false
