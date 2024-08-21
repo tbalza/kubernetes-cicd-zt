@@ -14,5 +14,5 @@ helmCharts:
 
 resources:
   - serviceaccount.yaml
-  - eck-stack/
+#  - eck-stack/
 

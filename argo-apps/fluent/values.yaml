@@ -33,7 +33,7 @@ fluentbit:
       # parser: docker   #If it is a containerd environment, then this item should be set to cri
       multilineParser: "cri" # "docker, cri"
       refreshIntervalSeconds: 10
-      memBufLimit: 5MB # limit of memory that Tail plugin can use when appending data to the Engine.
+      memBufLimit: 15MB # limit of memory that Tail plugin can use when appending data to the Engine.
       bufferMaxSize: ""
       path: "/var/log/containers/*.log"
       skipLongLines: true
@@ -68,7 +68,7 @@ fluentbit:
       #traceOutput: true # to debug fluentbit connection with es API (not about forwarding trace data in general)
       logstashFormat: true # True/False, On,Off
       replaceDots: true
-      writeOperation: create # create # upsert. Id_Key or Generate_ID needed for upsert. (default create)
+      writeOperation: create # upsert # Id_Key or Generate_ID needed for upsert. (default create)
       suppressTypeName: "On" # crucial for es 8.x and newer, _type not supported
       type: "doc" # crucial for es 8.x and newer, _type not supported
       #path: ""
