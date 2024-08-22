@@ -19,5 +19,5 @@ configMapGenerator:
 # ${ARGOCD_AWS_CLUSTER_NAME}
 images:
 - name: django-production-kustomize
-  newName: 350206045032.dkr.ecr.us-east-1.amazonaws.com/django-production2 # ${ARGOCD_AWS_CLUSTER_NAME}
+  newName: 350206045032.dkr.ecr.us-east-1.amazonaws.com/django-production2 # ${ARGOCD_ECR_REPO}/${ARGOCD_AWS_CLUSTER_NAME}
   newTag: ca12eafc281d84e1b7f14c2dc0d58bd96d6d464d
