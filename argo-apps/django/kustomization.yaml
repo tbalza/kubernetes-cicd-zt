@@ -14,11 +14,7 @@ configMapGenerator:
 - name: nginx-config
   files:
   - ../../django-todo/nginx/default.conf # load the nginx default.conf from the django project directory
-# the newName: def below has a seemingly hardcoded string, but is updated by image updater dynamically, since it has access to the repo. # pending . abstract from main kustomization.yaml
-# if the name of the cluster changes, images: name: will prevent image updater from updating
-#images:
-#- name: django-production-kustomize
-#  newName: ${ARGOCD_ECR_REPO}/${ARGOCD_AWS_CLUSTER_NAME}
+# the newTag: def below has a seemingly hardcoded string, but is updated by image updater dynamically, since it has access to both ECR and github repo
 images:
 - name: django-production-kustomize
   newName: ${ARGOCD_AWS_ECR_REPO}/${ARGOCD_AWS_CLUSTER_NAME}
