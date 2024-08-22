@@ -1,0 +1,33 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  generateName: cleanup-fluent-resources-
+  annotations:
+    argocd.argoproj.io/hook: PreDelete
+spec:
+  template:
+    spec:
+      serviceAccountName: argocd-cleanup
+      containers:
+      - name: cleanup
+        image: bitnami/kubectl
+        command: ["/bin/sh", "-c"]
+        args:
+        - |
+          # Assuming 'fluent' resources are confined to a specific namespace named 'fluent-namespace'
+          echo "Patching CRDs related to 'fluent', excluding system-critical CRDs..."
+          kubectl get crd --no-headers | grep 'fluent' | awk '{print $1}' | xargs -I {} kubectl patch crd {} -p '{"metadata":{"finalizers":[]}}' --type=merge
+
+          echo "Deleting all resources in the 'fluent' namespace, excluding system-critical resources..."
+          kubectl delete all,cm,pvc,sa,roles,rolebindings,secrets --all --namespace=fluent-namespace
+
+          # No need to delete the namespace if it should persist, remove this section if not desired
+          echo "Checking and deleting 'fluent' namespace if empty..."
+          if [ -z "$(kubectl get all,pvc,cm,sa,secrets,roles,rolebindings --namespace=fluent-namespace --no-headers)" ]; then
+            echo "Deleting namespace: fluent-namespace"
+            kubectl delete ns fluent-namespace --wait=false
+          else
+            echo "Namespace fluent-namespace is not empty and was not deleted."
+          fi
+
+      restartPolicy: Never
