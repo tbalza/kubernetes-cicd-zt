@@ -404,9 +404,9 @@ module "eks" {
       #ami_id                     = data.aws_ami.eks_default.image_id # check pin to specific version
       #enable_bootstrap_user_data = true # Must be set when using custom AMI i.e. AL2_x86_64, but only if you provide ami_id (not ami_type)
 
-      min_size     = 1
-      max_size     = 2
-      desired_size = 1
+      min_size     = 4
+      max_size     = 6
+      desired_size = 4
 
       capacity_type = "SPOT" # "ON_DEMAND" # SPOT instances nodes are created in random AZs without balance
 
@@ -451,7 +451,7 @@ module "eks" {
       }
 
       #force_update_version = true
-      instance_types = ["t3.medium"] # Overrides default instance defined above
+      instance_types = ["t3.small"] # Overrides default instance defined above
 
       description = "CI-CD managed node group launch template"
 
@@ -464,7 +464,7 @@ module "eks" {
           device_name = "/dev/xvda"
           ebs = {
             volume_size = 30
-            volume_type = "gp3" #gp3?
+            volume_type = "gp3"
             #iops                  = 3000 # Pending. this is for provisioned IOPS, disabled for testing
             #throughput            = 150 # Pending. this is for provisioned IOPS, disabled for testing
             encrypted = false # Check
@@ -505,7 +505,9 @@ module "eks" {
       }
     }
 
-    django = { # green
+    ###################################################################################################
+
+    django = {
 
       name = "django-node-group"
 
@@ -513,9 +515,9 @@ module "eks" {
 
       ami_type = "AL2_x86_64" # AL2_ARM_64 for arm
 
-      min_size     = 3
-      max_size     = 4
-      desired_size = 3
+      min_size     = 1
+      max_size     = 3
+      desired_size = 1
 
       capacity_type = "SPOT"
 
