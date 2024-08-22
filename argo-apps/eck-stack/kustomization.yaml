@@ -16,6 +16,6 @@ resources:
   - ingress.yaml
   - secrets.yaml
   - serviceaccount.yaml
-  - cleanup.yaml
+#  - cleanup.yaml
 
 
