@@ -9,9 +9,7 @@ spec:
         test-template:
           index_patterns:
           - logstash-*
-          priority: 500
-          template:
-            settings:
+          settings:
+            index:
               number_of_shards: 1
               number_of_replicas: 0
-          version: 1
