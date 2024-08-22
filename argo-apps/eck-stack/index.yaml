@@ -6,12 +6,16 @@ spec:
   elasticsearch:
     indexTemplates:
       composableIndexTemplates:
-        test-template11:
+        test-template-11:
           index_patterns:
-            - "logstash-*"
+            - logstash-*
+          priority: 1000
+          version: 1
           template:
             settings:
-              index:
-                number_of_shards: "1"
-                number_of_replicas: "0"
-          composed_of: []
+              number_of_shards: "1"
+              number_of_replicas: "0"
+#              index:
+#                number_of_shards: "1"
+#                number_of_replicas: "0"
+          composed_of: ["*"]
