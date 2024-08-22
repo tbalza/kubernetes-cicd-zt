@@ -15,8 +15,4 @@ configMapGenerator:
   files:
   - ../../django-todo/nginx/default.conf # load the nginx default.conf from the django project directory
 # the newName: def below has a seemingly hardcoded string, but is updated by image updater dynamically, since it has access to the repo. # pending . abstract from main kustomization.yaml
-
-images:
-- name: django-production-kustomize
-  newName: 350206045032.dkr.ecr.us-east-1.amazonaws.com/django-production
-  newTag: 2d06ecbe969a768a54dd992e9cdad91420d0cefb
+# if the name of the cluster changes, images: name: will prevent image updater from updating
