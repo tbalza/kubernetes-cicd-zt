@@ -463,7 +463,7 @@ module "eks" {
         xvda = {
           device_name = "/dev/xvda"
           ebs = {
-            volume_size = 30
+            volume_size = 50
             volume_type = "gp3"
             #iops                  = 3000 # Pending. this is for provisioned IOPS, disabled for testing
             #throughput            = 150 # Pending. this is for provisioned IOPS, disabled for testing
