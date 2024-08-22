@@ -8,8 +8,10 @@ spec:
       composableIndexTemplates:
         test-template:
           index_patterns:
-          - logstash-*
-          settings:
-            index:
-              number_of_shards: 1
-              number_of_replicas: 0
+            - "logstash-*"
+          template:
+            settings:
+              index:
+                number_of_shards: "1"
+                number_of_replicas: "0"
+          composed_of: []
