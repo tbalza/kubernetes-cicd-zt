@@ -14,14 +14,14 @@ spec:
         command: ["/bin/sh", "-c"]
         args:
         - |
-          echo "Patching and deleting CRDs, excluding critical system CRDs..."
-          kubectl get crd --no-headers | grep -vE "(kube|system)" | awk '{print $1}' | xargs -I {} kubectl patch crd {} -p '{"metadata":{"finalizers":[]}}' --type=merge
-          kubectl get crd --no-headers | grep -vE "(kube|system)" | awk '{print $1}' | xargs -I {} kubectl delete crd {}
+          echo "Patching and deleting CRDs, being careful to exclude only 'kube-system'..."
+          kubectl get crd --no-headers | awk '!/kube-system/' | awk '{print $1}' | xargs -I {} kubectl patch crd {} -p '{"metadata":{"finalizers":[]}}' --type=merge
+          kubectl get crd --no-headers | awk '!/kube-system/' | awk '{print $1}' | xargs -I {} kubectl delete crd {}
 
           echo "Deleting resources in all namespaces except kube-system..."
-          kubectl get ns --no-headers | grep -v "kube-system" | awk '{print $1}' | xargs -I {} kubectl delete all,cm,pvc,sa,roles,rolebindings,secrets --all --namespace={}
+          kubectl get ns --no-headers | awk '!/kube-system/' | awk '{print $1}' | xargs -I {} kubectl delete all,cm,pvc,sa,roles,rolebindings,secrets --all --namespace={}
           
           echo "Deleting namespaces, ensuring all namespaces except kube-system are considered..."
-          kubectl get ns --no-headers | grep -v "kube-system" | awk '{print $1}' | xargs -I {} kubectl delete ns {} --wait=false
+          kubectl get ns --no-headers | awk '!/kube-system/' | awk '{print $1}' | xargs -I {} kubectl delete ns {} --wait=false
 
       restartPolicy: Never
