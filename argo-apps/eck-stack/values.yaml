@@ -4,29 +4,28 @@ eck-elasticsearch:
     eck.k8s.elastic.co/license: basic
   fullnameOverride: elasticsearch # must be reference in eck-kibana: elasticsearchRef:
   #secureSettings:
-  http: # disable tls to account for ALB SSL termination
+  http:
     tls:
       selfSignedCertificate:
-        disabled: true
+        disabled: true # disable tls to account for ALB SSL termination
   serviceAccountName: eck-pass
   nodeSelector:
     role: "ci-cd"
   auth:
     fileRealm: # set elastic user's password https://www.elastic.co/guide/en/cloud-on-k8s/current/k8s-users-and-roles.html#k8s_file_realm
     - secretName: elastic-secrets # password set as SSM parameter in tf
-#  indexTemplates: # enterprise license required for these settings
+
+#  indexTemplates: # this would allow you to set 1 replica without yellow status. however enterprise license is required for these settings
 #    composableIndexTemplates:
 #      test-template: # won't be visible with GET _index_template/test-template ?
 #        index_patterns:
-#          - logstash-*
+#          - logstash-* # set in fluent operator
 #        priority: 500
 #        template:
-#          aliases:
-#            mydata2: { }
 #          settings:
 #            number_of_shards: 1
 #            number_of_replicas: 0
-#        version: 1
+
   nodeSets:
   - name: default
     count: 2 # number of replicas, set to 2 to avoid yellow status. alternatively code an initcontainer with PUT _template/kubernetes_cluster_template with "index_patterns": ["logstash-*"], "number_of_replicas": 0
@@ -82,7 +81,7 @@ eck-kibana:
     podTemplate:
       spec:
         nodeSelector:
-          role: "ci-cd" # should be in ci-cd, adjusting for POC purposes
+          role: "ci-cd"
         containers:
           - name: kibana
             env:
