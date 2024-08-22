@@ -14,19 +14,19 @@ eck-elasticsearch:
   auth:
     fileRealm: # set elastic user's password https://www.elastic.co/guide/en/cloud-on-k8s/current/k8s-users-and-roles.html#k8s_file_realm
     - secretName: elastic-secrets # password set as SSM parameter in tf
-  indexTemplates:
-    composableIndexTemplates:
-      test-template:
-        index_patterns:
-          - logstash-*
-        priority: 500
-        template:
-          aliases:
-            mydata2: { }
-          settings:
-            number_of_shards: 1
-            number_of_replicas: 0
-        version: 1
+#  indexTemplates:
+#    composableIndexTemplates:
+#      test-template: # won't be visible with GET _index_template/test-template ?
+#        index_patterns:
+#          - logstash-*
+#        priority: 500
+#        template:
+#          aliases:
+#            mydata2: { }
+#          settings:
+#            number_of_shards: 1
+#            number_of_replicas: 0
+#        version: 1
   nodeSets:
   - name: default
     count: 1 # number of replicas, set to 2 to avoid yellow status. alternatively set StackConfigPolicy CRD in ECK https://www.elastic.co/guide/en/cloud-on-k8s/current/k8s-stack-config-policy.html
