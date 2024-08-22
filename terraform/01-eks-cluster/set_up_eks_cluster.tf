@@ -2722,5 +2722,5 @@ output "db_instance_port" {
 resource "random_password" "elastic_password" {
   length           = 28
   special          = true
-  override_special = "!#$%&'()+,-.=?^_~" # special character whitelist
+  override_special = "!$%&()+-?_~" # special character whitelist
 }
