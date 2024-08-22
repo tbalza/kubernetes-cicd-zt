@@ -394,7 +394,7 @@ module "eks" {
 
   eks_managed_node_groups = {
 
-    ci-cd = { # green
+    ci-cd = { # green #
 
       name = "ci-cd-node-group"
 
