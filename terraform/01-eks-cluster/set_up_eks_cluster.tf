@@ -10,7 +10,7 @@ data "aws_availability_zones" "available" {}
 # aws kubernetes v1.29
 
 locals {
-  name            = "django-production2" # cluster name
+  name            = "django-production" # cluster name
   cluster_version = "1.29"              # 1.29
   region          = "us-east-1"
   domain          = "tbalza.net"
