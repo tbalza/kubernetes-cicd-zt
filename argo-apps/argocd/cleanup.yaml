@@ -1,0 +1,25 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  generateName: cleanup-resources-
+  annotations:
+    argocd.argoproj.io/hook: PreDelete
+spec:
+  template:
+    spec:
+      serviceAccountName: argocd-cleanup
+      containers:
+      - name: cleanup
+        image: bitnami/kubectl
+        command: ["/bin/sh", "-c"]
+        args:
+        - |
+          echo "Patching CRDs to remove finalizers..."
+          for crd in $(kubectl get crd -o name); do
+            kubectl patch $crd -p '{"metadata":{"finalizers":[]}}' --type=merge
+          done
+          echo "Deleting all CRDs..."
+          kubectl delete crd --all
+          echo "Deleting additional resources..."
+          kubectl delete all --all-namespaces --selector=app.kubernetes.io/managed-by=Helm
+      restartPolicy: Never
