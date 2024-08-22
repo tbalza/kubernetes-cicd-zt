@@ -5,13 +5,6 @@ metadata:
 spec:
   elasticsearch:
     indexTemplates:
-      componentTemplates:
-        test-component-template:
-          template:
-            mappings:
-              properties:
-                '@timestamp':
-                  type: date
       composableIndexTemplates:
         test-template11:
           index_patterns:
@@ -21,5 +14,4 @@ spec:
               index:
                 number_of_shards: "1"
                 number_of_replicas: "0"
-          composed_of:
-          - test-component-template
+          composed_of: []
