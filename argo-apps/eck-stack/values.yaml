@@ -14,9 +14,9 @@ eck-elasticsearch:
   auth:
     fileRealm: # set elastic user's password https://www.elastic.co/guide/en/cloud-on-k8s/current/k8s-users-and-roles.html#k8s_file_realm
     - secretName: elastic-secrets # password set as SSM parameter in tf
-  indexTemplates:
+  indexTemplates: # https://www.elastic.co/guide/en/cloud-on-k8s/current/k8s-stack-config-policy.html
     composableIndexTemplates:
-      - name: kubernetes-cluster-template
+      kubernetes-cluster-template:
         index_patterns:
           - "logstash-*"
         template:
