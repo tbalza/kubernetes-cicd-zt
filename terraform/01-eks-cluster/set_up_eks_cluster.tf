@@ -404,9 +404,9 @@ module "eks" {
       #ami_id                     = data.aws_ami.eks_default.image_id # check pin to specific version
       #enable_bootstrap_user_data = true # Must be set when using custom AMI i.e. AL2_x86_64, but only if you provide ami_id (not ami_type)
 
-      min_size     = 2
-      max_size     = 3
-      desired_size = 2
+      min_size     = 1
+      max_size     = 2
+      desired_size = 1
 
       capacity_type = "SPOT" # "ON_DEMAND" # SPOT instances nodes are created in random AZs without balance
 
@@ -513,9 +513,9 @@ module "eks" {
 
       ami_type = "AL2_x86_64" # AL2_ARM_64 for arm
 
-      min_size     = 1
-      max_size     = 2
-      desired_size = 1
+      min_size     = 3
+      max_size     = 4
+      desired_size = 3
 
       capacity_type = "SPOT"
 
@@ -537,7 +537,7 @@ module "eks" {
       }
 
       #force_update_version = true
-      instance_types = ["t3.medium"] # Overrides default instance defined above
+      instance_types = ["t3.small"] # Overrides default instance defined above
 
       description = "Django managed node group launch template"
 

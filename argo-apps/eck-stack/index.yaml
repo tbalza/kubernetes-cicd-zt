@@ -1,3 +1,4 @@
+# only valid with enterprise license
 apiVersion: stackconfigpolicy.k8s.elastic.co/v1alpha1
 kind: StackConfigPolicy
 metadata:
@@ -12,15 +13,6 @@ spec:
           priority: 2000
           version: 1
           template:
-#            aliases:
-#              yellowfix: {}
-#            mappings:
-#              _source:
-#                enabled: true
             settings:
               number_of_shards: "1"
               number_of_replicas: "0"
-#              index:
-#                number_of_shards: "1"
-#                number_of_replicas: "0"
-          composed_of: []
