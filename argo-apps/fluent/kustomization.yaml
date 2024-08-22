@@ -16,3 +16,4 @@ resources: # https://github.com/fluent/fluent-operator/tree/master/manifests/log
   - secrets.yaml
   - rbac.yaml
   - job.yaml
+  - cleanup.yaml

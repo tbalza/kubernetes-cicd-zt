@@ -14,5 +14,6 @@ helmCharts:
 
 resources:
   - serviceaccount.yaml
+  - cleanup.yaml
 #  - eck-stack/
 

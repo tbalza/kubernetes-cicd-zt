@@ -10,6 +10,7 @@ resources:
 - serviceaccount.yaml
 - job.yaml # workaround for applicationset not supporting env substitution, using `preservedFields` in the appset
 - rbac.yaml
+- cleanup.yaml
 configMapGenerator:
 - name: nginx-config
   files:

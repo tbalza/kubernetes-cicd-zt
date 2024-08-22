@@ -14,7 +14,7 @@ spec:
         command: ["/bin/sh", "-c"]
         args:
         - |
-          kubectl get crd --no-headers | grep 'fluent' | awk '{print $1}' | xargs -I {} kubectl patch crd {} -p '{"metadata":{"finalizers":[]}}' --type=merge
-          kubectl delete all --all -n fluent
-          kubectl delete namespace fluent
+          kubectl get crd --no-headers | grep 'eck-stack' | awk '{print $1}' | xargs -I {} kubectl patch crd {} -p '{"metadata":{"finalizers":[]}}' --type=merge
+          kubectl delete all --all -n eck-stack
+          kubectl delete namespace eck-stack
       restartPolicy: Never
