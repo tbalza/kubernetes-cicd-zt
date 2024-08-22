@@ -1,0 +1,19 @@
+apiVersion: stackconfigpolicy.k8s.elastic.co/v1alpha1
+kind: StackConfigPolicy
+metadata:
+  name: test-stack-config-policy
+spec:
+  elasticsearch:
+    indexTemplates:
+      composableIndexTemplates:
+        test-template:
+          index_patterns:
+          - logstash-*
+          priority: 500
+          template:
+            aliases:
+              mydata: {}
+            settings:
+              number_of_shards: 1
+              number_of_replicas: 0
+          version: 1
