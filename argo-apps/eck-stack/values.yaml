@@ -81,7 +81,7 @@ eck-kibana:
     podTemplate:
       spec:
         nodeSelector:
-          role: "ci-cd"
+          role: "django" # assigning app nodegroup for POC purposes
         containers:
           - name: kibana
             env:

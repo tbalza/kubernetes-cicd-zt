@@ -451,7 +451,7 @@ module "eks" {
       }
 
       #force_update_version = true
-      instance_types = ["t3.xlarge"] # Overrides default instance defined above
+      instance_types = ["t3.large"] # Overrides default instance defined above
 
       description = "CI-CD managed node group launch template"
 
