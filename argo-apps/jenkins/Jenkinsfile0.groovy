@@ -5,7 +5,9 @@ pipeline {
         }
     }
     triggers {
-        githubPush() // sets up the pipeline to receive a GitHub webhook
+        // Poll SCM every 5 minutes
+        //pollSCM('H/5 * * * *')
+        githubPush() // this sets up the pipeline to receive a GitHub webhook
     }
     stages {
         stage('Checkout Code') {
@@ -16,7 +18,7 @@ pipeline {
                         branches: [[name: '*/main']],
                         userRemoteConfigs: [[url: "${REPO_URL}"]] // this lets jenkins/github-plugin know the webhook ping is related to the repo
                     ]
-                    script {
+                    script {  // correct usage of script block to handle Groovy scripting
                         env.GIT_COMMIT = sh(script: "git rev-parse HEAD", returnStdout: true).trim()
                         echo "Current GIT COMMIT: ${env.GIT_COMMIT}"
 
@@ -26,10 +28,9 @@ pipeline {
 
                         // Check if the author is 'argocd-image-updater'
                         if (env.GIT_AUTHOR_NAME == 'argocd-image-updater') {
-                            echo "Commit made by ArgoCD Image Updater. Exiting with success."
+                            echo "Commit made by ArgoCD Image Updater. Marking build as successful and exiting."
                             currentBuild.result = 'SUCCESS'
-                            // Instead of throwing an error, skip the rest of the pipeline
-                            return
+                            return // Exit the pipeline successfully
                         }
                     }
                 }
@@ -39,7 +40,7 @@ pipeline {
             steps {
                 container('jnlp') {
                     script {
-                        def images = ecrListImages(repositoryName: "${ECR_REPO_NAME}")
+                        def images = ecrListImages(repositoryName: "${ECR_REPO_NAME}") // pending make dynamic
                         def tagList = []
 
                         if (images) {
@@ -78,7 +79,7 @@ pipeline {
                             echo "Git diff completed between ${env.LATEST_ECR_COMMIT} and ${env.GIT_COMMIT}."
                             if (changes.isEmpty()) {
                                 echo "No changes in the Django directory since the last ECR image commit. No build needed."
-                                env.BUILD_NEEDED = 'false'
+                                env.BUILD_NEEDED = 'false' // Explicitly marking no build needed
                             } else {
                                 echo "Changes detected in Django. Proceeding with build."
                                 env.BUILD_NEEDED = 'true'
