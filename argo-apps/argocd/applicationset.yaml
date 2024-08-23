@@ -31,12 +31,12 @@ spec:
               operator: NotIn
               values:
                 - argocd
-                #- fluent
-#        - matchExpressions:
-#            - key: syncorder # Label defined in appset template:,metadata:,labels:
-#              operator: In
-#              values:
-#                - fluent
+                - prometheus
+        - matchExpressions:
+            - key: syncorder # Label defined in appset template:,metadata:,labels:
+              operator: In
+              values:
+                - prometheus
   template:
     metadata:
       name: '{{.path.basename}}'
@@ -68,6 +68,7 @@ spec:
             - /spec/claimRef/uid
             - /status/lastPhaseTransitionTime
       syncPolicy:
+        #preserveResourcesOnDeletion: false
         automated:
           selfHeal: true
           prune: true # (disable when testing cmp plugin) enables the deletion of resources that are no longer in source

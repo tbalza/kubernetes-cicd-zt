@@ -18,8 +18,7 @@ resources:
   - secrets2.yaml
   - ingress.yaml
   - rbac.yaml
-#  - cleanup.yaml
-#  - serviceaccount.yaml
+#  - serviceaccount.yaml # annotation is bootstrapped in tf with helm resource
 #  - applicationset.yaml
 
 patches:

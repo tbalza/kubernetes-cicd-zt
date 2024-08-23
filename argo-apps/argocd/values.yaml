@@ -3,9 +3,6 @@ crds:
 
 global:
   domain: argocd.tbalza.net # Used for ingresses, certificates, SSO, notifications, etc. (blank allows all domains) # check if it can be replaced by ingress
-#  env:
-#    - name: ARGOCD_SYNC_WAVE_DELAY
-#      value: 15
 #  image:
 #    tag: "v2.11.4"
   nodeSelector:

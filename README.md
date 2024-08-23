@@ -114,7 +114,7 @@ Access argocd cli tool: port-forwarded the argo server to localhost port 8080
 
                         argocd login localhost:8080 --username admin --password PASSWORD
 
-                        argocd login localhost:8080 --username admin --password $(kubectl get secret argocd-initial-admin-secret -n argocd -o jsonpath="{.data.password}" | base64 --decode)
+                        argocd login localhost:8080 --username admin --password $(kubectl get secret argocd-initial-admin-secret -n argocd -o jsonpath="{.data.password}" | base64 --decode) --plaintext
 
 WARNING: server certificate had error: x509: “Argo CD” certificate is not trusted. Proceed insecurely (y/n)? y
 'admin:login' logged in successfully

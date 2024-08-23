@@ -94,6 +94,11 @@ resource "helm_release" "argo_cd" {
     value = data.terraform_remote_state.eks.outputs.argo_cd_repo_iam_role_arn # role/ArgoCDrepoRole
   }
 
+#  provisioner "local-exec" {
+#    when    = destroy
+#    command = "kubectl patch crd applications.argoproj.io -p '{\"metadata\":{\"finalizers\":[]}}' --type=merge"
+#  }
+
   # Ensure that the Kubernetes namespace exists before deploying
   depends_on = [
     #kubernetes_namespace.argo_cd,
@@ -109,6 +114,11 @@ resource "helm_release" "argo_cd" {
 
 resource "kubectl_manifest" "example_applicationset" {
   yaml_body = file("${path.module}/../../argo-apps/argocd/applicationset.yaml")
+
+  provisioner "local-exec" {
+    when    = destroy
+    command = "kubectl patch crd applications.argoproj.io -p '{\"metadata\":{\"finalizers\":[]}}' --type=merge"
+  }
 
   depends_on = [
     helm_release.argo_cd # kubectl_manifest.kustomize_patch

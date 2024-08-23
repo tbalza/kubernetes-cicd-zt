@@ -10,7 +10,7 @@ data "aws_availability_zones" "available" {}
 # aws kubernetes v1.29
 
 locals {
-  name            = "django-production7" # cluster name
+  name            = "django-production8" # cluster name
   cluster_version = "1.29"              # 1.29
   region          = "us-east-1"
   domain          = "tbalza.net"
@@ -280,17 +280,27 @@ module "eks" {
 
   cluster_addons = {
     coredns = {
-      resolve_conflicts_on_update = "OVERWRITE" #nodeSelector: {}
+      resolve_conflicts_on_update = "OVERWRITE"
       resolve_conflicts_on_create = "OVERWRITE"
       addon_version               = "v1.11.1-eksbuild.9"
+      configuration_values = jsonencode({
+        nodeSelector = {
+          "role" = "ci-cd"
+        }
+      })
     }
     kube-proxy = {
-      resolve_conflicts_on_update = "OVERWRITE" #nodeSelector: {}
+      resolve_conflicts_on_update = "OVERWRITE"
       resolve_conflicts_on_create = "OVERWRITE"
       addon_version               = "v1.29.3-eksbuild.2"
+      configuration_values = jsonencode({
+        nodeSelector = {
+          "role" = "ci-cd"
+        }
+      })
     }
     vpc-cni = {
-      resolve_conflicts_on_update = "OVERWRITE" #nodeSelector: {}
+      resolve_conflicts_on_update = "OVERWRITE"
       resolve_conflicts_on_create = "OVERWRITE"
       addon_version               = "v1.18.1-eksbuild.3"
       before_compute              = true # Attempts to create VPC CNI before the associated nodegroups, EC2 bootstrap may still be needed
@@ -299,13 +309,14 @@ module "eks" {
           ENABLE_PREFIX_DELEGATION = "true" # Increase max pods per node, t3.medium from 17 to 110 pod limit
           WARM_PREFIX_TARGET       = "1"
         }
+        nodeSelector = {
+          "role" = "ci-cd"
+        }
       })
     }
 
     # pending `kubectl annotate sc gp2 storageclass.kubernetes.io/is-default-class: "false"`
     # https://github.com/kubernetes-sigs/aws-ebs-csi-driver/blob/master/charts/aws-ebs-csi-driver/values.yaml
-    #nodeSelector: {}
-    #deploymentAnnotations: {}
     aws-ebs-csi-driver = {
       resolve_conflicts_on_update = "OVERWRITE"
       resolve_conflicts_on_create = "OVERWRITE"
@@ -320,10 +331,13 @@ module "eks" {
         #            }
         #          }
         #        ]
-        sidecars : { # https://github.com/kubernetes-sigs/aws-ebs-csi-driver/issues/1447 # pending
+        sidecars : { # https://github.com/kubernetes-sigs/aws-ebs-csi-driver/issues/1447 # fix `failed to list *v1.VolumeSnapshotClass` error
           snapshotter : {
             forceEnable : false
           }
+        }
+        nodeSelector = {
+          "role" = "ci-cd"
         }
 
       })
@@ -593,8 +607,6 @@ module "eks" {
     }
 
   }
-
-
 
   # check
   access_entries = {
@@ -1724,82 +1736,6 @@ resource "aws_iam_role_policy_attachment" "jenkins_ecr_attach" {
 }
 
 #####
-#resource "aws_iam_policy" "django_ecr" { # check AmazonEC2ContainerRegistryPowerUser
-#  name        = "DjangoECRPolicy"
-#  path        = "/"
-#  description = "Allows Django to list ECR artifacts" # pending
-#
-#  policy = jsonencode({
-#    Version = "2012-10-17"
-#    Statement = [
-#      {
-#        Effect = "Allow"
-#        Action = [
-#          "ecr:GetAuthorizationToken",       # req
-#          "ecr:BatchCheckLayerAvailability", # req
-#          "ecr:GetDownloadUrlForLayer",      # req
-#          "ecr:GetRepositoryPolicy",
-#          "ecr:DescribeRepositories",
-#          "ecr:ListImages",
-#          "ecr:DescribeImages",
-#          "ecr:BatchGetImage", # req
-#          "ecr:InitiateLayerUpload",
-#          "ecr:UploadLayerPart",
-#          "ecr:CompleteLayerUpload",
-#          "ecr:PutImage",
-#          "ecr:*",
-#          # https://github.com/argoproj/argo-cd/issues/8097
-#        ]
-#        Resource = "*"
-#      },
-#    ]
-#  })
-#}
-#
-#resource "aws_iam_role_policy_attachment" "django_ecr_attach" {
-#  role       = aws_iam_role.django.name
-#  policy_arn = aws_iam_policy.django_ecr.arn
-#}
-
-#####
-
-#resource "aws_iam_policy" "argocd_ecr" { # check AmazonEC2ContainerRegistryPowerUser
-#  name        = "ArgoCDECRPolicy"
-#  path        = "/"
-#  description = "Allows argoCD to list ECR artifacts" # pending
-#
-#  policy = jsonencode({
-#    Version = "2012-10-17"
-#    Statement = [
-#      {
-#        Effect = "Allow"
-#        Action = [
-#          "ecr:GetAuthorizationToken",       # req
-#          "ecr:BatchCheckLayerAvailability", # req
-#          "ecr:GetDownloadUrlForLayer",      # req
-#          "ecr:GetRepositoryPolicy",
-#          "ecr:DescribeRepositories",
-#          "ecr:ListImages",
-#          "ecr:DescribeImages",
-#          "ecr:BatchGetImage", # req
-#          "ecr:InitiateLayerUpload",
-#          "ecr:UploadLayerPart",
-#          "ecr:CompleteLayerUpload",
-#          "ecr:PutImage",
-#          # https://github.com/argoproj/argo-cd/issues/8097
-#        ]
-#        Resource = "*"
-#      },
-#    ]
-#  })
-#}
-#
-#resource "aws_iam_role_policy_attachment" "argocd_ecr_attach" {
-#  role       = aws_iam_role.argocd_image_updater
-#  policy_arn = aws_iam_policy.argocd_ecr.arn
-#}
-
-
 
 # ArgoCD Image Updater is going to read ECR
 resource "aws_iam_policy" "imageupdater_ecr" { # check AmazonEC2ContainerRegistryPowerUser
@@ -2056,28 +1992,6 @@ resource "aws_iam_role_policy_attachment" "reposerver_read_attach" { # check
   role       = aws_iam_role.argocd_repo.name
   policy_arn = aws_iam_policy.argocd_repo_ssm_read.arn
 }
-
-
-####### check
-
-#resource "aws_iam_policy" "jenkins_admin" {
-#  name   = "JenkinsAdminPolicy"
-#  policy = jsonencode({
-#    Version = "2012-10-17",
-#    Statement = [
-#      {
-#        Effect   = "Allow",
-#        Action   = "*",
-#        Resource = "*"
-#      }
-#    ]
-#  })
-#}
-#
-#resource "aws_iam_role_policy_attachment" "jenkins_admin_attach" {
-#  role       = aws_iam_role.jenkins.name
-#  policy_arn = aws_iam_policy.jenkins_admin.arn
-#}
 
 
 ###############################################################################
@@ -2358,6 +2272,7 @@ variable "CFL_ZONE_ID" {
 }
 
 # Create ACM wildcard cert, with DNS validation using Cloudflare
+# if gets stuck `terraform apply -target=module.acm`
 module "acm" {
   source  = "terraform-aws-modules/acm/aws"
   version = "5.0.1"
@@ -2401,7 +2316,7 @@ output "validation_domains" {
 # Cloudflare
 ###############################################################################
 # This block only takes care of validating the wildcard ACM cert.
-# individual app CNAME entries are created dynamically by ExternalDNS (defined in the ingress of each app)
+# individual app CNAME entries are created dynamically by ExternalDNS (defined in the ingress.yaml of each app)
 
 ## must be set before tf apply
 # export TF_VAR_CFL_API_TOKEN=123example
@@ -2434,8 +2349,6 @@ resource "cloudflare_record" "validation" {
 ###############################################################################
 
 # Pending. connection pooling (possibly using something like django-db-connection-pool or other external tools like PgBouncer).
-
-
 # Create rds random password.
 resource "random_password" "database_password" {
   length           = 28
@@ -2454,13 +2367,6 @@ resource "random_password" "django_secretkey" {
 
 ### must be set before tf apply
 ## export TF_VAR_RDS_PASSWORD=123example
-## optional: limit which Ingress objects are used as an ExternalDNS source via the ingress-class
-### Import environment variables as TF variable
-#variable "RDS_PASSWORD" {
-#  description = "Django RDS db password"
-#  type        = string
-#  sensitive   = true
-#}
 
 module "db" {
   source  = "terraform-aws-modules/rds/aws"
@@ -2499,8 +2405,6 @@ module "db" {
   master_user_password_rotate_immediately           = false
   master_user_password_rotation_schedule_expression = "rate(60 days)"
   manage_master_user_password                       = false # Set to true to allow RDS to manage the master user password in Secrets Manager
-  ##create_random_password                            = false # required if you supply your own password (i.e. SSM parameter) ## doesn't exist?
-
 
   password = random_password.database_password.result
   #password = aws_ssm_parameter.rds_password.value # random_password.database_password.result # data.aws_ssm_parameter.kms_keyid.value
