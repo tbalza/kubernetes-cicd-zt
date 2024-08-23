@@ -5,7 +5,7 @@ controller:
 #  scriptApproval:
 #    - "staticMethod org.codehaus.groovy.runtime.DefaultGroovyMethods dump java.lang.Object" # required for "dump" in ecr plugin
   nodeSelector:
-    role: ci-cd
+    role: django # ci-cd # assigned to app node group for POC purposes
   sidecars:
     configAutoReload:
       enabled: false # require pod restart for config change. false allows to view current temporary jcasc
