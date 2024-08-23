@@ -28,8 +28,7 @@ pipeline {
                         if (env.GIT_AUTHOR_NAME == 'argocd-image-updater') {
                             echo "Commit made by ArgoCD Image Updater. Exiting with success."
                             currentBuild.result = 'SUCCESS'
-                            // Instead of throwing an error, skip the rest of the pipeline
-                            return
+                            error('Exiting due to commit by ArgoCD Image Updater.') // Terminate pipeline
                         }
                     }
                 }
