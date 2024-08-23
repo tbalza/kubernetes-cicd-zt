@@ -31,12 +31,12 @@ spec:
               operator: NotIn
               values:
                 - argocd
-                - prometheus
+                - fluent
         - matchExpressions:
             - key: syncorder # Label defined in appset template:,metadata:,labels:
               operator: In
               values:
-                - prometheus
+                - fluent
   template:
     metadata:
       name: '{{.path.basename}}'
