@@ -28,7 +28,7 @@ eck-elasticsearch:
 
   nodeSets:
   - name: default
-    count: 2 # number of replicas, set to 2 to avoid yellow status. alternatively code an initcontainer with PUT _template/kubernetes_cluster_template with "index_patterns": ["logstash-*"], "number_of_replicas": 0
+    count: 1 # number of replicas, set to 2 to avoid yellow status. alternatively code an initcontainer with PUT _template/kubernetes_cluster_template with "index_patterns": ["logstash-*"], "number_of_replicas": 0
     config:
       node.store.allow_mmap: false # vm.max_map_count via initContainer # vm.max_map_count to 262144 # https://www.elastic.co/guide/en/cloud-on-k8s/current/k8s-virtual-memory.html
     podTemplate:
