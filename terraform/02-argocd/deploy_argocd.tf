@@ -71,7 +71,7 @@ resource "helm_release" "argo_cd" {
   version    = local.argocd_helm_chart.version # "6.7.14" # pending reference this dynamically to argo-apps/argocd/config.yaml
   namespace = local.argocd_helm_chart.namespace # "argocd"
 
-  #wait = false
+  #wait = false # might be needed!
 
   create_namespace = true
 # "${tostring(data.terraform_remote_state.eks.outputs.ecr_repo_url)}"
@@ -107,6 +107,8 @@ resource "helm_release" "argo_cd" {
       xargs -I {} kubectl delete all,pvc,secrets,configmaps,ingresses,networkpolicies,serviceaccounts,jobs,cronjobs,applicationsets --all -n {}
     EOT
   }
+
+  # delete all,pvc,secrets,configmaps,ingresses,networkpolicies,serviceaccounts,jobs,cronjobs,applicationsets
 
   # Ensure that the Kubernetes namespace exists before deploying
 #  depends_on = [

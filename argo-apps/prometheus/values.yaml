@@ -48,6 +48,8 @@ prometheusOperator:
         eks.amazonaws.com/role-arn: "arn:aws:iam::350206045032:role/PrometheusRole" # check , make cluster and account id dynamic
   admissionWebhooks:
     failurePolicy: Ignore # check
+    patch:
+      ttlSecondsAfterFinished: 120 # prometheus-kube-stack sync fix
   nodeSelector:
       role: ci-cd
 

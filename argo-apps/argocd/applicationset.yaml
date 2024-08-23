@@ -83,3 +83,4 @@ spec:
         - ServerSideApply=true
         - ServerSideDiff=true
         - RespectIgnoreDifferences=true # (custom diffing) fixes syncing error: .status.lastPhaseTransitionTime: field not declared in schema (related to django PV)
+        - PruneLast=true # prometheus-kube-stack sync fix
