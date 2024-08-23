@@ -65,60 +65,63 @@ resource "helm_release" "argo_cd" {
 
   # IDE may show "unresolved reference" even though it's linked correctly in tf.
   # referencing kustomization.yaml from argocd (inside /argo-apps/argocd)
-  name       = local.argocd_helm_chart.name # "argo-cd"
-  repository = local.argocd_helm_chart.repo # "https://argoproj.github.io/argo-helm"
+  name       = local.argocd_helm_chart.name        # "argo-cd"
+  repository = local.argocd_helm_chart.repo        # "https://argoproj.github.io/argo-helm"
   chart      = local.argocd_helm_chart.releaseName # "argo-cd"
-  version    = local.argocd_helm_chart.version # "6.7.14" # pending reference this dynamically to argo-apps/argocd/config.yaml
-  namespace = local.argocd_helm_chart.namespace # "argocd"
+  version    = local.argocd_helm_chart.version     # "6.7.14" # pending reference this dynamically to argo-apps/argocd/config.yaml
+  namespace  = local.argocd_helm_chart.namespace   # "argocd"
 
-  #wait = false # might be needed!
+  wait = false # might be needed!
 
   create_namespace = true
-# "${tostring(data.terraform_remote_state.eks.outputs.ecr_repo_url)}"
+  # "${tostring(data.terraform_remote_state.eks.outputs.ecr_repo_url)}"
   values = [file("${path.module}/../../argo-apps/argocd/values.yaml")]
-#  values = [
-#    file("../../${path.module}/argo-apps/argocd/values.yaml"),
-#    <<-EOT
-#    global:
-#      env:
-#        - name: ARGOCD_APP_DOMAIN2
-#          value: "${data.terraform_remote_state.eks.outputs.argo_cd_aws_domain}"
-#    EOT
-#  ]
+  #  values = [
+  #    file("../../${path.module}/argo-apps/argocd/values.yaml"),
+  #    <<-EOT
+  #    global:
+  #      env:
+  #        - name: ARGOCD_APP_DOMAIN2
+  #          value: "${data.terraform_remote_state.eks.outputs.argo_cd_aws_domain}"
+  #    EOT
+  #  ]
 
-#  set { # used for ImageUpdater secrets. contains github credentials
-#    name  = "controller.serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn" # annotation to allows service account to assume aws role
-#    value = data.terraform_remote_state.eks.outputs.argo_cd_image_iam_role_arn # role/ArgoCDRole
-#  }
+  #  set { # used for ImageUpdater secrets. contains github credentials
+  #    name  = "controller.serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn" # annotation to allows service account to assume aws role
+  #    value = data.terraform_remote_state.eks.outputs.argo_cd_image_iam_role_arn # role/ArgoCDRole
+  #  }
 
-  set { # used for ArgoCD Repo Server secrets. contains values that envsubst plugin uses (kustomize cannot load external env fed from tf by design, argocd cmp is a workaround)
+  set {                                                                            # used for ArgoCD Repo Server secrets. contains values that envsubst plugin uses (kustomize cannot load external env fed from tf by design, argocd cmp is a workaround)
     name  = "repoServer.serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn" # annotation to allows service account to assume aws role
-    value = data.terraform_remote_state.eks.outputs.argo_cd_repo_iam_role_arn # role/ArgoCDrepoRole
+    value = data.terraform_remote_state.eks.outputs.argo_cd_repo_iam_role_arn      # role/ArgoCDrepoRole
   }
 
   provisioner "local-exec" {
-    when    = destroy
+    when = destroy
     # kubectl patch application argocd -n argocd --type=json -p='[{"op": "remove", "path": "/metadata/finalizers"}]'
     # kubectl patch application eck-stack -n argocd --type=json -p='[{"op": "remove", "path": "/metadata/finalizers"}]'
-    command = "kubectl -n argocd get app -o jsonpath='{range .items[*]}{.metadata.name}{'\n'}{end}' | while read app; do echo 'Patching finalizer for $app'; kubectl patch application $app -n argocd --type json --patch '[{'op': 'remove', 'path': '/metadata/finalizers'}]'; done"
-#    command = <<-EOT
-#      kubectl get crd -o name |
-#      grep -E 'argoproj.io|monitoring.coreos.com|fluent.io|elastic.co' |
-#      xargs -I {} kubectl patch {} -p '{"metadata":{"finalizers":[]}}' --type=merge &&
-#      kubectl -n argocd get app -o jsonpath='{range .items[*]}{.metadata.name}{"\n"}{end}' |
-#      xargs -I {} kubectl delete all,pvc,secrets,configmaps,ingresses,networkpolicies,serviceaccounts,jobs,cronjobs,applicationsets --all -n {}
-#    EOT
+    #command = "kubectl -n argocd get app -o jsonpath='{range .items[*]}{.metadata.name}{'\n'}{end}' | while read app; do echo 'Patching finalizer for $app'; kubectl patch application $app -n argocd --type json --patch '[{'op': 'remove', 'path': '/metadata/finalizers'}]'; done"
+    command = <<EOF
+      kubectl -n argocd get app -o jsonpath="{range .items[*]}{.metadata.name}{'\n'}{end}" | while read app; do echo "Patching finalizer for $app"; kubectl patch application $app -n argocd --type json --patch "[{\"op\": \"remove\", \"path\": \"/metadata/finalizers\"}]"; done
+    EOF
+    #    command = <<-EOT
+    #      kubectl get crd -o name |
+    #      grep -E 'argoproj.io|monitoring.coreos.com|fluent.io|elastic.co' |
+    #      xargs -I {} kubectl patch {} -p '{"metadata":{"finalizers":[]}}' --type=merge &&
+    #      kubectl -n argocd get app -o jsonpath='{range .items[*]}{.metadata.name}{"\n"}{end}' |
+    #      xargs -I {} kubectl delete all,pvc,secrets,configmaps,ingresses,networkpolicies,serviceaccounts,jobs,cronjobs,applicationsets --all -n {}
+    #    EOT
   }
 
   # delete all,pvc,secrets,configmaps,ingresses,networkpolicies,serviceaccounts,jobs,cronjobs,applicationsets
 
   # Ensure that the Kubernetes namespace exists before deploying
-#  depends_on = [
-#    #kubernetes_namespace.argo_cd,
-#    #helm_release.cert_manager
-#    #data.terraform_remote_state.eks.outputs.eks, # pending. wait until node groups are provisioned before deploying argocd
-#    #data.terraform_remote_state.eks.outputs.eks_managed_node_groups # pending. wait until node groups are provisioned before deploying argocd
-#  ]
+  #  depends_on = [
+  #    #kubernetes_namespace.argo_cd,
+  #    #helm_release.cert_manager
+  #    #data.terraform_remote_state.eks.outputs.eks, # pending. wait until node groups are provisioned before deploying argocd
+  #    #data.terraform_remote_state.eks.outputs.eks_managed_node_groups # pending. wait until node groups are provisioned before deploying argocd
+  #  ]
 }
 
 ## ArgoCD apply ApplicationSet
