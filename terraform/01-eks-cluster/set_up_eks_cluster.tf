@@ -10,7 +10,7 @@ data "aws_availability_zones" "available" {}
 # aws kubernetes v1.29
 
 locals {
-  name            = "django-production6" # cluster name
+  name            = "django-production7" # cluster name
   cluster_version = "1.29"              # 1.29
   region          = "us-east-1"
   domain          = "tbalza.net"
@@ -463,7 +463,7 @@ module "eks" {
         xvda = {
           device_name = "/dev/xvda"
           ebs = {
-            volume_size = 50
+            volume_size = 30
             volume_type = "gp3"
             #iops                  = 3000 # Pending. this is for provisioned IOPS, disabled for testing
             #throughput            = 150 # Pending. this is for provisioned IOPS, disabled for testing
