@@ -24,7 +24,7 @@ resources:
 configMapGenerator:
   - name: jenkins-scripts
     files:
-    - Jenkinsfile0.groovy # Jenkinsfile.groovy
+    - Jenkinsfile.groovy # Jenkinsfile.groovy
 
 #replacements:
 #  - source:
