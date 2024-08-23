@@ -18,7 +18,7 @@ controller:
     password: "pass" # check
   resources:
     requests:
-      cpu: "250m"
+      cpu: "500m"
       memory: ".5Gi"
     limits:
       cpu: "1000m"
@@ -104,7 +104,7 @@ agent:
   directConnection: false #  (websocket and directConnection are mutually exclusive)
   resources:
     requests:
-      cpu: "250m"
+      cpu: "500m"
       memory: "512Mi"
       # ephemeralStorage:
     limits:
