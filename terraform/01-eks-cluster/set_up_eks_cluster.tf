@@ -2049,6 +2049,9 @@ data:
   ]
 }
 
+# if gets stuck, `terraform apply -target=helm_release.external_dns -auto-approve`
+# `terraform taint helm_release.external_dns`
+# `aws eks update-kubeconfig --name django-production8 --region us-east-1`
 resource "helm_release" "external_dns" {
   name       = "external-dns"
   chart      = "external-dns"
@@ -2273,6 +2276,7 @@ variable "CFL_ZONE_ID" {
 
 # Create ACM wildcard cert, with DNS validation using Cloudflare
 # if gets stuck `terraform apply -target=module.acm`
+# `terraform taint module.acm`
 module "acm" {
   source  = "terraform-aws-modules/acm/aws"
   version = "5.0.1"
