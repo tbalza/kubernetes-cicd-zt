@@ -29,12 +29,12 @@ spec:
               operator: NotIn
               values:
                 - argocd
-                - fluent
-        - matchExpressions:
-            - key: syncorder # Label defined in appset template:,metadata:,labels:
-              operator: In
-              values:
-                - fluent
+                #- fluent
+#        - matchExpressions:
+#            - key: syncorder # Label defined in appset template:,metadata:,labels:
+#              operator: In
+#              values:
+#                - fluent
   template:
     metadata:
       name: '{{.path.basename}}'
