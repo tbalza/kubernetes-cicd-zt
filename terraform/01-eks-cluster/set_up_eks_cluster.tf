@@ -293,11 +293,11 @@ module "eks" {
       resolve_conflicts_on_update = "OVERWRITE"
       resolve_conflicts_on_create = "OVERWRITE"
       addon_version               = "v1.29.3-eksbuild.2"
-      configuration_values = jsonencode({
-        nodeSelector = {
-          "role" = "ci-cd"
-        }
-      })
+#      configuration_values = jsonencode({
+#        nodeSelector = { nodeSelector: is not defined in the schema and the schema does not allow additional properties
+#          "role" = "ci-cd"
+#        }
+#      })
     }
     vpc-cni = {
       resolve_conflicts_on_update = "OVERWRITE"
@@ -309,9 +309,9 @@ module "eks" {
           ENABLE_PREFIX_DELEGATION = "true" # Increase max pods per node, t3.medium from 17 to 110 pod limit
           WARM_PREFIX_TARGET       = "1"
         }
-        nodeSelector = {
-          "role" = "ci-cd"
-        }
+#        nodeSelector = { nodeSelector: is not defined in the schema and the schema does not allow additional properties
+#          "role" = "ci-cd"
+#        }
       })
     }
 
@@ -336,9 +336,9 @@ module "eks" {
             forceEnable : false
           }
         }
-        nodeSelector = {
-          "role" = "ci-cd"
-        }
+#        nodeSelector = { nodeSelector: is not defined in the schema and the schema does not allow additional properties
+#          "role" = "ci-cd"
+#        }
 
       })
     }

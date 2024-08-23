@@ -71,6 +71,8 @@ resource "helm_release" "argo_cd" {
   version    = local.argocd_helm_chart.version # "6.7.14" # pending reference this dynamically to argo-apps/argocd/config.yaml
   namespace = local.argocd_helm_chart.namespace # "argocd"
 
+  #wait = false
+
   create_namespace = true
 # "${tostring(data.terraform_remote_state.eks.outputs.ecr_repo_url)}"
   values = [file("${path.module}/../../argo-apps/argocd/values.yaml")]
@@ -94,18 +96,25 @@ resource "helm_release" "argo_cd" {
     value = data.terraform_remote_state.eks.outputs.argo_cd_repo_iam_role_arn # role/ArgoCDrepoRole
   }
 
-#  provisioner "local-exec" {
-#    when    = destroy
-#    command = "kubectl patch crd applications.argoproj.io -p '{\"metadata\":{\"finalizers\":[]}}' --type=merge"
-#  }
+  provisioner "local-exec" {
+    when    = destroy
+    #command = "kubectl get crd -o name | grep -E 'argoproj.io|monitoring.coreos.com|fluent.io|elastic.co' | xargs -I {} kubectl patch {} -p '{"metadata":{"finalizers":[]}}' --type=merge && kubectl -n argocd get app -o jsonpath='{range .items[*]}{.metadata.name}{"\n"}{end}' | xargs -I {} kubectl delete all,pvc,secrets,configmaps,ingresses,networkpolicies,serviceaccounts,jobs,cronjobs,applicationsets --all -n {}"
+    command = <<-EOT
+      kubectl get crd -o name |
+      grep -E 'argoproj.io|monitoring.coreos.com|fluent.io|elastic.co' |
+      xargs -I {} kubectl patch {} -p '{"metadata":{"finalizers":[]}}' --type=merge &&
+      kubectl -n argocd get app -o jsonpath='{range .items[*]}{.metadata.name}{"\n"}{end}' |
+      xargs -I {} kubectl delete all,pvc,secrets,configmaps,ingresses,networkpolicies,serviceaccounts,jobs,cronjobs,applicationsets --all -n {}
+    EOT
+  }
 
   # Ensure that the Kubernetes namespace exists before deploying
-  depends_on = [
-    #kubernetes_namespace.argo_cd,
-    #helm_release.cert_manager
-    #data.terraform_remote_state.eks.outputs.eks, # pending. wait until node groups are provisioned before deploying argocd
-    #data.terraform_remote_state.eks.outputs.eks_managed_node_groups # pending. wait until node groups are provisioned before deploying argocd
-  ]
+#  depends_on = [
+#    #kubernetes_namespace.argo_cd,
+#    #helm_release.cert_manager
+#    #data.terraform_remote_state.eks.outputs.eks, # pending. wait until node groups are provisioned before deploying argocd
+#    #data.terraform_remote_state.eks.outputs.eks_managed_node_groups # pending. wait until node groups are provisioned before deploying argocd
+#  ]
 }
 
 ## ArgoCD apply ApplicationSet
@@ -114,11 +123,6 @@ resource "helm_release" "argo_cd" {
 
 resource "kubectl_manifest" "example_applicationset" {
   yaml_body = file("${path.module}/../../argo-apps/argocd/applicationset.yaml")
-
-  provisioner "local-exec" {
-    when    = destroy
-    command = "kubectl patch crd applications.argoproj.io -p '{\"metadata\":{\"finalizers\":[]}}' --type=merge"
-  }
 
   depends_on = [
     helm_release.argo_cd # kubectl_manifest.kustomize_patch
