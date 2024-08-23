@@ -3,6 +3,8 @@ kind: ApplicationSet
 metadata:
   name: cluster-addons
   namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
 spec:
   preservedFields:
     annotations:
