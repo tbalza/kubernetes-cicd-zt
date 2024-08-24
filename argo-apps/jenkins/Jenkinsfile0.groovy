@@ -4,6 +4,9 @@ pipeline {
             inheritFrom 'default'
         }
     }
+    environment {
+        SKIP_ALL = 'false' // Initialize the flag as false (for argocd-image-updater check)
+    }
     triggers {
         // Poll SCM every 5 minutes
         //pollSCM('H/5 * * * *')
@@ -28,19 +31,22 @@ pipeline {
 
                         // Check if the author is 'argocd-image-updater'
                         if (env.GIT_AUTHOR_NAME == 'argocd-image-updater') {
-                            echo "Commit made by ArgoCD Image Updater. Marking build as successful and exiting."
-                            currentBuild.result = 'SUCCESS'
-                            return // exit the pipeline successfully
+                            echo "Commit made by ArgoCD Image Updater. Marking build as successful and skipping remaining stages."
+                            env.SKIP_ALL = 'true'
+                            currentBuild.result = 'SUCCESS' // Set build result to SUCCESS
                         }
                     }
                 }
             }
         }
         stage('Check ECR for Latest Image Commit') {
+            when {
+                expression { env.SKIP_ALL == 'false' }
+            }
             steps {
                 container('jnlp') {
                     script {
-                        def images = ecrListImages(repositoryName: "${ECR_REPO_NAME}") // pending make dynamic
+                        def images = ecrListImages(repositoryName: "${ECR_REPO_NAME}")
                         def tagList = []
 
                         if (images) {
@@ -71,6 +77,9 @@ pipeline {
             }
         }
         stage('Check for Django Changes') {
+            when {
+                expression { env.SKIP_ALL == 'false' }
+            }
             steps {
                 container('jnlp') {
                     script {
@@ -94,7 +103,7 @@ pipeline {
         }
         stage('Build and Push Image') {
             when {
-                expression { env.BUILD_NEEDED == 'true' }
+                expression { env.BUILD_NEEDED == 'true' && env.SKIP_ALL == 'false' }
             }
             steps {
                 container('kaniko') {

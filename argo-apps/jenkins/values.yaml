@@ -35,9 +35,10 @@ controller:
     - credentials:latest # not activated by default 1337.v60b_d7b_c7b_c9f
     - job-dsl:latest # 1.87
     - pipeline-aws:latest # (displayed as `Pipeline: AWS Steps`) # used to list ECR images. (pending replacement with aws-cli pod template)
+    #- pipeline-utility-steps:latest (displayed as `Pipeline Utility Steps`) # used to skip stages when argocd image updater is detected
     - github:latest # github webhook
     #- pipeline-stage-view:latest # check. not being displayed
-    #- sonar:latest # (displayed as `SonarQube Scanner`) # 2.17.2
+    - sonar:latest # (displayed as `SonarQube Scanner`) # 2.17.2
   installLatestPlugins: true # set to `false` to attempt it from breaking even when pinning plugin versions (not guaranteed)
   # pending plugin ver pinning which working combination
   JCasC:
