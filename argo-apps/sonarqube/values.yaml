@@ -77,5 +77,5 @@ postgresql:
 #    name: sonarqube
 
 
-jdbcOverwrite:
-  enabled: true
+#jdbcOverwrite:
+#  enabled: true
