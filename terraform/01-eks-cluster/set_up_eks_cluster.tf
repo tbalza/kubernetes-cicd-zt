@@ -10,7 +10,7 @@ data "aws_availability_zones" "available" {}
 # aws kubernetes v1.29
 
 locals {
-  name            = "django-production8" # cluster name
+  name            = "django-production9" # cluster name
   cluster_version = "1.29"              # 1.29
   region          = "us-east-1"
   domain          = "tbalza.net"
@@ -293,11 +293,6 @@ module "eks" {
       resolve_conflicts_on_update = "OVERWRITE"
       resolve_conflicts_on_create = "OVERWRITE"
       addon_version               = "v1.29.3-eksbuild.2"
-#      configuration_values = jsonencode({
-#        nodeSelector = { nodeSelector: is not defined in the schema and the schema does not allow additional properties
-#          "role" = "ci-cd"
-#        }
-#      })
     }
     vpc-cni = {
       resolve_conflicts_on_update = "OVERWRITE"
@@ -309,9 +304,6 @@ module "eks" {
           ENABLE_PREFIX_DELEGATION = "true" # Increase max pods per node, t3.medium from 17 to 110 pod limit
           WARM_PREFIX_TARGET       = "1"
         }
-#        nodeSelector = { nodeSelector: is not defined in the schema and the schema does not allow additional properties
-#          "role" = "ci-cd"
-#        }
       })
     }
 
@@ -336,9 +328,6 @@ module "eks" {
             forceEnable : false
           }
         }
-#        nodeSelector = { nodeSelector: is not defined in the schema and the schema does not allow additional properties
-#          "role" = "ci-cd"
-#        }
 
       })
     }
