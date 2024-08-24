@@ -25,6 +25,6 @@ spec:
         pathType: Prefix
         backend:
           service:
-            name: sonarqube # check
+            name: sonarqube-sonarqube
             port:
               number: 9000
