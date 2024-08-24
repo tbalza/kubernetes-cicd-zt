@@ -1876,7 +1876,7 @@ resource "helm_release" "external_secrets" {
 
 # sonarqube
 resource "aws_iam_policy" "sonarqube_ssm_read" { # check
-  name = "SSM-for-fluent"
+  name = "SSM-for-sonarqube"
   policy = jsonencode({
     Version = "2012-10-17",
     Statement = [{
@@ -1891,7 +1891,7 @@ resource "aws_iam_policy" "sonarqube_ssm_read" { # check
   })
 }
 
-resource "aws_iam_role_policy_attachment" "fluent_read_attach" { # check
+resource "aws_iam_role_policy_attachment" "sonarqube_read_attach" { # check
   role       = aws_iam_role.sonarqube.name
   policy_arn = aws_iam_policy.sonarqube_ssm_read.arn
 }
