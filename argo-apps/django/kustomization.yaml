@@ -10,7 +10,6 @@ resources:
 - serviceaccount.yaml
 - job.yaml # workaround for applicationset not supporting env substitution, using `preservedFields` in the appset
 - rbac.yaml
-#- cleanup.yaml
 configMapGenerator:
 - name: nginx-config
   files:
@@ -22,5 +21,5 @@ configMapGenerator:
   #  newName: ${ARGOCD_AWS_ECR_REPO}/${ARGOCD_AWS_CLUSTER_NAME} #
 images:
 - name: django-production-kustomize
-  newName: 350206045032.dkr.ecr.us-east-1.amazonaws.com/django-production9
+  newName: 350206045032.dkr.ecr.us-east-1.amazonaws.com/django-production
   newTag: 0b608985a29274f702b73306b1f1e3b086b23bcf

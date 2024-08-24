@@ -10,7 +10,7 @@ data "aws_availability_zones" "available" {}
 # aws kubernetes v1.29
 
 locals {
-  name            = "django-production9" # cluster name
+  name            = "django-production" # cluster name
   cluster_version = "1.29"              # 1.29
   region          = "us-east-1"
   domain          = "tbalza.net"
@@ -2040,7 +2040,7 @@ data:
 
 # if gets stuck, `terraform apply -target=helm_release.external_dns -auto-approve`
 # `terraform taint helm_release.external_dns`
-# `aws eks update-kubeconfig --name django-production8 --region us-east-1`
+# `aws eks update-kubeconfig --name django-production9 --region us-east-1`
 # `rm ~/.kube/config`
 resource "helm_release" "external_dns" {
   name       = "external-dns"

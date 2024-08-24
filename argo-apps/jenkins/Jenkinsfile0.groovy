@@ -22,7 +22,7 @@ pipeline {
                         env.GIT_COMMIT = sh(script: "git rev-parse HEAD", returnStdout: true).trim()
                         echo "Current GIT COMMIT: ${env.GIT_COMMIT}"
 
-                        // Retrieve the last committer's name
+                        // retrieve the last committer's name
                         env.GIT_AUTHOR_NAME = sh(script: "git --no-pager show -s --format='%an' ${env.GIT_COMMIT}", returnStdout: true).trim()
                         echo "Last commit made by: ${env.GIT_AUTHOR_NAME}"
 
@@ -30,7 +30,7 @@ pipeline {
                         if (env.GIT_AUTHOR_NAME == 'argocd-image-updater') {
                             echo "Commit made by ArgoCD Image Updater. Marking build as successful and exiting."
                             currentBuild.result = 'SUCCESS'
-                            return // Exit the pipeline successfully
+                            return // exit the pipeline successfully
                         }
                     }
                 }

@@ -71,7 +71,7 @@ resource "helm_release" "argo_cd" {
   version    = local.argocd_helm_chart.version     # "6.7.14" # pending reference this dynamically to argo-apps/argocd/config.yaml
   namespace  = local.argocd_helm_chart.namespace   # "argocd"
 
-  wait = false # might be needed!
+  #wait = false # might be needed!
 
   create_namespace = true
   # "${tostring(data.terraform_remote_state.eks.outputs.ecr_repo_url)}"

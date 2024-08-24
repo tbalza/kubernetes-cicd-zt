@@ -91,7 +91,7 @@ persistence:
     name: jenkins-groovy-scripts # arbitrary name
     readOnly: true
 agent:
-  podName: default # default # Agent Pod base name
+  podName: default # refer to Jenkinsfile.groovy argent/kubernetes/inheritFrom `default` # Agent Pod base name
   args: "" # must leave blank as kubernetes plugin provides these as env variables. default populated values break this setup
   defaultsProviderTemplate: "" # default: blank # The name of the pod template to use for providing default values
   workingDir: "/home/jenkins/agent" # default
@@ -112,7 +112,7 @@ agent:
       cpu: "1000m"
       memory: "1Gi"
   additionalContainers: # this adds kaniko to the default pod template (which already has jnlp required by kubernetes plugin)
-    - sideContainerName: "kaniko"
+    - sideContainerName: "kaniko" # is used instead of docker for building the image
       image:
         repository: "gcr.io/kaniko-project/executor" # debug release required for tty
         tag: "v1.23.1-debug"
