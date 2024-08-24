@@ -156,7 +156,7 @@ agent:
       optional: true
 
 serviceAccount:
-  create: false
+  create: false # defined in serviceaccount.yaml
   name: jenkins
 
 serviceAccountAgent:
