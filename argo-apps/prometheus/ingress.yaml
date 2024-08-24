@@ -5,7 +5,7 @@ metadata:
   namespace: prometheus
   annotations:
     alb.ingress.kubernetes.io/group.name: argo-cd-cluster
-    alb.ingress.kubernetes.io/group.order: "3"
+    alb.ingress.kubernetes.io/group.order: "5"
     alb.ingress.kubernetes.io/scheme: "internet-facing"
     alb.ingress.kubernetes.io/target-type: "ip"
     alb.ingress.kubernetes.io/listen-ports: '[{"HTTPS": 443}]'

@@ -1,0 +1,66 @@
+replicaCount: 0
+
+nodeSelector:
+  role: "django" # assigning app nodegroup for POC purposes
+
+elasticsearch:
+  # DEPRECATED: Use initSysctl.enabled instead
+  configureNode: false
+  bootstrapChecks: true
+
+## Environment variables to attach to the pods
+##
+# env:
+#   # If you use a different ingress path from /, you have to add it here as the value of SONAR_WEB_CONTEXT
+#   - name: SONAR_WEB_CONTEXT
+#     value: /sonarqube
+#   - name: VARIABLE
+#     value: my-value
+
+## Those default are based on the default `Web -Xmx1G -Xms128m` and `CE -Xmx2G -Xms128m` and Search -Xmx2G -Xms2G settings of SQ sub processes
+## Adjust these values to your needs, you can find more details on the main README of the chart.
+# SONAR_CE_JAVAOPTS # sonar.ce.javaOpts
+resources:
+  limits:
+    cpu: 800m
+    memory: 2Gi
+    ephemeral-storage: 3536M
+  requests:
+    cpu: 400m
+    memory: 1Gi # 1536M
+    ephemeral-storage: 1536M
+
+# A custom sonar.properties file can be provided via dictionary.
+# For example:
+# sonarProperties:
+#   sonar.forceAuthentication: true
+#   sonar.security.realm: LDAP
+#   ldap.url: ldaps://organization.com
+
+# Additional sonar properties to load from a secret with a key "secret.properties" (must be a string)
+# sonarSecretProperties:
+
+# Kubernetes secret that contains the encryption key for the sonarqube instance.
+# The secret must contain the key 'sonar-secret.txt'.
+# The 'sonar.secretKeyPath' property will be set automatically.
+# sonarSecretKey: "settings-encryption-secret"
+
+tests:
+  enabled: false
+
+serviceAccount:
+  create: false
+  name: sonarqube
+  automountToken: true
+
+#extraConfig:
+#  secrets: []
+
+account:
+  # The values can be set to define the current and the (new) custom admin passwords at the startup (the username will remain "admin")
+  adminPassword: admin
+  currentAdminPassword: admin
+
+#  # values can be also provided by a secret that contains "password" and "currentPassword" as keys. You can generate such a secret in your cluster
+#  # using "kubectl create secret generic admin-password-secret-name --from-literal=password=admin --from-literal=currentPassword=admin"
+#  adminPasswordSecretName: ""

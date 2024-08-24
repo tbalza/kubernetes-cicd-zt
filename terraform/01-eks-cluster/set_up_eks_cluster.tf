@@ -600,6 +600,21 @@ module "eks" {
   # check
   access_entries = {
 
+
+    sonarqube = {
+      principal_arn     = aws_iam_role.sonarqube.arn # aws_iam_role.fluent_operator.arn
+      kubernetes_groups = []
+
+      policy_associations = {
+        admin_policy = {
+          policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy" # check
+          access_scope = {
+            type = "cluster" # check
+          }
+        }
+      }
+    }
+
     fluent-operator = {
       principal_arn     = aws_iam_role.fluent_operator.arn # aws_iam_role.fluent_operator.arn
       kubernetes_groups = []
@@ -864,8 +879,39 @@ module "eks" {
 #}
 
 #############
-# fluent
 
+resource "aws_iam_role" "sonarqube" {
+  name = "SonarqubeRole"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Action = "sts:AssumeRole",
+        Principal = {
+          Service = "eks.amazonaws.com"
+        },
+      },
+      # External Secrets Operator reqs (jwt auth)
+      {
+        Effect = "Allow",
+        Action = "sts:AssumeRoleWithWebIdentity",
+        Principal = {
+          Federated = module.eks.oidc_provider_arn
+        },
+        Condition = {
+          StringEquals = {
+            "${replace(module.eks.cluster_oidc_issuer_url, "https://", "")}:sub" : "system:serviceaccount:sonarqube:sonarqube" # "namespace:service-account-name"
+          }
+        }
+      },
+    ]
+  })
+}
+
+
+# fluent
 resource "aws_iam_role" "fluent_operator" {
   name = "FluentRole"
 
@@ -1827,6 +1873,29 @@ resource "helm_release" "external_secrets" {
     module.eks # important
   ]
 }
+
+# sonarqube
+resource "aws_iam_policy" "sonarqube_ssm_read" { # check
+  name = "SSM-for-fluent"
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [{
+      Effect = "Allow",
+      "Action" : [
+        "ssm:GetParameter*",
+        "ssm:ListTagsForResource", # check
+        "ssm:DescribeParameters"   # check
+      ],
+      Resource = "arn:aws:ssm:${local.region}:${data.aws_caller_identity.current.account_id}:parameter/*" # check .limit scope accordingly. SSM is region specific
+    }]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "fluent_read_attach" { # check
+  role       = aws_iam_role.sonarqube.name
+  policy_arn = aws_iam_policy.sonarqube_ssm_read.arn
+}
+
 
 # Fluent operator
 resource "aws_iam_policy" "fluent_ssm_read" { # check

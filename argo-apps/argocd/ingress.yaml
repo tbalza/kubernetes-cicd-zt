@@ -4,8 +4,8 @@ metadata:
   name: argo-cd-argocd-server
   namespace: argocd
   annotations:
-    argocd.argoproj.io/hook: PostSync
-    argocd.argoproj.io/sync-wave: "2" # wait for repo server and redis to restart before doing any variable substitutions
+    argocd.argoproj.io/hook: PostSync # important
+    argocd.argoproj.io/sync-wave: "2" # important # wait for repo server and redis to restart before doing any variable substitutions
     alb.ingress.kubernetes.io/backend-protocol: HTTP
     alb.ingress.kubernetes.io/conditions.argo-cd-argocd-server-grpc: |
       [{"field":"http-header","httpHeaderConfig":{"httpHeaderName": "Content-Type", "values":["application/grpc"]}}]

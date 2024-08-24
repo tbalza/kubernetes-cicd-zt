@@ -1,0 +1,18 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: sonarqube
+
+helmCharts:
+  - name: sonarqube
+    repo: https://SonarSource.github.io/helm-chart-sonarqube
+    version: 10.6.1 # Chart v10.6.1
+    releaseName: sonarqube
+    namespace: sonarqube
+    includeCRDs: true
+    valuesFile: values.yaml
+
+resources:
+  - ingress.yaml
+  - secrets.yaml
+  - serviceaccount.yaml
