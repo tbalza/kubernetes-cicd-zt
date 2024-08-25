@@ -18,13 +18,44 @@ locals {
   vpc_cidr = "10.0.0.0/16" # ~65k IPs
   azs      = slice(data.aws_availability_zones.available.names, 0, 3)
 
-  rds_user   = "django"
-  rds_dbname = "postgres"
-  rds_port   = 5432 # postgres default
+  rds_user   = "django" # django rds
+  rds_dbname = "postgres" # django rds
+  rds_port   = 5432 # postgres default # django rds
+
+  sonar_rds_user = "sonarqube"
+  sonar_rds_dbname = "postgres"
+  sonar_rds_port = 5432
+
   repo_url   = "https://github.com/tbalza/kubernetes-cicd-zt.git"
 
   # SSM Parameter values
   parameters = {
+
+
+    "sonar_rds_user" = {
+      value = local.sonar_rds_user
+    }
+    "sonar_rds_dbname" = {
+      value = local.sonar_rds_dbname
+    }
+    "sonar_rds_port" = {
+      value = local.sonar_rds_port
+    }
+    "sonar_rds_password" = {
+      value = random_password.sonarqube_database_password.result
+    }
+    "sonar_rds_endpoint" = {
+      value = "jdbc:postgresql://${module.db_sonarqube.db_instance_endpoint}/${local.sonar_rds_dbname}?socketTimeout=1500" # `SONARQUBE_JDBC_URL` requires baked in interpolation # jdbc:postgresql://[host]:[port]/[database]
+    }
+    "sonar_token" = {
+      value = random_password.sonarqube_token.result
+    }
+    "sonar_admin_password" = {
+      value = random_password.sonarqube_admin_password.result
+    }
+    "sonar_admin_password_current" = {
+      value = random_password.sonarqube_admin_password.result
+    }
 
     # e.g. tbalza.net (used by ExternalDNS) (and argocd)
     "domain" = {
@@ -2692,4 +2723,136 @@ resource "random_password" "elastic_password" {
   length           = 28
   special          = true
   override_special = "!$%&()+-?_~" # special character whitelist
+}
+
+###############################################################################
+# RDS - sonarqube
+###############################################################################
+
+# Pending. connection pooling (possibly using something like django-db-connection-pool or other external tools like PgBouncer).
+# Create rds random password.
+resource "random_password" "sonarqube_database_password" {
+  length           = 28
+  special          = true
+  override_special = "!#$%&'()+,-.=?^_~" # special character whitelist
+}
+
+resource "random_password" "sonarqube_admin_password" {
+  length      = 28
+  special     = false
+  min_numeric = 10
+  #override_special = "!#$%&'()+,-.=?^_~" # special character whitelist
+}
+
+resource "random_password" "sonarqube_token" {
+  length      = 28
+  special     = false
+  min_numeric = 10
+  #override_special = "!#$%&'()+,-.=?^_~" # special character whitelist
+}
+
+#############
+
+### must be set before tf apply
+## export TF_VAR_RDS_PASSWORD=123example
+
+module "db_sonarqube" {
+  source  = "terraform-aws-modules/rds/aws"
+  version = "6.7.0"
+
+  identifier = "${local.name}-rds-sonar"
+
+  # All available versions: https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_PostgreSQL.html#PostgreSQL.Concepts
+  # aws rds describe-db-engine-versions --default-only --engine postgres
+  engine               = "postgres"
+  engine_version       = "16.2"
+  family               = "postgres16" # DB parameter group
+  major_engine_version = "16"         # DB option group
+  instance_class       = "db.t4g.micro"
+
+  #kms_key_id        = "arn:aws:kms:${var.aws_region}:${var.account_id}:key/${data.aws_ssm_parameter.kms_keyid.value}"
+
+  allocated_storage     = 5
+  max_allocated_storage = 10
+
+  # NOTE: Do NOT use 'user' as the value for 'username' as it throws:
+  # "Error creating DB Instance: InvalidParameterValue: MasterUsername
+  # user cannot be used as it is a reserved word used by the engine"
+  db_name  = local.sonar_rds_dbname
+  username = local.sonar_rds_user
+  port     = local.sonar_rds_port
+
+  # Setting manage_master_user_password_rotation to false after it
+  # has previously been set to true disables automatic rotation
+  # however using an initial value of false (default) does not disable
+  # automatic rotation and rotation will be handled by RDS.
+  # manage_master_user_password_rotation allows users to configure
+  # a non-default schedule and is not meant to disable rotation
+  # when initially creating / enabling the password management feature
+  manage_master_user_password_rotation              = false
+  master_user_password_rotate_immediately           = false
+  master_user_password_rotation_schedule_expression = "rate(60 days)"
+  manage_master_user_password                       = false # Set to true to allow RDS to manage the master user password in Secrets Manager
+
+  password = random_password.sonarqube_database_password.result
+  #password = aws_ssm_parameter.rds_password.value # random_password.database_password.result # data.aws_ssm_parameter.kms_keyid.value
+  # IRSA + IAM DB auth?
+
+  iam_database_authentication_enabled = false # pending
+  publicly_accessible                 = false
+
+  multi_az = false # false
+  #availability_zone = local.azs
+  db_subnet_group_name   = module.vpc.database_subnet_group
+  vpc_security_group_ids = [module.security_group.security_group_id]
+
+  create_db_option_group    = false # Use a default option group provided by AWS
+  create_db_parameter_group = false # Use a default parameter group provided by AWS
+
+  maintenance_window              = "Mon:00:00-Mon:03:00"
+  backup_window                   = "03:00-06:00"
+  enabled_cloudwatch_logs_exports = ["postgresql", "upgrade"]
+  create_cloudwatch_log_group     = false # check
+
+  backup_retention_period = 1
+  skip_final_snapshot     = true
+  deletion_protection     = false
+
+  performance_insights_enabled          = false # check cloudwatch
+  performance_insights_retention_period = 7
+  create_monitoring_role                = false
+  monitoring_interval                   = 0 # 0 disables collecting enhanced metrics
+  monitoring_role_name                  = "sonarqube-example-monitoring-role-name"
+  monitoring_role_use_name_prefix       = true
+  monitoring_role_description           = "sonarqube Description for monitoring role"
+
+  parameters = [ # pending. force SSL?
+    {
+      name  = "autovacuum"
+      value = 1
+    },
+    {
+      name  = "client_encoding"
+      value = "utf8"
+    },
+  ]
+
+  tags = local.tags
+  db_option_group_tags = {
+    "Sensitive" = "low"
+  }
+  db_parameter_group_tags = {
+    "Sensitive" = "low"
+  }
+
+  depends_on = [
+    module.eks,
+    #helm_release.aws_load_balancer_controller,
+  ]
+
+}
+
+output "db_sonar_instance_endpoint" {
+  description = "The connection endpoint"
+  value       = split(":", module.db_sonarqube.db_instance_endpoint)[0] # regular output includes `endpoint:port`, this filters out the port
 }

@@ -53,29 +53,27 @@ serviceAccount:
   name: sonarqube
   automountToken: true
 
-#extraConfig:
-#  secrets: []
-
-#account:
-  # The values can be set to define the current and the (new) custom admin passwords at the startup (the username will remain "admin")
-#  adminPassword: admin
-#  currentAdminPassword: admin
-#  adminPasswordSecretName: "admin-password-secret-name"
-
-#  # values can be also provided by a secret that contains "password" and "currentPassword" as keys. You can generate such a secret in your cluster
-#  # using "kubectl create secret generic admin-password-secret-name --from-literal=password=admin --from-literal=currentPassword=admin"
-#  adminPasswordSecretName: ""
+account:
+  # values can be also provided by a secret that contains "password" and "currentPassword" as keys. You can generate such a secret in your cluster
+  # using "kubectl create secret generic admin-password-secret-name --from-literal=password=admin --from-literal=currentPassword=admin"
+  adminPasswordSecretName: "sonarqube-secrets"
 
 postgresql:
   persistence:
-    enabled: true
-    accessMode: ReadWriteOnce
-    size: 5Gi
-    storageClass: gp3
-#  serviceAccount:
-#    enabled: true
-#    name: sonarqube
+    enabled: false # creates `sample` db, doesn't really work with chart. RDS is used instead
 
+## Override JDBC values
+## for external Databases
+jdbcOverwrite:
+  #enable: true # check
+  enabled: false
+  jdbcUrl: "jdbc:postgresql://myPostgress/myDatabase?socketTimeout=1500" # The JDBC url of the external DB
+  #jdbcUrl: 'jdbc:postgresql://<my_DB_endpoint>.us-east-1.rds.amazonaws.com/sonar_sandbox?socketTimeout=1500'
+  jdbcUsername: "sonarqube" # The DB user that should be used for the JDBC connection # check
+  #jdbcPassword: "sonarPass" # # Use this if you don't mind the DB password getting stored in plain text within the values file
+  jdbcSecretName: "sonarqube-secrets" # pre-existing k8s secret containing the DB password
+  jdbcSecretPasswordKey: "sonar_rds_password" # `"jdbc-password"` secretValueKey of the password found within that secret
 
-#jdbcOverwrite:
-#  enabled: true
+extraConfig: # contains JDBC/RDS connection values
+  secrets:
+    - sonarqube-secrets
