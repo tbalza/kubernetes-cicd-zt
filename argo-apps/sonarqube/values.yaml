@@ -70,14 +70,14 @@ postgresql:
 ## for external Databases
 jdbcOverwrite:
   #enable: true # check
-  enabled: false
-  jdbcUrl: "jdbc:postgresql://myPostgress/myDatabase?socketTimeout=1500" # The JDBC url of the external DB
+  enabled: true
+  jdbcUrl: "jdbc:postgresql://django-production-rds-sonar.cfwo68mist26.us-east-1.rds.amazonaws.com:5432/postgres?socketTimeout=1500" # The JDBC url of the external DB
   #jdbcUrl: 'jdbc:postgresql://<my_DB_endpoint>.us-east-1.rds.amazonaws.com/sonar_sandbox?socketTimeout=1500'
   jdbcUsername: "sonarqube" # The DB user that should be used for the JDBC connection # check
-  #jdbcPassword: "sonarPass" # # Use this if you don't mind the DB password getting stored in plain text within the values file
-  jdbcSecretName: "sonarqube-secrets" # pre-existing k8s secret containing the DB password
-  jdbcSecretPasswordKey: "sonar_rds_password" # `"jdbc-password"` secretValueKey of the password found within that secret
+  jdbcPassword: "Ve3-?2LlMp2V-hiFkt0eh&e&gMl," # # Use this if you don't mind the DB password getting stored in plain text within the values file
+  #jdbcSecretName: "sonarqube-secrets" # pre-existing k8s secret containing the DB password
+  #jdbcSecretPasswordKey: "sonar_rds_password" # `"jdbc-password"` secretValueKey of the password found within that secret
 
-extraConfig: # contains JDBC/RDS connection values
-  secrets:
-    - sonarqube-secrets
+#extraConfig: # contains JDBC/RDS connection values
+#  secrets:
+#    - sonarqube-secrets
