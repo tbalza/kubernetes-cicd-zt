@@ -54,17 +54,8 @@ service:
   labels:
   annotations: {}
 
-#tolerations:
-# - key: "sonarqube"
-#   operator: "Equal"
-#   value: "true"
-#   effect: "NoSchedule"
-
 nodeSelector:
-  sonarqube: "true"
-
-#nodeSelector:
-#  role: "django" # assigning app nodegroup for POC purposes
+  role: "django" # assigning app nodegroup for POC purposes
 
 readinessProbe: # http://localhost: # http://sonarqube-sonarqube.sonarqube.svc.cluster.local
   exec:
@@ -139,6 +130,7 @@ serviceAccount:
   name: sonarqube
   automountToken: true
 
+# Default Administrator credentials are still being used. Make sure to change the password or deactivate the account.
 account:
   # values can be also provided by a secret that contains "password" and "currentPassword" as keys. You can generate such a secret in your cluster
   # using "kubectl create secret generic admin-password-secret-name --from-literal=password=admin --from-literal=currentPassword=admin"
