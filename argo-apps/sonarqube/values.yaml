@@ -132,19 +132,19 @@ postgresql:
   enabled: false # creates `sample` db. RDS is used instead
 
 env:
-  - name: SONARQUBE_JDBC_URL # jdbcUrl
+  - name: jdbcUrl # jdbcUrl
     valueFrom:
       secretKeyRef:
         name: sonarqube-secrets
         key: jdbcUrl
 
-  - name: SONARQUBE_JDBC_USERNAME # jdbcUsername
+  - name: jdbcUsername # jdbcUsername
     valueFrom:
       secretKeyRef:
         name: sonarqube-secrets
         key: jdbcUsername
 
-  - name: SONARQUBE_JDBC_PASSWORD # jdbcPassword
+  - name: jdbcPassword # jdbcPassword
     valueFrom:
       secretKeyRef:
         name: sonarqube-secrets
