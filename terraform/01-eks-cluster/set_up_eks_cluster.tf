@@ -45,7 +45,7 @@ locals {
       value = random_password.sonarqube_database_password.result
     }
     "sonar_rds_endpoint" = {
-      value = "jdbc:postgresql://${module.db_sonarqube.db_instance_endpoint}/${local.sonar_rds_dbname}?socketTimeout=1500" # `SONARQUBE_JDBC_URL` requires baked in interpolation # jdbc:postgresql://[host]:[port]/[database]
+      value = "jdbc:postgresql://${module.db_sonarqube.db_instance_endpoint}/${local.sonar_rds_dbname}" # `SONARQUBE_JDBC_URL` requires baked in interpolation # jdbc:postgresql://[host]:[port]/[database]
     }
     "sonar_token" = {
       value = random_password.sonarqube_token.result
