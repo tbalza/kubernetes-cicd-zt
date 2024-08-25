@@ -131,6 +131,8 @@ account:
 postgresql:
   enabled: false # creates `sample` db. RDS is used instead
 
+## RDS connection
+
 jdbcOverwrite: # even if you define `extraConfig` this needs to be on, but only for `jdbcSecret`
   enable: true
   #enabled: true # chart documentation is wrong, says `enable` is deprecated, but `enabled` doesn't work
