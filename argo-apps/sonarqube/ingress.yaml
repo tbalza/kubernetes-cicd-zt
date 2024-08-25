@@ -1,7 +1,7 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: sonarqube
+  name: sonarqube-sonarqube
   namespace: sonarqube
   annotations:
     alb.ingress.kubernetes.io/group.name: argo-cd-cluster
