@@ -10,12 +10,12 @@ deploymentStrategy:
 #  allowPrivilegeEscalation: true
 #  privileged: true
 #
-#initSysctl:
-#  image: busybox:1.36
-#
-#initFs:
-#  enabled: true
-#  Image: busybox:1.36
+initSysctl:
+  image: busybox:1.36
+
+initFs:
+  enabled: true
+  Image: busybox:1.36
 #
 #containerSecurityContext:
 #  allowPrivilegeEscalation: false
