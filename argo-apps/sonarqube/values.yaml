@@ -131,37 +131,14 @@ account:
 postgresql:
   enabled: false # creates `sample` db. RDS is used instead
 
-env:
-#  - name: jdbcUrl # jdbcUrl
-#    valueFrom:
-#      secretKeyRef:
-#        name: sonarqube-secrets
-#        key: jdbcUrl
-#
-#  - name: SONARQUBE_JDBC_USERNAME # jdbcUsername
-#    valueFrom:
-#      secretKeyRef:
-#        name: sonarqube-secrets
-#        key: SONAR_JDBC_USERNAME
-
-#  - name: SONAR_JDBC_PASSWORD # jdbcPassword
-#    valueFrom:
-#      secretKeyRef:
-#        name: sonarqube-secrets
-#        key: SONAR_JDBC_PASSWORD
-
-jdbcOverwrite:
+jdbcOverwrite: # even if you define `extraConfig` this needs to be on, but only for `jdbcSecret`
   enable: true
-#  #enabled: true # chart documentation is wrong, says `enable` is deprecated, but `enabled` doesn't work
-  #jdbcUrl: {} # "jdbc:postgresql://django-production-rds-sonar.cfwo68mist26.us-east-1.rds.amazonaws.com:5432/postgres" # ?socketTimeout=1500 # The JDBC url of the external DB
-  #url from extranConifg: jdbc:postgresql://django-production-rds-sonar.cfwo68mist26.us-east-1.rds.amazonaws.com:5432/postgres
-  #jdbcUsername: "sonarqube" # The DB user that should be used for the JDBC connection # check
-  #jdbcPassword: {} "Ve3-?2LlMp2V-hiFkt0eh&e&gMl," # # Use this if you don't mind the DB password getting stored in plain text within the values file
-  jdbcSecretName: "sonarqube-secrets" # pre-existing k8s secret containing the DB password
-  jdbcSecretPasswordKey: "SONAR_JDBC_PASSWORD" # `"jdbc-password"` secretValueKey of the password found within that secret
+  #enabled: true # chart documentation is wrong, says `enable` is deprecated, but `enabled` doesn't work
+  jdbcSecretName: "sonarqube-secrets"
+  jdbcSecretPasswordKey: "SONAR_JDBC_PASSWORD"
 
-## Create JDBC data source for jdbc:postgresql://%!s(<nil>):5432/sonarDB
-## loads Environment Variables from Secrets
+# `extraConfig` is only able to load jdbc url and jdbc user, jdbcOverwrite needs to be set to true, and secret name has to be defined for password
+# url key needs to be `SONAR_JDBC_URL` and user needs to be `SONAR_JDBC_USERNAME`, documentation is incorrect defining `SONARQUBE_JDBC_URL` `SONARQUBE_JDBC_USERNAME`
 extraConfig: # contains JDBC/RDS connection values
   secrets:
     - sonarqube-secrets
