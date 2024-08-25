@@ -151,7 +151,7 @@ env:
         key: jdbcPassword
 
 jdbcOverwrite:
-  enable: false
+  enable: true
   #enabled: true # chart documentation is wrong, says `enable` is deprecated, but `enabled` doesn't work
   ##jdbcUrl: "jdbc:postgresql://django-production-rds-sonar.cfwo68mist26.us-east-1.rds.amazonaws.com:5432/postgres?socketTimeout=1500" # The JDBC url of the external DB
   #jdbcUsername: "sonarqube" # The DB user that should be used for the JDBC connection # check
