@@ -128,10 +128,10 @@ account:
   # using "kubectl create secret generic admin-password-secret-name --from-literal=password=admin --from-literal=currentPassword=admin"
   adminPasswordSecretName: "sonarqube-secrets"
 
+## RDS connection
+
 postgresql:
   enabled: false # creates `sample` db. RDS is used instead
-
-## RDS connection
 
 jdbcOverwrite: # even if you define `extraConfig` this needs to be on, but only for `jdbcSecret`
   enable: true
