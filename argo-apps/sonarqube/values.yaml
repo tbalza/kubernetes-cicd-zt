@@ -35,12 +35,12 @@ resources:
 
 # A custom sonar.properties file can be provided via dictionary.
 # For example:
-sonarProperties:
-  #sonar.forceAuthentication: true
-  #sonar.security.realm: LDAP
-  #ldap.url: ldaps://organization.com
-  sonar.web.host: sonarqube-sonarqube.sonarqube.svc.cluster.local
-  sonar.web.port: 9000
+
+#sonarProperties:
+#  #sonar.forceAuthentication: true
+#  sonar.web.host: sonarqube-sonarqube.sonarqube.svc.cluster.local
+#  sonar.web.port: 9000
+#  sonar.host.url: http://sonarqube-sonarqube.sonarqube.svc.cluster.local:9000
 
 # Additional sonar properties to load from a secret with a key "secret.properties" (must be a string)
 # sonarSecretProperties:
@@ -58,10 +58,10 @@ serviceAccount:
   name: sonarqube
   automountToken: true
 
-account:
-  # values can be also provided by a secret that contains "password" and "currentPassword" as keys. You can generate such a secret in your cluster
-  # using "kubectl create secret generic admin-password-secret-name --from-literal=password=admin --from-literal=currentPassword=admin"
-  adminPasswordSecretName: "sonarqube-secrets"
+#account:
+#  # values can be also provided by a secret that contains "password" and "currentPassword" as keys. You can generate such a secret in your cluster
+#  # using "kubectl create secret generic admin-password-secret-name --from-literal=password=admin --from-literal=currentPassword=admin"
+#  adminPasswordSecretName: "sonarqube-secrets"
 
 postgresql:
   enabled: false # creates `sample` db, doesn't really work with chart. RDS is used instead
