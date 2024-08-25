@@ -150,8 +150,8 @@ postgresql:
 ## Override JDBC values
 ## for external Databases
 jdbcOverwrite:
-  #enable: true # check
-  enabled: true
+  enable: true # check
+  #enabled: true
   jdbcUrl: "jdbc:postgresql://django-production-rds-sonar.cfwo68mist26.us-east-1.rds.amazonaws.com:5432/postgres?socketTimeout=1500" # The JDBC url of the external DB
   #jdbcUrl: 'jdbc:postgresql://<my_DB_endpoint>.us-east-1.rds.amazonaws.com/sonar_sandbox?socketTimeout=1500'
   jdbcUsername: "sonarqube" # The DB user that should be used for the JDBC connection # check
