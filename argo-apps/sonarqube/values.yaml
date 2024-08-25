@@ -3,8 +3,8 @@ replicaCount: 1
 deploymentStrategy:
  priorityClassName: "high-priority"
 
-#securityContext:
-#  fsGroup: 0
+securityContext:
+  fsGroup: 0
 #  runAsUser: 0
 #  runAsGroup: 0
 #  allowPrivilegeEscalation: true

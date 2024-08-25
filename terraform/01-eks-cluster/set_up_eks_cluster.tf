@@ -570,7 +570,6 @@ module "eks" {
       #      }]
       labels = {
         role = "django" # used by k8s/argocd. node selection, scheduling, grouping, policy enforcement
-        sonarqube = "true"
       }
 
       #force_update_version = true
