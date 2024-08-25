@@ -32,11 +32,13 @@ spec:
               values:
                 - argocd
                 - fluent
+                - django
         - matchExpressions:
             - key: syncorder # Label defined in appset template:,metadata:,labels:
               operator: In
               values:
                 - fluent
+                - django
   template:
     metadata:
       name: '{{.path.basename}}'
