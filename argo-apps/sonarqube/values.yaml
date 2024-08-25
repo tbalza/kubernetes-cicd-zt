@@ -30,6 +30,9 @@ resources:
     memory: 1Gi # 1536M
     ephemeral-storage: 1536M
 
+# SONAR_WEB_JAVAOPTS= #The web server is executed in a dedicated Java process. Use this property to customize JVM options.
+# SONAR_WEB_JAVAADDITIONALOPTS= #Same as previous property, but allows to not repeat all other settings like -Xmx
+
 # A custom sonar.properties file can be provided via dictionary.
 # For example:
 # sonarProperties:
