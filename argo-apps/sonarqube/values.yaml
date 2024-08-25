@@ -144,11 +144,11 @@ env:
         name: sonarqube-secrets
         key: SONAR_JDBC_USERNAME
 
-  - name: SONAR_JDBC_PASSWORD # jdbcPassword
-    valueFrom:
-      secretKeyRef:
-        name: sonarqube-secrets
-        key: SONAR_JDBC_PASSWORD
+#  - name: SONAR_JDBC_PASSWORD # jdbcPassword
+#    valueFrom:
+#      secretKeyRef:
+#        name: sonarqube-secrets
+#        key: SONAR_JDBC_PASSWORD
 
 #jdbcOverwrite:
 #  enable: true
