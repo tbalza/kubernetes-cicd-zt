@@ -138,7 +138,7 @@ env:
 #        name: sonarqube-secrets
 #        key: jdbcUrl
 #
-  - name: SONAR_JDBC_USERNAME # jdbcUsername
+  - name: SONARQUBE_JDBC_USERNAME # jdbcUsername
     valueFrom:
       secretKeyRef:
         name: sonarqube-secrets
