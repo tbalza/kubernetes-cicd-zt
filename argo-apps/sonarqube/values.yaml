@@ -35,10 +35,12 @@ resources:
 
 # A custom sonar.properties file can be provided via dictionary.
 # For example:
-# sonarProperties:
-#   sonar.forceAuthentication: true
-#   sonar.security.realm: LDAP
-#   ldap.url: ldaps://organization.com
+sonarProperties:
+  #sonar.forceAuthentication: true
+  #sonar.security.realm: LDAP
+  #ldap.url: ldaps://organization.com
+  sonar.web.host: sonarqube-sonarqube.sonarqube.svc.cluster.local
+  sonar.web.port: 9000
 
 # Additional sonar properties to load from a secret with a key "secret.properties" (must be a string)
 # sonarSecretProperties:
