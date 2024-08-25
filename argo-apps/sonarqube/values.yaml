@@ -1,12 +1,92 @@
-replicaCount: 0
+replicaCount: 1
+
+deploymentStrategy:
+ priorityClassName: "high-priority"
+
+#securityContext:
+#  fsGroup: 0
+#  runAsUser: 0
+#  runAsGroup: 0
+#  allowPrivilegeEscalation: true
+#  privileged: true
+#
+#initSysctl:
+#  image: busybox:1.36
+#
+#initFs:
+#  enabled: true
+#  Image: busybox:1.36
+#
+#containerSecurityContext:
+#  allowPrivilegeEscalation: false
+#  runAsNonRoot: true
+#  runAsUser: 1000
+#  runAsGroup: 0
+#  seccompProfile:
+#    type: RuntimeDefault
+#  capabilities:
+#    drop: ["ALL"]
+#  readOnlyRootFilesystem: true
+#
+#initContainers:
+#  image: busybox:1.36
+#  securityContext:
+#    allowPrivilegeEscalation: false
+#    runAsNonRoot: true
+#    runAsUser: 1000
+#    runAsGroup: 0
+#    seccompProfile:
+#      type: RuntimeDefault
+#    capabilities:
+#      drop: ["ALL"]
+#    readOnlyRootFilesystem: true
+
+elasticsearch:
+  # DEPRECATED: Use initSysctl.enabled instead
+  configureNode: false # default false
+  bootstrapChecks: true # default true
+
+service:
+  type: ClusterIP
+  externalPort: 9000
+  internalPort: 9000
+  labels:
+  annotations: {}
+
+#tolerations:
+# - key: "sonarqube"
+#   operator: "Equal"
+#   value: "true"
+#   effect: "NoSchedule"
+
+#nodeSelector:
+#  sonarqube: "true"
 
 nodeSelector:
   role: "django" # assigning app nodegroup for POC purposes
 
-elasticsearch:
-  # DEPRECATED: Use initSysctl.enabled instead
-  configureNode: false
-  bootstrapChecks: true
+readinessProbe: # http://localhost: # http://sonarqube-sonarqube.sonarqube.svc.cluster.local
+  exec:
+    command:
+    - sh
+    - -c
+    - |
+      #!/bin/bash
+      # A Sonarqube container is considered ready if the status is UP, DB_MIGRATION_NEEDED or DB_MIGRATION_RUNNING
+      # status about migration are added to prevent the node to be kill while sonarqube is upgrading the database.
+      if wget --no-proxy -qO- http://localhost:{{ .Values.service.internalPort }}{{ .Values.readinessProbe.sonarWebContext | default (include "sonarqube.webcontext" .) }}api/system/status | grep -q -e '"status":"UP"' -e '"status":"DB_MIGRATION_NEEDED"' -e '"status":"DB_MIGRATION_RUNNING"'; then
+        exit 0
+      fi
+      exit 1
+
+livenessProbe: # http://localhost: # http://sonarqube-sonarqube.sonarqube.svc.cluster.local
+  exec:
+    command:
+    - sh
+    - -c
+    - |
+      wget --no-proxy --quiet -O /dev/null --timeout={{ .Values.livenessProbe.timeoutSeconds }} --header="X-Sonar-Passcode: $SONAR_WEB_SYSTEMPASSCODE" "http://localhost:{{ .Values.service.internalPort }}{{ .Values.livenessProbe.sonarWebContext | default (include "sonarqube.webcontext" .) }}api/system/liveness"
+  initialDelaySeconds: 60
 
 ## Environment variables to attach to the pods
 ##
@@ -51,7 +131,7 @@ resources:
 # sonarSecretKey: "settings-encryption-secret"
 
 tests:
-  enabled: true
+  enabled: false
 
 serviceAccount:
   create: false
