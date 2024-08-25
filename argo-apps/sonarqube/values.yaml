@@ -1,4 +1,4 @@
-replicaCount: 1
+replicaCount: 1 # value of 0 will not launch any pods
 
 deploymentStrategy:
  priorityClassName: "high-priority"
@@ -75,7 +75,7 @@ readinessProbe: # http://localhost: # http://sonarqube-sonarqube.sonarqube.svc.c
       #!/bin/bash
       # A Sonarqube container is considered ready if the status is UP, DB_MIGRATION_NEEDED or DB_MIGRATION_RUNNING
       # status about migration are added to prevent the node to be kill while sonarqube is upgrading the database.
-      if wget --no-proxy -qO- http://localhost:{{ .Values.service.internalPort }}{{ .Values.readinessProbe.sonarWebContext | default (include "sonarqube.webcontext" .) }}api/system/status | grep -q -e '"status":"UP"' -e '"status":"DB_MIGRATION_NEEDED"' -e '"status":"DB_MIGRATION_RUNNING"'; then
+      if wget --no-proxy -qO- http://sonarqube-sonarqube.sonarqube.svc.cluster.local:{{ .Values.service.internalPort }}{{ .Values.readinessProbe.sonarWebContext | default (include "sonarqube.webcontext" .) }}api/system/status | grep -q -e '"status":"UP"' -e '"status":"DB_MIGRATION_NEEDED"' -e '"status":"DB_MIGRATION_RUNNING"'; then
         exit 0
       fi
       exit 1
@@ -86,7 +86,7 @@ livenessProbe: # http://localhost: # http://sonarqube-sonarqube.sonarqube.svc.cl
     - sh
     - -c
     - |
-      wget --no-proxy --quiet -O /dev/null --timeout={{ .Values.livenessProbe.timeoutSeconds }} --header="X-Sonar-Passcode: $SONAR_WEB_SYSTEMPASSCODE" "http://localhost:{{ .Values.service.internalPort }}{{ .Values.livenessProbe.sonarWebContext | default (include "sonarqube.webcontext" .) }}api/system/liveness"
+      wget --no-proxy --quiet -O /dev/null --timeout={{ .Values.livenessProbe.timeoutSeconds }} --header="X-Sonar-Passcode: $SONAR_WEB_SYSTEMPASSCODE" "http://sonarqube-sonarqube.sonarqube.svc.cluster.local:{{ .Values.service.internalPort }}{{ .Values.livenessProbe.sonarWebContext | default (include "sonarqube.webcontext" .) }}api/system/liveness"
   initialDelaySeconds: 60
 
 ## Environment variables to attach to the pods
@@ -150,8 +150,8 @@ postgresql:
 ## Override JDBC values
 ## for external Databases
 jdbcOverwrite:
-  enable: true # check
-  #enabled: true
+  enable: true
+  #enabled: true # documentation is wrong, says `enable` is deprecated
   jdbcUrl: "jdbc:postgresql://django-production-rds-sonar.cfwo68mist26.us-east-1.rds.amazonaws.com:5432/postgres?socketTimeout=1500" # The JDBC url of the external DB
   #jdbcUrl: 'jdbc:postgresql://<my_DB_endpoint>.us-east-1.rds.amazonaws.com/sonar_sandbox?socketTimeout=1500'
   jdbcUsername: "sonarqube" # The DB user that should be used for the JDBC connection # check
