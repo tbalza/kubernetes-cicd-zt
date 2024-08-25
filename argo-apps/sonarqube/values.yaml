@@ -82,7 +82,7 @@ livenessProbe: # bypass probes for testing purposes, allow for argocd to sync
 #     value: my-value
 
 env:
-  - name: SONAR_JDBC_URL
+  - name: jdbcUrl
     valueFrom:
       secretKeyRef:
         name: sonarqube-secrets
