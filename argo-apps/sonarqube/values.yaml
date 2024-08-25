@@ -47,13 +47,13 @@ elasticsearch:
   configureNode: false # default false
   bootstrapChecks: true # default true
 
-#service:
-#  type: ClusterIP
-#  externalPort: 9000
-#  internalPort: 9000
-#  labels:
-#    app.kubernetes.io/instance: sonarqube
-#    app.kubernetes.io/name: sonarqube
+service:
+  type: ClusterIP
+  externalPort: 9000
+  internalPort: 9000
+  labels:
+    app.kubernetes.io/instance: sonarqube
+    app.kubernetes.io/name: sonarqube
 
 nodeSelector:
   role: "django" # assigning app nodegroup for POC purposes
