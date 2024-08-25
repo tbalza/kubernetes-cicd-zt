@@ -91,7 +91,7 @@ resources:
     ephemeral-storage: 5536M
   requests:
     cpu: 400m
-    memory: 1536M # 1536M # 2048M
+    memory: 2048M # 1536M # 2048M
     ephemeral-storage: 1536M
 
 # SONAR_WEB_JAVAOPTS= #The web server is executed in a dedicated Java process. Use this property to customize JVM options.
