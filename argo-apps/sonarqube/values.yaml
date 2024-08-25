@@ -62,8 +62,7 @@ account:
   adminPasswordSecretName: "sonarqube-secrets"
 
 postgresql:
-  persistence:
-    enabled: false # creates `sample` db, doesn't really work with chart. RDS is used instead
+  enabled: false # creates `sample` db, doesn't really work with chart. RDS is used instead
 
 ## Override JDBC values
 ## for external Databases
