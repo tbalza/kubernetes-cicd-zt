@@ -23,12 +23,12 @@ elasticsearch:
 resources:
   limits:
     cpu: 800m
-    memory: 2Gi
-    ephemeral-storage: 3536M
+    memory: 6144M
+    ephemeral-storage: 5536M
   requests:
     cpu: 400m
-    memory: 1563M # 1536M
-    ephemeral-storage: 5536M
+    memory: 2048M # 1536M
+    ephemeral-storage: 1536M
 
 # SONAR_WEB_JAVAOPTS= #The web server is executed in a dedicated Java process. Use this property to customize JVM options.
 # SONAR_WEB_JAVAADDITIONALOPTS= #Same as previous property, but allows to not repeat all other settings like -Xmx
@@ -36,11 +36,11 @@ resources:
 # A custom sonar.properties file can be provided via dictionary.
 # For example:
 
-sonarProperties:
-#  #sonar.forceAuthentication: true
-  sonar.web.host: sonarqube-sonarqube.sonarqube.svc.cluster.local
-  sonar.web.port: 9000
-  sonar.host.url: http://sonarqube-sonarqube.sonarqube.svc.cluster.local:9000
+#sonarProperties:
+##  #sonar.forceAuthentication: true
+#  sonar.web.host: sonarqube-sonarqube.sonarqube.svc.cluster.local
+#  sonar.web.port: 9000
+#  sonar.host.url: http://sonarqube-sonarqube.sonarqube.svc.cluster.local:9000
 
 # Additional sonar properties to load from a secret with a key "secret.properties" (must be a string)
 # sonarSecretProperties:
