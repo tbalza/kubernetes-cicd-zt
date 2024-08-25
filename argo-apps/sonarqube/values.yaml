@@ -81,13 +81,6 @@ livenessProbe: # bypass probes for testing purposes, allow for argocd to sync
 #   - name: VARIABLE
 #     value: my-value
 
-env:
-  - name: jdbcUrl
-    valueFrom:
-      secretKeyRef:
-        name: sonarqube-secrets
-        key: jdbcUrl
-
 ## Those default are based on the default `Web -Xmx1G -Xms128m` and `CE -Xmx2G -Xms128m` and Search -Xmx2G -Xms2G settings of SQ sub processes
 ## Adjust these values to your needs, you can find more details on the main README of the chart.
 # SONAR_CE_JAVAOPTS # sonar.ce.javaOpts
@@ -138,15 +131,22 @@ account:
 postgresql:
   enabled: false # creates `sample` db. RDS is used instead
 
+env:
+  - name: jdbcUrl
+    valueFrom:
+      secretKeyRef:
+        name: sonarqube-secrets
+        key: jdbcUrl
+
 jdbcOverwrite:
-  enable: true
+  enable: false
   #enabled: true # chart documentation is wrong, says `enable` is deprecated, but `enabled` doesn't work
   ##jdbcUrl: "jdbc:postgresql://django-production-rds-sonar.cfwo68mist26.us-east-1.rds.amazonaws.com:5432/postgres?socketTimeout=1500" # The JDBC url of the external DB
-  jdbcUrl: "{{ .Values.jdbcUrl }}"
+  #jdbcUrl: "{{ .Values.jdbcUrl }}"
   #jdbcUsername: "sonarqube" # The DB user that should be used for the JDBC connection # check
   #jdbcPassword: "Ve3-?2LlMp2V-hiFkt0eh&e&gMl," # # Use this if you don't mind the DB password getting stored in plain text within the values file
-  #jdbcSecretName: "sonarqube-secrets" # pre-existing k8s secret containing the DB password
-  #jdbcSecretPasswordKey: "sonar_rds_password" # `"jdbc-password"` secretValueKey of the password found within that secret
+  jdbcSecretName: "sonarqube-secrets" # pre-existing k8s secret containing the DB password
+  jdbcSecretPasswordKey: "jdbcPassword" # `"jdbc-password"` secretValueKey of the password found within that secret
 
 ## Create JDBC data source for jdbc:postgresql://%!s(<nil>):5432/sonarDB
 ## loads Environment Variables from Secrets
