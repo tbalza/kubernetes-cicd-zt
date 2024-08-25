@@ -47,41 +47,30 @@ elasticsearch:
   configureNode: false # default false
   bootstrapChecks: true # default true
 
-service:
-  type: ClusterIP
-  externalPort: 9000
-  internalPort: 9000
-  labels:
-    app.kubernetes.io/instance: sonarqube
-    app.kubernetes.io/name: sonarqube
+#service:
+#  type: ClusterIP
+#  externalPort: 9000
+#  internalPort: 9000
+#  labels:
+#    app.kubernetes.io/instance: sonarqube
+#    app.kubernetes.io/name: sonarqube
 
 nodeSelector:
   role: "django" # assigning app nodegroup for POC purposes
 
-readinessProbe: # http://localhost: # http://sonarqube-sonarqube.sonarqube.svc.cluster.local
+readinessProbe:
   exec:
     command:
     - sh
     - -c
     - "exit 0"
-#    - |
-#      #!/bin/bash
-#      # A Sonarqube container is considered ready if the status is UP, DB_MIGRATION_NEEDED or DB_MIGRATION_RUNNING
-#      # status about migration are added to prevent the node to be kill while sonarqube is upgrading the database.
-#      if wget --no-proxy -qO- http://localhost:{{ .Values.service.internalPort }}{{ .Values.readinessProbe.sonarWebContext | default (include "sonarqube.webcontext" .) }}api/system/status | grep -q -e '"status":"UP"' -e '"status":"DB_MIGRATION_NEEDED"' -e '"status":"DB_MIGRATION_RUNNING"'; then
-#        exit 0
-#      fi
-#      exit 1
 
-livenessProbe: # http://localhost: # http://sonarqube-sonarqube.sonarqube.svc.cluster.local
+livenessProbe:
   exec:
     command:
     - sh
     - -c
     - "exit 0"
-#    - |
-#      wget --no-proxy --quiet -O /dev/null --timeout={{ .Values.livenessProbe.timeoutSeconds }} --header="X-Sonar-Passcode: $SONAR_WEB_SYSTEMPASSCODE" "http://localhost:{{ .Values.service.internalPort }}{{ .Values.livenessProbe.sonarWebContext | default (include "sonarqube.webcontext" .) }}api/system/liveness"
-  initialDelaySeconds: 60
 
 ## Environment variables to attach to the pods
 ##
