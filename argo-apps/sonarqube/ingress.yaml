@@ -14,7 +14,7 @@ metadata:
     alb.ingress.kubernetes.io/healthcheck-path: "/login"
     alb.ingress.kubernetes.io/healthcheck-port: "traffic-port"
     alb.ingress.kubernetes.io/success-codes: "200,307"
-    external-dns.alpha.kubernetes.io/hostname: sonarqube.${ARGOCD_APP_DOMAIN}
+    external-dns.alpha.kubernetes.io/hostname: sonarqube.${ARGOCD_APP_DOMAIN} #
 spec:
   ingressClassName: alb
   rules:
