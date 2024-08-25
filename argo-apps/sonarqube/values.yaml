@@ -124,9 +124,11 @@ serviceAccount:
 
 # Default Administrator credentials are still being used. Make sure to change the password or deactivate the account.
 account:
+  adminPassword: admin123
+  currentAdminPassword: admin123
   # values can be also provided by a secret that contains "password" and "currentPassword" as keys. You can generate such a secret in your cluster
   # using "kubectl create secret generic admin-password-secret-name --from-literal=password=admin --from-literal=currentPassword=admin"
-  adminPasswordSecretName: "sonarqube-secrets"
+  #adminPasswordSecretName: "sonarqube-secrets"
 
 ## RDS connection
 
