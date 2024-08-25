@@ -58,14 +58,14 @@ service:
 nodeSelector:
   role: "django" # assigning app nodegroup for POC purposes
 
-readinessProbe:
+readinessProbe: # bypass probes for testing purposes, allow for argocd to sync
   exec:
     command:
     - sh
     - -c
     - "exit 0"
 
-livenessProbe:
+livenessProbe: # bypass probes for testing purposes, allow for argocd to sync
   exec:
     command:
     - sh
@@ -80,6 +80,13 @@ livenessProbe:
 #     value: /sonarqube
 #   - name: VARIABLE
 #     value: my-value
+
+env:
+  - name: SONAR_JDBC_URL
+    valueFrom:
+      secretKeyRef:
+        name: sonarqube-secrets
+        key: jdbcUrl
 
 ## Those default are based on the default `Web -Xmx1G -Xms128m` and `CE -Xmx2G -Xms128m` and Search -Xmx2G -Xms2G settings of SQ sub processes
 ## Adjust these values to your needs, you can find more details on the main README of the chart.
@@ -131,16 +138,17 @@ account:
 postgresql:
   enabled: false # creates `sample` db. RDS is used instead
 
-jdbcOverwrite:
-  enable: true
-  #enabled: true # chart documentation is wrong, says `enable` is deprecated, but `enabled` doesn't work
-  jdbcUrl: "jdbc:postgresql://django-production-rds-sonar.cfwo68mist26.us-east-1.rds.amazonaws.com:5432/postgres?socketTimeout=1500" # The JDBC url of the external DB
-  jdbcUsername: "sonarqube" # The DB user that should be used for the JDBC connection # check
-  jdbcPassword: "Ve3-?2LlMp2V-hiFkt0eh&e&gMl," # # Use this if you don't mind the DB password getting stored in plain text within the values file
-  #jdbcSecretName: "sonarqube-secrets" # pre-existing k8s secret containing the DB password
-  #jdbcSecretPasswordKey: "sonar_rds_password" # `"jdbc-password"` secretValueKey of the password found within that secret
+#jdbcOverwrite:
+#  enable: true
+#  #enabled: true # chart documentation is wrong, says `enable` is deprecated, but `enabled` doesn't work
+#  jdbcUrl: "jdbc:postgresql://django-production-rds-sonar.cfwo68mist26.us-east-1.rds.amazonaws.com:5432/postgres?socketTimeout=1500" # The JDBC url of the external DB
+#  jdbcUsername: "sonarqube" # The DB user that should be used for the JDBC connection # check
+#  jdbcPassword: "Ve3-?2LlMp2V-hiFkt0eh&e&gMl," # # Use this if you don't mind the DB password getting stored in plain text within the values file
+#  #jdbcSecretName: "sonarqube-secrets" # pre-existing k8s secret containing the DB password
+#  #jdbcSecretPasswordKey: "sonar_rds_password" # `"jdbc-password"` secretValueKey of the password found within that secret
 
 ## Create JDBC data source for jdbc:postgresql://%!s(<nil>):5432/sonarDB
-#extraConfig: # contains JDBC/RDS connection values
-#  secrets:
-#    - sonarqube-secrets
+## loads Environment Variables from Secrets
+extraConfig: # contains JDBC/RDS connection values
+  secrets:
+    - sonarqube-secrets
