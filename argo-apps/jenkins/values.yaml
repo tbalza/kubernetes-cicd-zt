@@ -128,10 +128,10 @@ agent:
 #        limits:
 #          cpu: 1
 #          memory: 2Gi
-    - sideContainerName: "sonar-scanner" # is used instead of docker for building the image
+    - sideContainerName: "sonarscanner" # is used instead of docker for building the image
       image:
         repository: "sonarsource/sonar-scanner-cli" # debug release required for tty
-        tag: "11.0"
+        tag: "11"
       command: "sleep" # required
       args: "9999999" # required
       privileged: false
