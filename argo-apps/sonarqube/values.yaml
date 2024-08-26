@@ -3,57 +3,58 @@ replicaCount: 1 # value of 0 will not launch any pods
 deploymentStrategy:
  priorityClassName: "high-priority"
 
-securityContext:
-  fsGroup: 0
-#  runAsUser: 0
-#  runAsGroup: 0
-#  allowPrivilegeEscalation: true
-#  privileged: true
-#
+#securityContext:
+#  fsGroup: 0
+#  runAsUser: 0 #
+#  runAsGroup: 0 #
+#  allowPrivilegeEscalation: true #
+#  privileged: true #
+
 initSysctl:
   enabled: false
-  image: busybox:1.36
+  #image: busybox:1.36
 
 initFs:
   enabled: false
-  Image: busybox:1.36
-#
-#containerSecurityContext:
-#  allowPrivilegeEscalation: false
-#  runAsNonRoot: true
-#  runAsUser: 1000
-#  runAsGroup: 0
-#  seccompProfile:
-#    type: RuntimeDefault
-#  capabilities:
-#    drop: ["ALL"]
-#  readOnlyRootFilesystem: true
+  #Image: busybox:1.36
+
+containerSecurityContext:
+  allowPrivilegeEscalation: false
+  runAsNonRoot: true
+  runAsUser: 1000
+  runAsGroup: 0
+  seccompProfile:
+    type: RuntimeDefault
+  capabilities:
+    drop: ["ALL"]
+  readOnlyRootFilesystem: true
 #
 initContainers:
   image: busybox:1.36
-#  securityContext:
-#    allowPrivilegeEscalation: false
-#    runAsNonRoot: true
-#    runAsUser: 1000
-#    runAsGroup: 0
-#    seccompProfile:
-#      type: RuntimeDefault
-#    capabilities:
-#      drop: ["ALL"]
-#    readOnlyRootFilesystem: true
+  securityContext:
+    allowPrivilegeEscalation: false
+    runAsNonRoot: true
+    runAsUser: 1000
+    runAsGroup: 0
+    seccompProfile:
+      type: RuntimeDefault
+    capabilities:
+      drop: ["ALL"]
+    readOnlyRootFilesystem: true
 
 elasticsearch:
-  # DEPRECATED: Use initSysctl.enabled instead
-  configureNode: false # default false
-  bootstrapChecks: true # default true
+  configureNode: false # default
+  bootstrapChecks: true # default
+  # https://www.elastic.co/guide/en/elasticsearch/reference/current/vm-max-map-count.html#vm-max-map-count
+  # https://github.com/SonarSource/docker-sonarqube/issues/614
 
 service:
   type: ClusterIP
   externalPort: 9000
   internalPort: 9000
   labels:
-    app.kubernetes.io/instance: sonarqube
-    app.kubernetes.io/name: sonarqube
+    app.kubernetes.io/instance: sonarqube # needed for ALB to work
+    app.kubernetes.io/name: sonarqube # needed for ALB to work
 
 nodeSelector:
   role: "django" # assigning app nodegroup for POC purposes
@@ -123,12 +124,13 @@ serviceAccount:
   automountToken: true
 
 # Default Administrator credentials are still being used. Make sure to change the password or deactivate the account.
-account:
-  adminPassword: admin123
-  currentAdminPassword: admin123
-  # values can be also provided by a secret that contains "password" and "currentPassword" as keys. You can generate such a secret in your cluster
-  # using "kubectl create secret generic admin-password-secret-name --from-literal=password=admin --from-literal=currentPassword=admin"
-  #adminPasswordSecretName: "sonarqube-secrets"
+#account:
+#  adminPassword: admin123
+#  currentAdminPassword: admin123
+#  # values can be also provided by a secret that contains "password" and "currentPassword" as keys. You can generate such a secret in your cluster
+#  # using "kubectl create secret generic admin-password-secret-name --from-literal=password=admin --from-literal=currentPassword=admin"
+#  #adminPasswordSecretName: "sonarqube-secrets"
+#  curlContainerImage: curlimages/curl:8.2.1 # initContainers.securityContext # account.securityContext
 
 ## RDS connection
 
