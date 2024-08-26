@@ -1,46 +1,76 @@
+#apiVersion: batch/v1
+#kind: Job
+#metadata:
+#  name: sonarqube-change-password-create-token
+#  labels:
+#    app.kubernetes.io/name: sonarqube
+#    app.kubernetes.io/instance: sonarqube
+##  annotations:
+##    "helm.sh/hook": "post-install, post-upgrade"
+##    "helm.sh/hook-delete-policy": "hook-succeeded"
+#spec:
+#  template:
+#    metadata:
+#      name: sonarqube-change-password-create-token
+#      labels:
+#        app.kubernetes.io/name: sonarqube
+#        app.kubernetes.io/instance: sonarqube
+#    spec:
+#      restartPolicy: OnFailure
+#      serviceAccountName: sonarqube
+#      containers:
+#      - name: curl-api-commands
+#        image: curlimages/curl:8.2.1
+#        securityContext:
+#          runAsUser: 1000  # check
+#        command:
+#          - "sh"
+#          - "-c"
+#          - |
+#            until curl -v --connect-timeout 100 sonarqube-sonarqube.sonarqube.svc.cluster.local:9000/api/system/status | grep -w UP; do sleep 10; done;
+#            curl -v --connect-timeout 100 -u admin:admin -X POST "sonarqube-sonarqube.sonarqube.svc.cluster.local:9000/api/users/change_password?login=admin&previousPassword=admin&password=$ADMIN_PASSWORD";
+#            # Add command to create token after password change if required
+#        env:
+#        - name: ADMIN_PASSWORD
+#          valueFrom:
+#            secretKeyRef:
+#              name: sonarqube-secrets
+#              key: password
+#        - name: CURRENT_ADMIN_PASSWORD
+#          valueFrom:
+#            secretKeyRef:
+#              name: sonarqube-secrets
+#              key: currentPassword
+
+# curl -v --connect-timeout 100 -u admin:$CURRENT_ADMIN_PASSWORD -X POST "sonarqube-sonarqube.sonarqube.svc.cluster.local:9000/api/users/change_password?login=admin&previousPassword=$CURRENT_ADMIN_PASSWORD&password=$ADMIN_PASSWORD";
+#            # Add command to create token after password change if required
+#---
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: sonarqube-change-password-create-token
-  labels:
-    app.kubernetes.io/name: sonarqube
-    app.kubernetes.io/instance: sonarqube
+  name: sonarqube-change-password-create-token-webhook
+  namespace: argocd
   annotations:
-    "helm.sh/hook": "post-install, post-upgrade"
-    "helm.sh/hook-delete-policy": "hook-succeeded"
+    argocd.argoproj.io/hook: PostSync
+    argocd.argoproj.io/hook-delete-policy: HookSucceeded
 spec:
   template:
-    metadata:
-      name: sonarqube-change-password-create-token
-      labels:
-        app.kubernetes.io/name: sonarqube
-        app.kubernetes.io/instance: sonarqube
     spec:
-      restartPolicy: OnFailure
+      restartPolicy: Never # OnFailure
       serviceAccountName: sonarqube
       containers:
       - name: curl-api-commands
         image: curlimages/curl:8.2.1
-        securityContext:
-          runAsUser: 1000  # check
-        command:
-          - "sh"
-          - "-c"
-          - |
-            until curl -v --connect-timeout 100 sonarqube-sonarqube.sonarqube.svc.cluster.local:9000/api/system/status | grep -w UP; do sleep 10; done;
-            curl -v --connect-timeout 100 -u admin:admin -X POST "sonarqube-sonarqube.sonarqube.svc.cluster.local:9000/api/users/change_password?login=admin&previousPassword=admin&password=$ADMIN_PASSWORD";
-            # Add command to create token after password change if required
+        imagePullPolicy: IfNotPresent
+        command: # currently both repo server and redis need to be restarted for envFrom to take effect. (Repo server restart is done elsewhere, in the plugin container in /argocd/values.yaml)
+        - /bin/sh
+        - -c
+        - |
+          until curl -v --connect-timeout 100 sonarqube-sonarqube.sonarqube.svc.cluster.local:9000/api/system/status | grep -w UP; do sleep 10; done;
+          curl -v --connect-timeout 100 -u admin:admin -X POST "sonarqube-sonarqube.sonarqube.svc.cluster.local:9000/api/users/change_password?login=admin&previousPassword=admin&password=$ADMIN_PASSWORD";
         env:
         - name: ADMIN_PASSWORD
           valueFrom:
             secretKeyRef:
               name: sonarqube-secrets
               key: password
-        - name: CURRENT_ADMIN_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: sonarqube-secrets
-              key: currentPassword
-
-# curl -v --connect-timeout 100 -u admin:$CURRENT_ADMIN_PASSWORD -X POST "sonarqube-sonarqube.sonarqube.svc.cluster.local:9000/api/users/change_password?login=admin&previousPassword=$CURRENT_ADMIN_PASSWORD&password=$ADMIN_PASSWORD";
-#            # Add command to create token after password change if required
