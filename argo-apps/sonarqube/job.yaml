@@ -1,58 +1,11 @@
-#apiVersion: batch/v1
-#kind: Job
-#metadata:
-#  name: sonarqube-change-password-create-token
-#  labels:
-#    app.kubernetes.io/name: sonarqube
-#    app.kubernetes.io/instance: sonarqube
-##  annotations:
-##    "helm.sh/hook": "post-install, post-upgrade"
-##    "helm.sh/hook-delete-policy": "hook-succeeded"
-#spec:
-#  template:
-#    metadata:
-#      name: sonarqube-change-password-create-token
-#      labels:
-#        app.kubernetes.io/name: sonarqube
-#        app.kubernetes.io/instance: sonarqube
-#    spec:
-#      restartPolicy: OnFailure
-#      serviceAccountName: sonarqube
-#      containers:
-#      - name: curl-api-commands
-#        image: curlimages/curl:8.2.1
-#        securityContext:
-#          runAsUser: 1000  # check
-#        command:
-#          - "sh"
-#          - "-c"
-#          - |
-#            until curl -v --connect-timeout 100 sonarqube-sonarqube.sonarqube.svc.cluster.local:9000/api/system/status | grep -w UP; do sleep 10; done;
-#            curl -v --connect-timeout 100 -u admin:admin -X POST "sonarqube-sonarqube.sonarqube.svc.cluster.local:9000/api/users/change_password?login=admin&previousPassword=admin&password=$ADMIN_PASSWORD";
-#            # Add command to create token after password change if required
-#        env:
-#        - name: ADMIN_PASSWORD
-#          valueFrom:
-#            secretKeyRef:
-#              name: sonarqube-secrets
-#              key: password
-#        - name: CURRENT_ADMIN_PASSWORD
-#          valueFrom:
-#            secretKeyRef:
-#              name: sonarqube-secrets
-#              key: currentPassword
-
-# curl -v --connect-timeout 100 -u admin:$CURRENT_ADMIN_PASSWORD -X POST "sonarqube-sonarqube.sonarqube.svc.cluster.local:9000/api/users/change_password?login=admin&previousPassword=$CURRENT_ADMIN_PASSWORD&password=$ADMIN_PASSWORD";
-#            # Add command to create token after password change if required
-#---
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: sonarqube-change-password-create-token-webhook
+  name: sonarqube-change-password-create-webhook
   namespace: argocd
   annotations:
     argocd.argoproj.io/hook: PostSync
-    #argocd.argoproj.io/hook-delete-policy: HookSucceeded
+    argocd.argoproj.io/hook-delete-policy: HookSucceeded
 spec:
   template:
     spec:
@@ -67,10 +20,12 @@ spec:
         - -c
         - |
           until curl -v --connect-timeout 100 sonarqube-sonarqube.sonarqube.svc.cluster.local:9000/api/system/status | grep -w UP; do sleep 10; done;
-          curl -v --connect-timeout 100 -u admin:pass -X POST "sonarqube-sonarqube.sonarqube.svc.cluster.local:9000/api/users/change_password?login=admin&previousPassword=pass&password=$ADMIN_PASSWORD";
+          curl -v --connect-timeout 100 -u admin:admin -X POST "sonarqube-sonarqube.sonarqube.svc.cluster.local:9000/api/users/change_password?login=admin&previousPassword=admin&password=$ADMIN_PASSWORD";
+          sleep 10;
+          curl -X POST -H "Content-Type: application/x-www-form-urlencoded" -d "name=webhook&url=http://jenkins.jenkins.svc.cluster.local:8080/sonarqube-webhook/" -u admin:$ADMIN_PASSWORD sonarqube-sonarqube.sonarqube.svc.cluster.local:9000/api/webhooks/create;
         env:
-        - name: ADMIN_PASSWORD
+        - name: ADMIN_PASSWORD # not actual password, name of ENV
           valueFrom:
             secretKeyRef:
               name: sonarqube-secrets
-              key: password
+              key: password # not actual password just name of the key in secrets.yaml
