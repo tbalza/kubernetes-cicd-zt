@@ -111,12 +111,20 @@ agent:
       # ephemeralStorage:
     limits:
       cpu: "1000m"
-      memory: "1Gi"
+      memory: "2Gi"
   additionalContainers: # this adds kaniko to the default pod template (which already has jnlp required by kubernetes plugin)
     - sideContainerName: "kaniko" # is used instead of docker for building the image
       image:
         repository: "gcr.io/kaniko-project/executor" # debug release required for tty
         tag: "v1.23.1-debug"
+      command: "sleep" # required
+      args: "9999999" # required
+      privileged: false
+      ttyEnabled: true
+    - sideContainerName: "sonar-scanner" # is used instead of docker for building the image
+      image:
+        repository: "sonarsource/sonar-scanner-cli" # debug release required for tty
+        tag: "11.0"
       command: "sleep" # required
       args: "9999999" # required
       privileged: false
@@ -152,6 +160,10 @@ agent:
       optional: true
     - key: GITHUB_TOKEN
       secretKey: GITHUB_TOKEN
+      secretName: jenkins-secrets
+      optional: true
+    - key: SONARQUBE_PASSWORD
+      secretKey: SONARQUBE_PASSWORD
       secretName: jenkins-secrets
       optional: true
 
