@@ -125,8 +125,8 @@ agent:
       image:
         repository: "sonarsource/sonar-scanner-cli" # debug release required for tty
         tag: "11.0"
-      command: "sleep" # required
-      args: "9999999" # required
+      #command: "sleep" # required
+      #args: "9999999" # required
       privileged: false
       ttyEnabled: true
 #    - sideContainerName: "aws-cli" # adding this additional container makes agent crash, possibly resource related
