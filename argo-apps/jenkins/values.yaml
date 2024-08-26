@@ -104,14 +104,14 @@ agent:
 #    role: ci-cd
   websocket: true # (websocket and directConnection are mutually exclusive)
   directConnection: false #  (websocket and directConnection are mutually exclusive)
-#  resources:
-#    requests:
-#      cpu: "500m"
-#      memory: "512Mi"
-#      # ephemeralStorage:
-#    limits:
-#      cpu: "1000m"
-#      memory: "2Gi"
+  resources:
+    requests:
+      cpu: "500m"
+      memory: "512Mi"
+      # ephemeralStorage:
+    limits:
+      cpu: "1000m"
+      memory: "2Gi"
   additionalContainers: # this adds kaniko to the default pod template (which already has jnlp required by kubernetes plugin)
     - sideContainerName: "kaniko" # is used instead of docker for building the image
       image:
@@ -132,8 +132,8 @@ agent:
       image:
         repository: "sonarsource/sonar-scanner-cli" # debug release required for tty
         tag: "11.0"
-      #command: "sleep" # required
-      #args: "9999999" # required
+      command: "sleep" # required
+      args: "9999999" # required
       privileged: false
       ttyEnabled: true
 #      resources:
