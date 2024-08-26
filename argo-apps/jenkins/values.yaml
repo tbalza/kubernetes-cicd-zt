@@ -117,8 +117,8 @@ agent:
       image:
         repository: "gcr.io/kaniko-project/executor" # debug release required for tty
         tag: "v1.23.1-debug"
-      command: "sleep" # required
-      args: "9999999" # required
+      #command: "sleep" # required
+      #args: "9999999" # required
       privileged: false
       ttyEnabled: true
     - sideContainerName: "sonar-scanner" # is used instead of docker for building the image
