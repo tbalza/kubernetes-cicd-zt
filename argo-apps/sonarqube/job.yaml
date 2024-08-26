@@ -67,7 +67,7 @@ spec:
         - -c
         - |
           until curl -v --connect-timeout 100 sonarqube-sonarqube.sonarqube.svc.cluster.local:9000/api/system/status | grep -w UP; do sleep 10; done;
-          curl -v --connect-timeout 100 -u admin:admin -X POST "sonarqube-sonarqube.sonarqube.svc.cluster.local:9000/api/users/change_password?login=admin&previousPassword=admin&password=$ADMIN_PASSWORD";
+          curl -v --connect-timeout 100 -u admin:pass -X POST "sonarqube-sonarqube.sonarqube.svc.cluster.local:9000/api/users/change_password?login=admin&previousPassword=pass&password=$ADMIN_PASSWORD";
         env:
         - name: ADMIN_PASSWORD
           valueFrom:
