@@ -104,14 +104,14 @@ agent:
 #    role: ci-cd
   websocket: true # (websocket and directConnection are mutually exclusive)
   directConnection: false #  (websocket and directConnection are mutually exclusive)
-  resources:
-    requests:
-      cpu: "500m"
-      memory: "512Mi"
-      # ephemeralStorage:
-    limits:
-      cpu: "1000m"
-      memory: "2Gi"
+#  resources:
+#    requests:
+#      cpu: "500m"
+#      memory: "512Mi"
+#      # ephemeralStorage:
+#    limits:
+#      cpu: "1000m"
+#      memory: "2Gi"
   additionalContainers: # this adds kaniko to the default pod template (which already has jnlp required by kubernetes plugin)
     - sideContainerName: "kaniko" # is used instead of docker for building the image
       image:
@@ -121,13 +121,13 @@ agent:
       args: "9999999" # required
       privileged: false
       ttyEnabled: true
-      resources:
-        requests:
-          cpu: 500m
-          memory: .5Gi
-        limits:
-          cpu: 1
-          memory: 2Gi
+#      resources:
+#        requests:
+#          cpu: 500m
+#          memory: .5Gi
+#        limits:
+#          cpu: 1
+#          memory: 2Gi
     - sideContainerName: "sonar-scanner" # is used instead of docker for building the image
       image:
         repository: "sonarsource/sonar-scanner-cli" # debug release required for tty
@@ -136,13 +136,13 @@ agent:
       #args: "9999999" # required
       privileged: false
       ttyEnabled: true
-      resources:
-        requests:
-          cpu: 500m
-          memory: .5Gi
-        limits:
-          cpu: 1
-          memory: 2Gi
+#      resources:
+#        requests:
+#          cpu: 500m
+#          memory: .5Gi
+#        limits:
+#          cpu: 1
+#          memory: 2Gi
 #    - sideContainerName: "aws-cli" # adding this additional container makes agent crash, possibly resource related
 #      image:
 #        repository: "amazon/aws-cli"
