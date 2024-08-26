@@ -113,14 +113,14 @@ agent:
 #      cpu: "1000m"
 #      memory: "2Gi"
   additionalContainers: # this adds kaniko to the default pod template (which already has jnlp required by kubernetes plugin)
-    - sideContainerName: "kaniko" # is used instead of docker for building the image
-      image:
-        repository: "gcr.io/kaniko-project/executor" # debug release required for tty
-        tag: "v1.23.1-debug"
-      command: "sleep" # required
-      args: "9999999" # required
-      privileged: false
-      ttyEnabled: true
+#    - sideContainerName: "kaniko" # is used instead of docker for building the image
+#      image:
+#        repository: "gcr.io/kaniko-project/executor" # debug release required for tty
+#        tag: "v1.23.1-debug"
+#      command: "sleep" # required
+#      args: "9999999" # required
+#      privileged: false
+#      ttyEnabled: true
 #      resources:
 #        requests:
 #          cpu: 500m
