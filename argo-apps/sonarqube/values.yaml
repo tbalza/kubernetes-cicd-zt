@@ -123,6 +123,12 @@ serviceAccount:
   name: sonarqube
   automountToken: true
 
+## pod sonarqube-sonarqube-0
+# SONAR_WEB_SYSTEMPASSCODE:     <set to the key 'SONAR_WEB_SYSTEMPASSCODE' in secret 'sonarqube-sonarqube-monitoring-passcode'>
+# Startup probe failed: Get "http://10.0.10.66:9000/api/system/status
+
+
+
 # Default Administrator credentials are still being used. Make sure to change the password or deactivate the account.
 #account:
 #  adminPassword: admin123

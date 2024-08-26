@@ -27,8 +27,8 @@ spec:
           - "sh"
           - "-c"
           - |
-            until curl -v --connect-timeout 100 sonarqube:9000/api/system/status | grep -w UP; do sleep 10; done;
-            curl -v --connect-timeout 100 -u admin:$CURRENT_ADMIN_PASSWORD -X POST "sonarqube:9000/api/users/change_password?login=admin&previousPassword=$CURRENT_ADMIN_PASSWORD&password=$ADMIN_PASSWORD";
+            until curl -v --connect-timeout 100 sonarqube-sonarqube.sonarqube.svc.cluster.local:9000/api/system/status | grep -w UP; do sleep 10; done;
+            curl -v --connect-timeout 100 -u admin:admin -X POST "sonarqube-sonarqube.sonarqube.svc.cluster.local:9000/api/users/change_password?login=admin&previousPassword=admin&password=$ADMIN_PASSWORD";
             # Add command to create token after password change if required
         env:
         - name: ADMIN_PASSWORD
@@ -41,3 +41,6 @@ spec:
             secretKeyRef:
               name: sonarqube-secrets
               key: currentPassword
+
+# curl -v --connect-timeout 100 -u admin:$CURRENT_ADMIN_PASSWORD -X POST "sonarqube-sonarqube.sonarqube.svc.cluster.local:9000/api/users/change_password?login=admin&previousPassword=$CURRENT_ADMIN_PASSWORD&password=$ADMIN_PASSWORD";
+#            # Add command to create token after password change if required

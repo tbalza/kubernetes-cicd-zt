@@ -16,3 +16,4 @@ resources:
   - ingress.yaml
   - secrets.yaml
   - serviceaccount.yaml
+  - job.yaml
