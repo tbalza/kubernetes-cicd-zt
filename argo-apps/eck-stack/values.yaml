@@ -10,7 +10,7 @@ eck-elasticsearch:
         disabled: true # disable tls to account for ALB SSL termination
   serviceAccountName: eck-pass
   nodeSelector:
-    role: "ci-cd"
+    role: "django" # assigning app nodegroup for POC purposes
   auth:
     fileRealm: # set elastic user's password https://www.elastic.co/guide/en/cloud-on-k8s/current/k8s-users-and-roles.html#k8s_file_realm
     - secretName: elastic-secrets # password set as SSM parameter in tf
