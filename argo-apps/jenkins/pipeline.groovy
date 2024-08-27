@@ -39,22 +39,6 @@ pipeline {
                 }
             }
         }
-        stage('SonarQube Analysis') {
-          steps {
-            script {
-              scannerHome = tool 'SonarQubeScanner' // match `sonarRunnerInstallation:` (JCasC values.yaml) // v6.1.0.4477
-            }
-            withSonarQubeEnv('SonarQube') { // match `sonarGlobalConfiguration:` (JCasC values.yaml) // sonar.python.version
-              sh """
-              ${scannerHome}/bin/sonar-scanner \
-                -Dsonar.projectKey=django_todo_project \
-                -Dsonar.sources=/home/jenkins/agent/workspace/build-django/django-todo/ \
-                -Dsonar.host.url=http://sonarqube-sonarqube.sonarqube.svc.cluster.local:9000 \
-                -Dsonar.token=squ_38317b7095dc90823b822555ba9209d238500214
-              """
-            }
-          }
-        }
         stage('Check ECR for Latest Image Commit') {
             when {
                 expression { env.SKIP_ALL == 'false' }
@@ -116,6 +100,44 @@ pipeline {
                     }
                 }
             }
+        }
+        stage('SonarQube Analysis') {
+          steps {
+//            script {
+//              scannerHome = tool 'SonarQubeScanner' // match `sonarRunnerInstallation:` (JCasC values.yaml) // Scanner v6.1.0.4477, SQ community edition v10.6
+//            }
+            script {
+                    // Retrieve the path to the SonarQube scanner // match `sonarRunnerInstallation:` (JCasC values.yaml) // Scanner v6.1.0.4477, SQ community edition v10.6
+                    scannerHome = tool 'SonarQubeScanner'
+
+                    // Check if the SQ_TOKEN environment variable is set and not empty
+                    if (!env.SQ_TOKEN) {
+                        echo 'SQ_TOKEN is not defined or empty, generating a new token.'
+
+                        // Generate a new SonarQube token using curl command
+                        def response = sh(script: """
+                        curl -X POST -H "Content-Type: application/x-www-form-urlencoded" -d "name=token" -u admin:${SONARQUBE_PASSWORD} http://sonarqube-sonarqube.sonarqube.svc.cluster.local:9000/api/user_tokens/generate
+                        """, returnStdout: true).trim()
+
+                        // Parse the JSON response to extract the token
+                        def jsonResponse = readJSON text: response
+                        env.SQ_TOKEN = jsonResponse.token
+
+                        echo "Generated new SQ_TOKEN: ${env.SQ_TOKEN}"
+                    } else {
+                        echo 'SQ_TOKEN is already set.'
+                    }
+                }
+            withSonarQubeEnv('SonarQube') { // match `sonarGlobalConfiguration:` (JCasC values.yaml) // sonar.python.version // env.SQ_TOKEN
+              sh """
+              ${scannerHome}/bin/sonar-scanner \
+                -Dsonar.projectKey=django_todo_project \
+                -Dsonar.sources=/home/jenkins/agent/workspace/build-django/django-todo/ \
+                -Dsonar.host.url=http://sonarqube-sonarqube.sonarqube.svc.cluster.local:9000 \
+                -Dsonar.token=${env.SQ_TOKEN}
+              """
+            }
+          }
         }
         stage('Build and Push Image') {
             when {
