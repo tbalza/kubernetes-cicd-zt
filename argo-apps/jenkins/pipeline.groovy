@@ -44,13 +44,13 @@ pipeline {
             script {
               scannerHome = tool 'SonarQubeScanner' // match Global Tool Configuration
             }
-            withSonarQubeEnv('SonarQube') { // match the name in the SonarQube servers configuration
+            withSonarQubeEnv('SonarQube') { // match the name in the SonarQube servers configuration // sonar.python.version
               sh """
               ${scannerHome}/bin/sonar-scanner \
                 -Dsonar.projectKey=django_todo_project \
                 -Dsonar.sources=/home/jenkins/agent/workspace/build-django/django-todo/ \
                 -Dsonar.host.url=http://sonarqube-sonarqube.sonarqube.svc.cluster.local:9000 \
-                -Dsonar.login=squ_38317b7095dc90823b822555ba9209d238500214
+                -Dsonar.token=squ_38317b7095dc90823b822555ba9209d238500214
               """
             }
           }
