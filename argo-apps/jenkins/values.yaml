@@ -126,7 +126,7 @@ agent:
       # ephemeralStorage:
     limits:
       cpu: "1000m"
-      memory: "1Gi"
+      memory: "2Gi"
   additionalContainers: # this adds kaniko to the default pod template (which already has jnlp required by kubernetes plugin)
     - sideContainerName: "kaniko" # is used instead of docker for building the image
       image:
