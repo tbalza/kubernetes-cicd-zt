@@ -41,7 +41,7 @@ pipeline {
         }
         stage('SonarQube Analysis') { // SONARQUBE_PASSWORD
             steps {
-                container('sonar-scanner') {
+                container('jnlp') {
                     script {
                         withSonarQubeEnv('sonarqubeserver') {
                             sh """
