@@ -120,7 +120,7 @@ agent:
       args: "9999999" # required
       privileged: false
       ttyEnabled: true
-#    - sideContainerName: "sonar-scanner" # is used instead of docker for building the image
+#    - sideContainerName: "sonar-scanner"
 #      image:
 #        repository: "sonarsource/sonar-scanner-cli" # debug release required for tty
 #        tag: "11.0"
