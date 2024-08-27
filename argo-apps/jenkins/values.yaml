@@ -86,6 +86,69 @@ controller:
       } else {
           println("Job 'build-django' not found.")
       }
+    getSQAPIMakeCredential: |-
+      import jenkins.model.Jenkins
+      import com.cloudbees.plugins.credentials.*
+      import com.cloudbees.plugins.credentials.domains.Domain
+      import com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl
+      import groovy.json.JsonSlurper
+      import java.net.HttpURLConnection
+      import java.net.URL
+      
+      // SonarQube server details
+      def sonarUrl = 'http://sonarqube-sonarqube.sonarqube.svc.cluster.local:9000'
+      def apiTokenEndpoint = sonarUrl + '/api/user_tokens/generate'
+      def username = 'admin'
+      def password = System.getenv('SONARQUBE_PASSWORD') // Assuming the password is stored in an environment variable
+      
+      // Prepare the request
+      def url = new URL(apiTokenEndpoint)
+      def connection = (HttpURLConnection) url.openConnection()
+      connection.requestMethod = 'POST'
+      connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded")
+      String userpass = username + ":" + password
+      String basicAuth = "Basic " + javax.xml.bind.DatatypeConverter.printBase64Binary(userpass.getBytes())
+      connection.setRequestProperty ("Authorization", basicAuth)
+      connection.doOutput = true
+      def writer = new java.io.OutputStreamWriter(connection.outputStream)
+      writer.write("name=jenkins-token") // You can specify the token name here
+      writer.close()
+      
+      // Handle the response
+      def response = connection.inputStream.text
+      connection.disconnect()
+      
+      // Parse JSON response
+      def jsonSlurper = new groovy.json.JsonSlurper()
+      def jsonResponse = jsonSlurper.parseText(response)
+      def token = jsonResponse.token
+      
+      if (token) {
+          // Credentials details
+          def credentialsId = 'sonar-api-token'
+          def description = 'SonarQube API Token Credential'
+          def domain = Domain.global()
+          def store = Jenkins.instance.getExtensionList('com.cloudbees.plugins.credentials.SystemCredentialsProvider')[0].getStore()
+      
+          // Check if credential already exists
+          if (!store.getCredentials(domain).any { it.id == credentialsId }) {
+              // Create the credential
+              def newCreds = new UsernamePasswordCredentialsImpl(
+                  CredentialsScope.GLOBAL,
+                  credentialsId,
+                  description,
+                  username,
+                  token
+              )
+              // Add credential to the store
+              store.addCredentials(domain, newCreds)
+              println("Added new credential with ID: ${credentialsId}")
+          } else {
+              println("Credential ${credentialsId} already exists.")
+          }
+      } else {
+          println("Failed to retrieve or parse the token.")
+      }
   serviceType: ClusterIP
   ingress: # If you are using SSL termination on the ALB, with a self-signed certificate, you need also to build a custom inbound-agent base image with the CA certificate.
     enabled: false # disabled in chart, supplied by kustomize as a resource

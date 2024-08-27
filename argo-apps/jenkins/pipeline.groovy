@@ -123,7 +123,7 @@ pipeline {
                         def jsonResponse = readJSON text: response
                         env.SQ_TOKEN = jsonResponse.token
 
-                        echo "Generated new SQ_TOKEN: ${env.SQ_TOKEN}"
+                        echo "Generated new SQ_TOKEN"
                     } else {
                         echo 'SQ_TOKEN is already set.'
                     }
