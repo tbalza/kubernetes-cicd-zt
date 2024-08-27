@@ -42,9 +42,9 @@ pipeline {
         stage('SonarQube Analysis') {
           steps {
             script {
-              scannerHome = tool 'SonarQubeScanner' // match Global Tool Configuration
+              scannerHome = tool 'SonarQubeScanner' // match `sonarRunnerInstallation:` (JCasC values.yaml) // v6.1.0.4477
             }
-            withSonarQubeEnv('SonarQube') { // match the name in the SonarQube servers configuration // sonar.python.version
+            withSonarQubeEnv('SonarQube') { // match `sonarGlobalConfiguration:` (JCasC values.yaml) // sonar.python.version
               sh """
               ${scannerHome}/bin/sonar-scanner \
                 -Dsonar.projectKey=django_todo_project \

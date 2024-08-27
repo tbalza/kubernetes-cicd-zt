@@ -57,6 +57,7 @@ controller:
                 }
               }
       sonarqube: | # minimal required SonarQube Scanner Plugin configuration
+        jenkins:
         unclassified:
           sonarGlobalConfiguration:
             buildWrapperEnabled: true
