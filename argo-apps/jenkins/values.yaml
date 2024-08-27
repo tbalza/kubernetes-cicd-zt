@@ -61,16 +61,16 @@ controller:
           sonarGlobalConfiguration:
             buildWrapperEnabled: true
             installations:
-              - name: "SonarQube"
+            - name: "SonarQube"
         tool:
           sonarRunnerInstallation:
             installations:
-              - name: "SonarQubeScanner"
-                properties:
-                  - installSource:
-                      installers:
-                        - sonarRunnerInstaller:
-                            id: "6.1.0.4477"
+            - name: "SonarQubeScanner"
+              properties:
+              - installSource:
+                  installers:
+                  - sonarRunnerInstaller:
+                      id: "6.1.0.4477"
   initScripts: # triggers the `build-django` pipeline to be executed on first launch
     triggerBuildDjango: |-
       import jenkins.model.Jenkins
