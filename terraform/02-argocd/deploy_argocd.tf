@@ -101,9 +101,9 @@ resource "helm_release" "argo_cd" {
     # kubectl patch application argocd -n argocd --type=json -p='[{"op": "remove", "path": "/metadata/finalizers"}]'
     # kubectl patch application eck-stack -n argocd --type=json -p='[{"op": "remove", "path": "/metadata/finalizers"}]'
     #command = "kubectl -n argocd get app -o jsonpath='{range .items[*]}{.metadata.name}{'\n'}{end}' | while read app; do echo 'Patching finalizer for $app'; kubectl patch application $app -n argocd --type json --patch '[{'op': 'remove', 'path': '/metadata/finalizers'}]'; done"
-#    command = <<EOF
-#      kubectl -n argocd get app -o jsonpath="{range .items[*]}{.metadata.name}{'\n'}{end}" | while read app; do echo "Patching finalizer for $app"; kubectl patch application $app -n argocd --type json --patch "[{\"op\": \"remove\", \"path\": \"/metadata/finalizers\"}]"; done
-#    EOF
+    #command = <<EOF
+      #kubectl -n argocd get app -o jsonpath="{range .items[*]}{.metadata.name}{'\n'}{end}" | while read app; do echo "Patching finalizer for $app"; kubectl patch application $app -n argocd --type json --patch "[{\"op\": \"remove\", \"path\": \"/metadata/finalizers\"}]"; done
+    #EOF
         command = <<-EOT
           kubectl get crd -o name |
           grep -E 'argoproj.io|monitoring.coreos.com|fluent.io|elastic.co' |
