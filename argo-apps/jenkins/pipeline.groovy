@@ -42,15 +42,15 @@ pipeline {
         stage('SonarQube Analysis') {
           steps {
             script {
-              scannerHome = tool 'SonarQube Scanner 2.8' // match Global Tool Configuration
+              scannerHome = tool 'SonarQubeScanner' // match Global Tool Configuration
             }
             withSonarQubeEnv('SonarQube') { // match the name in the SonarQube servers configuration
               sh """
               ${scannerHome}/bin/sonar-scanner \
-                -Dsonar.projectKey=my_python_project \
-                -Dsonar.sources=. \
+                -Dsonar.projectKey=django_todo_project \
+                -Dsonar.sources=/home/jenkins/agent/workspace/build-django/django-todo/ \
                 -Dsonar.host.url=http://sonarqube-sonarqube.sonarqube.svc.cluster.local:9000 \
-                -Dsonar.login=${env.SONAR_AUTH_TOKEN}
+                -Dsonar.login=squ_38317b7095dc90823b822555ba9209d238500214
               """
             }
           }
