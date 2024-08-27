@@ -102,31 +102,39 @@ pipeline {
             }
         }
         stage('SonarQube Analysis') {
+          when {
+            expression { env.BUILD_NEEDED == 'true' && env.SKIP_ALL == 'false' }
+          }
           steps {
-//            script {
-//              scannerHome = tool 'SonarQubeScanner' // match `sonarRunnerInstallation:` (JCasC values.yaml) // Scanner v6.1.0.4477, SQ community edition v10.6
-//            }
             script {
-                    // Retrieve the path to the SonarQube scanner // match `sonarRunnerInstallation:` (JCasC values.yaml) // Scanner v6.1.0.4477, SQ community edition v10.6
-                    scannerHome = tool 'SonarQubeScanner'
+                    // initialize SonarQubeScanner
+                    scannerHome = tool 'SonarQubeScanner' // match `sonarRunnerInstallation:` (JCasC values.yaml) // Scanner v6.1.0.4477, SQ community edition v10.6
 
-                    // Check if the SQ_TOKEN environment variable is set and not empty
-                    if (!env.SQ_TOKEN) {
-                        echo 'SQ_TOKEN is not defined or empty, generating a new token.'
+                    // revoke token
+                    echo "Attempting to revoke the existing SonarQube token..."
+                    sh(script: """
+                    curl -X POST -H "Content-Type: application/x-www-form-urlencoded" \
+                        -d "name=token" \
+                        -u admin:${SONARQUBE_PASSWORD} \
+                        http://sonarqube-sonarqube.sonarqube.svc.cluster.local:9000/api/user_tokens/revoke
+                    """, returnStdout: true).trim()
 
-                        // Generate a new SonarQube token using curl command
-                        def response = sh(script: """
-                        curl -X POST -H "Content-Type: application/x-www-form-urlencoded" -d "name=token" -u admin:${SONARQUBE_PASSWORD} http://sonarqube-sonarqube.sonarqube.svc.cluster.local:9000/api/user_tokens/generate
-                        """, returnStdout: true).trim()
+                    sleep 5
+                    echo "Generating a new SonarQube token..."
+                    // generate a new token
+                    def response = sh(script: """
+                    curl -X POST -H "Content-Type: application/x-www-form-urlencoded" \
+                        -d "name=token" \
+                        -u admin:${SONARQUBE_PASSWORD} \
+                        http://sonarqube-sonarqube.sonarqube.svc.cluster.local:9000/api/user_tokens/generate
+                    """, returnStdout: true).trim()
 
-                        // Parse the JSON response to extract the token
-                        def jsonResponse = readJSON text: response
-                        env.SQ_TOKEN = jsonResponse.token
+                    sleep 5
+                    // parse the JSON response and set the environment variable
+                    def jsonResponse = readJSON text: response
+                    env.SQ_TOKEN = jsonResponse.token
 
-                        echo "Generated new SQ_TOKEN"
-                    } else {
-                        echo 'SQ_TOKEN is already set.'
-                    }
+                    echo "New SonarQube token stored"
                 }
             withSonarQubeEnv('SonarQube') { // match `sonarGlobalConfiguration:` (JCasC values.yaml) // sonar.python.version // env.SQ_TOKEN
               sh """
