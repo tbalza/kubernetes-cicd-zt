@@ -39,22 +39,21 @@ pipeline {
                 }
             }
         }
-        stage('SonarQube Analysis') { // SONARQUBE_PASSWORD
-            steps {
-                container('jnlp') {
-                    script {
-                        withSonarQubeEnv('sonarqubeserver') {
-                            sh """
-                            sonar-scanner \
-                              -Dsonar.projectKey=django_todo \
-                              -Dsonar.sources=/home/jenkins/agent/workspace/build-django/django-todo/ \
-                              -Dsonar.host.url=http://sonarqube-sonarqube.sonarqube.svc.cluster.local:9000 \
-                              -Dsonar.login=squ_03901140f756551acb59be40be3c9c3ed593ec9b
-                            """
-                        }
-                    }
-                }
+        stage('SonarQube Analysis') {
+          steps {
+            script {
+              scannerHome = tool 'SonarQube Scanner 2.8' // match Global Tool Configuration
             }
+            withSonarQubeEnv('SonarQube') { // match the name in the SonarQube servers configuration
+              sh """
+              ${scannerHome}/bin/sonar-scanner \
+                -Dsonar.projectKey=my_python_project \
+                -Dsonar.sources=. \
+                -Dsonar.host.url=http://sonarqube-sonarqube.sonarqube.svc.cluster.local:9000 \
+                -Dsonar.login=${env.SONAR_AUTH_TOKEN}
+              """
+            }
+          }
         }
         stage('Check ECR for Latest Image Commit') {
             when {

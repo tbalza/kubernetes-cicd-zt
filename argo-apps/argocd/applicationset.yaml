@@ -30,15 +30,16 @@ spec:
             - key: syncorder
               operator: NotIn
               values:
-                - argocd
                 - fluent
                 - django
+                - jenkins
         - matchExpressions:
             - key: syncorder # Label defined in appset template:,metadata:,labels:
               operator: In
               values:
                 - fluent
                 - django
+                - jenkins
   template:
     metadata:
       name: '{{.path.basename}}'
