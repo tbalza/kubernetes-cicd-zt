@@ -6,7 +6,7 @@ namespace: jenkins # crucial for configMapGenerator
 helmCharts:
   - name: jenkins
     repo: https://charts.jenkins.io
-    version: 5.3.1 # Chart v5.3.1, App 2.452.2 # Chart v5.1.6, App v2.440.3 (check values.yaml image: tag:)
+    version: 5.5.12 # 5.3.1 # Chart v5.3.1, App 2.452.2 # Chart v5.1.6, App v2.440.3 (check values.yaml image: tag:)
     releaseName: jenkins
     namespace: jenkins
     includeCRDs: true # check if necessary ( as it should be defined in values.yaml)
