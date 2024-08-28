@@ -1245,7 +1245,7 @@ resource "aws_iam_role" "prometheus" {
         },
         Condition = {
           StringEquals = {
-            "${replace(module.eks.cluster_oidc_issuer_url, "https://", "")}:sub" : "system:serviceaccount:prometheus:grafana" #"namespace:service-account-name"
+            "${replace(module.eks.cluster_oidc_issuer_url, "https://", "")}:sub" : "system:serviceaccount:prometheus:kube-prometheus-stack-grafana" #"namespace:service-account-name"
           }
         }
       },

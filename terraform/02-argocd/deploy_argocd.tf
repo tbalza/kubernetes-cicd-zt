@@ -96,6 +96,9 @@ resource "helm_release" "argo_cd" {
     value = data.terraform_remote_state.eks.outputs.argo_cd_repo_iam_role_arn      # role/ArgoCDrepoRole
   }
 
+
+  # patch the applicationset to delete all apps except argocd first, instead of deleting resources with kubectl
+
   provisioner "local-exec" {
     when = destroy
     # kubectl patch application argocd -n argocd --type=json -p='[{"op": "remove", "path": "/metadata/finalizers"}]'
