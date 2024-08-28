@@ -107,6 +107,22 @@ locals {
       value = local.repo_url # right now the name of the cluster is being used for the app name # pending
     }
 
+    "grafana_admin_user" = {
+      value = "admin"
+    }
+
+    "grafana_admin_password" = {
+      value = random_password.grafana_password.result
+    }
+
+    "jenkins_admin_user" = {
+      value = "admin"
+    }
+
+    "jenkins_admin_password" = {
+      value = random_password.jenkins_password.result
+    }
+
     "jenkins_github_app_user" = {
       value = var.ARGOCD_GITHUB_USER # not yet setup since repo is public
     }
@@ -1188,20 +1204,51 @@ resource "aws_iam_role" "django" {
   })
 }
 
+## delete
+#resource "aws_iam_role" "prometheus" {
+#  name = "PrometheusRole"
+#
+#  assume_role_policy = jsonencode({
+#    Version = "2012-10-17"
+#    Statement = [
+#      {
+#        Action = "sts:AssumeRole"
+#        Principal = {
+#          Service = "eks.amazonaws.com"
+#        }
+#        Effect = "Allow"
+#        Sid    = ""
+#      }
+#    ]
+#  })
+#}
+
 resource "aws_iam_role" "prometheus" {
   name = "PrometheusRole"
 
   assume_role_policy = jsonencode({
-    Version = "2012-10-17"
+    Version = "2012-10-17",
     Statement = [
       {
-        Action = "sts:AssumeRole"
+        Effect = "Allow",
+        Action = "sts:AssumeRole",
         Principal = {
           Service = "eks.amazonaws.com"
+        },
+      },
+      # External Secrets Operator reqs (jwt auth)
+      {
+        Effect = "Allow",
+        Action = "sts:AssumeRoleWithWebIdentity",
+        Principal = {
+          Federated = module.eks.oidc_provider_arn
+        },
+        Condition = {
+          StringEquals = {
+            "${replace(module.eks.cluster_oidc_issuer_url, "https://", "")}:sub" : "system:serviceaccount:prometheus:grafana" #"namespace:service-account-name"
+          }
         }
-        Effect = "Allow"
-        Sid    = ""
-      }
+      },
     ]
   })
 }
@@ -2082,6 +2129,28 @@ resource "aws_iam_role_policy_attachment" "reposerver_read_attach" { # check
   policy_arn = aws_iam_policy.argocd_repo_ssm_read.arn
 }
 
+# Prometheus
+resource "aws_iam_policy" "prometheus_ssm_read" { # check
+  name = "SSM-for-prometheus"
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [{
+      Effect = "Allow",
+      "Action" : [
+        "ssm:GetParameter*",
+        "ssm:ListTagsForResource", # check
+        "ssm:DescribeParameters"   # check
+      ],
+      Resource = "arn:aws:ssm:${local.region}:${data.aws_caller_identity.current.account_id}:parameter/*" # check .limit scope accordingly. SSM is region specific
+    }]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "prometheus_read_attach" { # check
+  role       = aws_iam_role.prometheus.name
+  policy_arn = aws_iam_policy.prometheus_ssm_read.arn
+}
+
 
 ###############################################################################
 # TF Helpers
@@ -2855,4 +2924,27 @@ module "db_sonarqube" {
 output "db_sonar_instance_endpoint" {
   description = "The connection endpoint"
   value       = split(":", module.db_sonarqube.db_instance_endpoint)[0] # regular output includes `endpoint:port`, this filters out the port
+}
+
+
+###############################################################################
+# Jenkins
+###############################################################################
+
+resource "random_password" "jenkins_password" {
+  length      = 28
+  special     = false
+  min_numeric = 10
+  #override_special = "!#$%&'()+,-.=?^_~" # special character whitelist
+}
+
+###############################################################################
+# Grafana
+###############################################################################
+
+resource "random_password" "grafana_password" {
+  length      = 28
+  special     = false
+  min_numeric = 10
+  #override_special = "!#$%&'()+,-.=?^_~" # special character whitelist
 }

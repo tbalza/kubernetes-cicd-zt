@@ -22,13 +22,24 @@ prometheus-node-exporter:
   nodeSelector:
     role: ci-cd
 
+####
+# https://github.com/prometheus-community/helm-charts/issues/4755
+# https://github.com/grafana/helm-charts/blob/main/charts/grafana/values.yaml
 grafana:
-  adminPassword: test123
+  admin:
+    existingSecret: "kube-prometheus-stack-grafana"
+    userKey: admin-user
+    passwordKey: admin-password
+  #adminPassword: test123
   serviceAccount:
-    annotations:
-      eks.amazonaws.com/role-arn: "arn:aws:iam::350206045032:role/PrometheusRole" # check , make cluster and account id dynamic
+    create: false
+    name: grafana # used for secrets
+    automountServiceAccountToken: true
+#    annotations:
+#      eks.amazonaws.com/role-arn: "arn:aws:iam::350206045032:role/PrometheusRole" # check , make cluster and account id dynamic
   nodeSelector:
     role: ci-cd
+####
 
 prometheus:
   serviceAccount:
