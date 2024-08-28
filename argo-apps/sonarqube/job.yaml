@@ -4,7 +4,7 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: sonarqube-change-password-create-webhook
-  namespace: argocd
+  namespace: sonarqube
   annotations:
     argocd.argoproj.io/hook: PostSync
     argocd.argoproj.io/hook-delete-policy: HookSucceeded
@@ -17,7 +17,7 @@ spec:
       - name: curl-api-commands
         image: curlimages/curl:8.2.1
         imagePullPolicy: IfNotPresent
-        command: # currently both repo server and redis need to be restarted for envFrom to take effect. (Repo server restart is done elsewhere, in the plugin container in /argocd/values.yaml)
+        command:
         - /bin/sh
         - -c
         - |

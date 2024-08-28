@@ -1,0 +1,31 @@
+# pending, pod logs will show password on API call `processing: sonarqube-sonarqube.sonarqube.svc.cluster.local:9000/api/users/change_password?login=admin&previousPassword=pass&password=`
+# might end up in elasticsearch
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: argocd-chang-admin-password
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/hook: Sync
+    argocd.argoproj.io/hook-delete-policy: HookSucceeded
+spec:
+  template:
+    spec:
+      restartPolicy: Never # OnFailure
+      serviceAccountName: sonarqube
+      containers:
+      - name: kubectl-admin-pw
+        image: bitnami/kubectl:latest # quay.io/argoproj/argocd:latest ?
+        imagePullPolicy: IfNotPresent
+        command:
+        - /bin/sh
+        - -c
+        - |
+          kubectl -n argocd patch secret argocd-secret \
+          -p '{"stringData": {"admin.password": "'$(htpasswd -bnBC 10 "" $ADMIN_PASSWORD | tr -d ':\n' | sed 's/$2y/$2a/')'", "admin.passwordMtime": "'$(date +%FT%T%Z)'"}}'
+        env:
+        - name: ADMIN_PASSWORD # not actual password, name of ENV
+          valueFrom:
+            secretKeyRef:
+              name: argocd-secrets
+              key: ARGOCD_ADMIN_PASSWORD # not actual password just name of the key in secrets.yaml

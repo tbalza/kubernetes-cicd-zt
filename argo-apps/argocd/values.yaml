@@ -1,6 +1,11 @@
 crds:
   keep: false # Delete CRDs on chart uninstall
 
+secret:
+    createSecret: true
+    #githubSecret: "argocd-secrets" # GitHub webhook
+    #argocdServerAdminPassword: "" # ? htpasswd -nbBC 10 "" $ARGO_PWD | tr -d ':\n' | sed 's/$2y/$2a/'
+
 global:
   domain: argocd.tbalza.net # Used for ingresses, certificates, SSO, notifications, etc. (blank allows all domains) # check if it can be replaced by ingress
 #  image:
@@ -26,7 +31,7 @@ configs:
               AVAILABLE_VARS=$(env | cut -d "=" -f 1 | awk '{print "$"$1}' | tr "\n" " ")
               kustomize build --load-restrictor LoadRestrictionsNone --enable-helm | envsubst "$AVAILABLE_VARS"
         preserveFileMode: true # by default cmp resets file mode
-        allowConcurrency: true
+        allowConcurrency: true # alt approach for cmp https://medium.com/@jojoooo/deploy-infra-stack-using-self-managed-argocd-with-cert-manager-externaldns-external-secrets-op-640fe8c1587b
 
 server:
   ingress: # Working helm ingress with externalDNS as per https://github.com/argoproj/argo-helm/tree/main/charts/argo-cd # no grpc warning errors

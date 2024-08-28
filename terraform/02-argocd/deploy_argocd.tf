@@ -86,10 +86,10 @@ resource "helm_release" "argo_cd" {
   #    EOT
   #  ]
 
-  #  set { # used for ImageUpdater secrets. contains github credentials
-  #    name  = "controller.serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn" # annotation to allows service account to assume aws role
-  #    value = data.terraform_remote_state.eks.outputs.argo_cd_image_iam_role_arn # role/ArgoCDRole
-  #  }
+#  set {                                                                            # used for ArgoCD admin secrets. contains github credentials
+#    name  = "server.serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn" # annotation to allows service account to assume aws role
+#    value = data.terraform_remote_state.eks.outputs.argo_cd_image_iam_role_arn     # role/ArgoCDRole
+#  }
 
   set {                                                                            # used for ArgoCD Repo Server secrets. contains values that envsubst plugin uses (kustomize cannot load external env fed from tf by design, argocd cmp is a workaround)
     name  = "repoServer.serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn" # annotation to allows service account to assume aws role
@@ -98,6 +98,8 @@ resource "helm_release" "argo_cd" {
 
 
   # patch the applicationset to delete all apps except argocd first, instead of deleting resources with kubectl
+  # kubectl patch applicationset cluster-addons -n argocd --type=json -p='[{"op": "replace", "path": "/spec/generators/0/git/directories/0/path", "value": "argo-apps/argocd"}]'
+
 
   provisioner "local-exec" {
     when = destroy
@@ -114,7 +116,7 @@ resource "helm_release" "argo_cd" {
           kubectl -n argocd get app -o jsonpath='{range .items[*]}{.metadata.name}{"\n"}{end}' |
           xargs -I {} kubectl delete all,pvc,secrets,configmaps,ingresses,networkpolicies,serviceaccounts,jobs,cronjobs,applicationsets --all -n {}
         EOT
-  } # add sonarqube
+  }
 
   # delete all,pvc,secrets,configmaps,ingresses,networkpolicies,serviceaccounts,jobs,cronjobs,applicationsets
 

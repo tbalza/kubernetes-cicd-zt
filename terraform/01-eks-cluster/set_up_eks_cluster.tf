@@ -166,7 +166,15 @@ locals {
       value = var.ARGOCD_GITHUB_TOKEN
     }
 
+    #ArgoCD admin password
+
+    "argo_cd_admin_password" = { # check
+      value = random_password.argocd_password.result
+    }
+
     ###################################################################################
+
+    # Global variables of envsubst
 
     "argo_cd_aws_account_number" = { # check
       value = data.aws_caller_identity.current.account_id
@@ -2943,6 +2951,17 @@ resource "random_password" "jenkins_password" {
 ###############################################################################
 
 resource "random_password" "grafana_password" {
+  length      = 28
+  special     = false
+  min_numeric = 10
+  #override_special = "!#$%&'()+,-.=?^_~" # special character whitelist
+}
+
+###############################################################################
+# ArgoCD
+###############################################################################
+
+resource "random_password" "argocd_password" {
   length      = 28
   special     = false
   min_numeric = 10
