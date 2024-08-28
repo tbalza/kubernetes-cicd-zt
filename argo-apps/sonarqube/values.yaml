@@ -1,7 +1,7 @@
 replicaCount: 1 # value of 0 will not launch any pods
 
-deploymentStrategy:
- priorityClassName: "high-priority"
+#deploymentStrategy:
+# priorityClassName: "high-priority"
 
 securityContext:
   fsGroup: 0
