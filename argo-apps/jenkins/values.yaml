@@ -68,9 +68,9 @@ controller:
             installations:
             - name: "SonarQube"
               serverUrl: "http://sonarqube-sonarqube.sonarqube.svc.cluster.local:9000"
-              triggers:
-                skipScmCause: false
-                skipUpstreamCause: false
+#              triggers:
+#                skipScmCause: false
+#                skipUpstreamCause: false
         tool:
           sonarRunnerInstallation:
             installations:
