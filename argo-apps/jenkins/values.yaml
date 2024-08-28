@@ -56,30 +56,27 @@ controller:
               pipelineJob('build-django') {
                 definition {
                   cps {
-                    script(new File('/var/jenkins_home/groovy_scripts/pipeline.groovy').text)
+                    script(new File('/var/jenkins_home/groovy_scripts/Jenkinsfilepipeline.groovy').text)
                     sandbox(true)
                   }
                 }
               }
-      sonarqube: # minimal required SonarQube Scanner Plugin configuration # `:9000/` ?
-        unclassified:
-          sonarGlobalConfiguration:
-            buildWrapperEnabled: true # false ?
-            installations:
-            - name: "SonarQube"
-              serverUrl: "http://sonarqube-sonarqube.sonarqube.svc.cluster.local:9000"
-#              triggers:
-#                skipScmCause: false
-#                skipUpstreamCause: false
-        tool:
-          sonarRunnerInstallation:
-            installations:
-            - name: "SonarQubeScanner"
-              properties:
-              - installSource:
-                  installers:
-                  - sonarRunnerInstaller:
-                      id: "6.1.0.4477"
+#      sonarqube: # minimal required SonarQube Scanner Plugin configuration # `:9000/` ?
+#        unclassified:
+#          sonarGlobalConfiguration:
+#            buildWrapperEnabled: true # false ?
+#            installations:
+#            - name: "SonarQube"
+#              serverUrl: "http://sonarqube-sonarqube.sonarqube.svc.cluster.local:9000"
+#        tool:
+#          sonarRunnerInstallation:
+#            installations:
+#            - name: "SonarQubeScanner"
+#              properties:
+#              - installSource:
+#                  installers:
+#                  - sonarRunnerInstaller:
+#                      id: "6.1.0.4477"
   initScripts: # triggers the `build-django` pipeline to be executed on first launch
     triggerBuildDjango: |-
       import jenkins.model.Jenkins
