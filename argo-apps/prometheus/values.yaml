@@ -32,9 +32,9 @@ grafana:
 #    passwordKey: admin-password # key in secrets.yaml, not actual password
   adminPassword: test123
   serviceAccount:
-#    create: false
+    create: false
 #    name: kube-prometheus-stack-grafana # used for secrets
-#    automountServiceAccountToken: true
+    automountServiceAccountToken: true
 #    annotations:
 #      eks.amazonaws.com/role-arn: "arn:aws:iam::350206045032:role/PrometheusRole" # check , make cluster and account id dynamic
   nodeSelector:
