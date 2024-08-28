@@ -27,10 +27,10 @@ prometheus-node-exporter:
 # https://github.com/grafana/helm-charts/blob/main/charts/grafana/values.yaml
 grafana:
   admin:
-#    existingSecret: "kube-prometheus-stack-grafana"
-#    userKey: admin-user # key in secrets.yaml, not actual password
-#    passwordKey: admin-password # key in secrets.yaml, not actual password
-  adminPassword: test123
+    existingSecret: "prometheus-secrets"
+    userKey: admin-user # key in secrets.yaml, not actual password
+    passwordKey: admin-password # key in secrets.yaml, not actual password
+  #adminPassword: test123
   serviceAccount:
     create: false
 #    name: kube-prometheus-stack-grafana # used for secrets
