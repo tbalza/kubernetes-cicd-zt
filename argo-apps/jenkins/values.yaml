@@ -61,13 +61,17 @@ controller:
                   }
                 }
               }
-      sonarqube: | # minimal required SonarQube Scanner Plugin configuration # `:9000/` ?
+      sonarqube: # minimal required SonarQube Scanner Plugin configuration # `:9000/` ?
         unclassified:
           sonarGlobalConfiguration:
-            buildWrapperEnabled: true
+            buildWrapperEnabled: true # false ?
             installations:
             - name: "SonarQube"
               serverUrl: "http://sonarqube-sonarqube.sonarqube.svc.cluster.local:9000"
+              triggers:
+                skipScmCause: false
+                skipUpstreamCause: false
+
         tool:
           sonarRunnerInstallation:
             installations:
