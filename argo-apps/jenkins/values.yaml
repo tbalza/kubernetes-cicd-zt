@@ -14,12 +14,12 @@ controller:
 #    tag: 2.452.2 # Chart v5.3.1, App 2.452.2 # Chart v5.1.6, App v2.440.3 (chart ver is defined in kustomization.yaml)
   javaOpts: "-Xmx1536m -Xms512m -Dcasc.jenkins.config=/var/jenkins_home/casc_configs -Dorg.csanchez.jenkins.plugins.kubernetes.clients.cacheExpiration=60 -Dhudson.model.UsageStatistics.disabled=true" # -Dcasc.jenkins.config=/var/jenkins_home/casc_configs prevent memory limit issues, define jcasc config path
   admin: # -Xmx1536m
-#    username: "admin" # check
-#    password: "pass"
-    existingSecret: "jenkins-secrets"
-    userKey: jenkins-admin-user # key in secrets.yaml, not actual password
-    passwordKey: jenkins-admin-password # key in secrets.yaml, not actual password
-    createSecret: true
+    username: "admin" # check
+    password: "pass"
+#    existingSecret: "jenkins-secrets"
+#    userKey: jenkins-admin-user # key in secrets.yaml, not actual password
+#    passwordKey: jenkins-admin-password # key in secrets.yaml, not actual password
+#    createSecret: true
   resources:
     requests:
       cpu: "500m"
