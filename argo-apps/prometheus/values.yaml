@@ -27,16 +27,16 @@ prometheus-node-exporter:
 # https://github.com/grafana/helm-charts/blob/main/charts/grafana/values.yaml
 grafana:
   admin:
-    existingSecret: "kube-prometheus-stack-grafana"
-    userKey: admin-user
-    passwordKey: admin-password
-  #adminPassword: test123
+#    existingSecret: "kube-prometheus-stack-grafana"
+#    userKey: admin-user # key in secrets.yaml, not actual password
+#    passwordKey: admin-password # key in secrets.yaml, not actual password
+  adminPassword: test123
   serviceAccount:
-    create: false
-    name: grafana # used for secrets
-    automountServiceAccountToken: true
-#    annotations:
-#      eks.amazonaws.com/role-arn: "arn:aws:iam::350206045032:role/PrometheusRole" # check , make cluster and account id dynamic
+#    create: false
+#    name: grafana # used for secrets
+#    automountServiceAccountToken: true
+    annotations:
+      eks.amazonaws.com/role-arn: "arn:aws:iam::350206045032:role/PrometheusRole" # check , make cluster and account id dynamic
   nodeSelector:
     role: ci-cd
 ####
