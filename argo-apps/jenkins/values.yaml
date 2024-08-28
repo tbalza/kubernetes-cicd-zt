@@ -5,7 +5,7 @@ controller:
 #  scriptApproval:
 #    - "staticMethod org.codehaus.groovy.runtime.DefaultGroovyMethods dump java.lang.Object" # required for "dump" in ecr plugin
   nodeSelector:
-    role: ci-cd # ci-cd # assigned to app node group for POC purposes
+    role: django # ci-cd # assigned to app node group for POC purposes
   sidecars:
     configAutoReload:
       enabled: false # require pod restart for config change. false allows to view current temporary jcasc
@@ -61,22 +61,22 @@ controller:
                   }
                 }
               }
-#      sonarqube: | # minimal required SonarQube Scanner Plugin configuration # `:9000/` ?
-#        unclassified:
-#          sonarGlobalConfiguration:
-#            buildWrapperEnabled: true
-#            installations:
-#            - name: "SonarQube"
-#              serverUrl: "http://sonarqube-sonarqube.sonarqube.svc.cluster.local:9000"
-#        tool:
-#          sonarRunnerInstallation:
-#            installations:
-#            - name: "SonarQubeScanner"
-#              properties:
-#              - installSource:
-#                  installers:
-#                  - sonarRunnerInstaller:
-#                      id: "6.1.0.4477"
+      sonarqube: | # minimal required SonarQube Scanner Plugin configuration # `:9000/` ?
+        unclassified:
+          sonarGlobalConfiguration:
+            buildWrapperEnabled: true
+            installations:
+            - name: "SonarQube"
+              serverUrl: "http://sonarqube-sonarqube.sonarqube.svc.cluster.local:9000"
+        tool:
+          sonarRunnerInstallation:
+            installations:
+            - name: "SonarQubeScanner"
+              properties:
+              - installSource:
+                  installers:
+                  - sonarRunnerInstaller:
+                      id: "6.1.0.4477"
   initScripts: # triggers the `build-django` pipeline to be executed on first launch
     triggerBuildDjango: |-
       import jenkins.model.Jenkins
