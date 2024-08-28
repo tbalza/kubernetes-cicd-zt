@@ -23,11 +23,12 @@ spec:
         - |
           until curl -v --connect-timeout 100 sonarqube-sonarqube.sonarqube.svc.cluster.local:9000/api/system/status | grep -w UP; do sleep 10; done;
           curl -v --connect-timeout 100 -u admin:admin -X POST "sonarqube-sonarqube.sonarqube.svc.cluster.local:9000/api/users/change_password?login=admin&previousPassword=admin&password=$ADMIN_PASSWORD";
-          sleep 10;
-          curl -X POST -H "Content-Type: application/x-www-form-urlencoded" -d "name=webhook&url=http://jenkins.jenkins.svc.cluster.local:8080/sonarqube-webhook/" -u admin:$ADMIN_PASSWORD sonarqube-sonarqube.sonarqube.svc.cluster.local:9000/api/webhooks/create;
         env:
         - name: ADMIN_PASSWORD # not actual password, name of ENV
           valueFrom:
             secretKeyRef:
               name: sonarqube-secrets
               key: password # not actual password just name of the key in secrets.yaml
+
+#sleep 10;
+#curl -X POST -H "Content-Type: application/x-www-form-urlencoded" -d "name=webhook&url=http://jenkins.jenkins.svc.cluster.local:8080/sonarqube-webhook/" -u admin:$ADMIN_PASSWORD sonarqube-sonarqube.sonarqube.svc.cluster.local:9000/api/webhooks/create;
