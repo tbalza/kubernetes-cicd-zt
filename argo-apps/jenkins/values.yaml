@@ -19,7 +19,7 @@ controller:
     existingSecret: "jenkins-secrets"
     userKey: jenkins-admin-user # key in secrets.yaml, not actual password
     passwordKey: jenkins-admin-password # key in secrets.yaml, not actual password
-    createSecret: false
+    createSecret: true
   resources:
     requests:
       cpu: "500m"
