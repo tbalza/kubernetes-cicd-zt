@@ -16,7 +16,7 @@ controller:
   admin: # -Xmx1536m
     username: "admin" # check
     password: "pass"
-#    existingSecret: "jenkins-secrets"
+#    existingSecret: "jenkins-secrets" # this breaks the agent from working for some reason # with /2 nodes are available: 1 Insufficient cpu,
 #    userKey: jenkins-admin-user # key in secrets.yaml, not actual password
 #    passwordKey: jenkins-admin-password # key in secrets.yaml, not actual password
 #    createSecret: true
@@ -56,7 +56,7 @@ controller:
               pipelineJob('build-django') {
                 definition {
                   cps {
-                    script(new File('/var/jenkins_home/groovy_scripts/pipeline.groovy').text)
+                    script(new File('/var/jenkins_home/groovy_scripts/Jenkinsfile0.groovy').text)
                     sandbox(true)
                   }
                 }
