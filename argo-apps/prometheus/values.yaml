@@ -77,4 +77,11 @@ kubeEtcd:
 kubeScheduler:
   enabled: false
 
+kubelet:
+  enabled: true
+  namespace: kube-system
+  serviceMonitor:
+    interval: "30s"
+    resource: true
+    resourcePath: "/metrics/resource
 
