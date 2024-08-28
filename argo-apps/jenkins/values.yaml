@@ -120,8 +120,8 @@ agent:
   TTYEnabled: true
   namespace: jenkins # where agents are launched
   privileged: false # Agent privileged container # default: false
-  nodeSelector: # breaks install. might not be related to ec2 instance, and break agent connection
-    role: ci-cd
+#  nodeSelector: # breaks install. might not be related to ec2 instance, and break agent connection
+#    role: ci-cd
   websocket: true # (websocket and directConnection are mutually exclusive)
   directConnection: false #  (websocket and directConnection are mutually exclusive)
   resources:
