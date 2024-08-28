@@ -19,25 +19,8 @@ resources:
   - ingress.yaml # upstream helm ingress is stringent/finicky. kustomize is going to patch environments anyway
   - secrets.yaml
   - serviceaccount.yaml
-#  - application.yaml
 
 configMapGenerator:
   - name: jenkins-scripts
     files:
     - pipeline.groovy # refer to values.yaml `job-dsl:` for the auto-launch script
-
-#replacements:
-#  - source:
-#      kind: ConfigMap
-#      name: aws-account
-#      namespace: jenkins
-#      fieldPath: data.aws-account
-#    targets:
-#      - select:
-#          kind: ServiceAccount
-#          name: jenkins
-#        fieldPaths:
-#          - metadata.annotations.eks\.amazonaws\.com/role-arn
-#        options:
-#          delimiter: ":"
-#          index: 5 #
