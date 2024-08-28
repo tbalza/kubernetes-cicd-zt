@@ -56,7 +56,7 @@ controller:
               pipelineJob('build-django') {
                 definition {
                   cps {
-                    script(new File('/var/jenkins_home/groovy_scripts/Jenkinsfile0.groovy').text)
+                    script(new File('/var/jenkins_home/groovy_scripts/pipeline.groovy').text)
                     sandbox(true)
                   }
                 }
