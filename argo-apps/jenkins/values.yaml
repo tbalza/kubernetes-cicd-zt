@@ -26,7 +26,7 @@ controller:
       memory: ".5Gi"
     limits:
       cpu: "1000m"
-      memory: "2Gi"
+      memory: "4Gi"
   service:
     port: 8080
   installPlugins:
@@ -130,7 +130,7 @@ agent:
       memory: "512Mi"
       # ephemeralStorage:
     limits:
-      cpu: "1000m"
+      cpu: "2000m"
       memory: "2Gi"
   additionalContainers: # this adds kaniko to the default pod template (which already has jnlp required by kubernetes plugin)
     - sideContainerName: "kaniko" # is used instead of docker for building the image
