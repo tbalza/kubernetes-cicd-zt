@@ -236,7 +236,8 @@ locals {
 ## ArgoCD ImageUpdater Github App Token
 ## must be set before tf apply
 # export TF_VAR_ARGOCD_GITHUB_TOKEN=123example
-# or just use terraform.tfvars
+# or have tfvars present
+
 ## Import environment variables as TF variable
 variable "ARGOCD_GITHUB_TOKEN" {
   description = "ArgoCD Image Updater Github Personal Token"
@@ -500,9 +501,7 @@ module "eks" {
     django = {
 
       name = "django-node-group"
-
       subnet_ids = module.vpc.private_subnets
-
       ami_type = "AL2_x86_64" # AL2_ARM_64 for arm
 
       min_size     = 1
@@ -515,7 +514,6 @@ module "eks" {
         role = "django" # used by k8s/argocd. node selection, scheduling, grouping, policy enforcement
       }
 
-      #force_update_version = true
       instance_types = ["t3.large"] # Overrides default instance defined above
 
       description = "Django managed node group launch template"
@@ -530,8 +528,8 @@ module "eks" {
           device_name = "/dev/xvdb"
           ebs = {
             volume_size = 30
-            volume_type = "gp3" #gp3?
-            encrypted   = false # Check
+            volume_type = "gp3"
+            encrypted   = false
             #kms_key_id            = module.ebs_kms_key.key_arn
             delete_on_termination = true
           }
@@ -568,12 +566,10 @@ module "eks" {
         ExtraTag = "django-node" # used for cost allocation, resource mgmt, automation
       }
     }
-
   }
 
   # check
   access_entries = {
-
 
     sonarqube = {
       principal_arn     = aws_iam_role.sonarqube.arn # aws_iam_role.fluent_operator.arn
@@ -761,7 +757,7 @@ module "eks" {
 
   }
 }
-
+## automation
 #resource "aws_iam_role" "this" {
 #  for_each = toset(["argocd", "jenkins", "alertmanager", "kubestatemetrics", "nodexporter", "grafana", "prometheus", "prometheusoperator"])
 #
@@ -784,9 +780,9 @@ module "eks" {
 #  tags = local.tags
 #}
 
-## STS
-
-#############
+###############################################################################
+# STS - ServiceAccount/IRSA
+###############################################################################
 
 resource "aws_iam_role" "sonarqube" {
   name = "SonarqubeRole"
@@ -880,7 +876,7 @@ resource "aws_iam_role" "fluent_operator2" {
   })
 }
 
-##############
+# elastic
 
 resource "aws_iam_role" "elastic_operator" {
   name = "ElasticRole"
@@ -943,7 +939,7 @@ resource "aws_iam_role" "elastic_operator2" {
   })
 }
 
-##########
+# argocd
 
 resource "aws_iam_role" "argocd_repo" {
   name = "ArgoCDrepoRole"
@@ -1005,6 +1001,8 @@ resource "aws_iam_role" "argocd_image_updater" {
   })
 }
 
+# jenkins
+
 resource "aws_iam_role" "jenkins" {
   name = "JenkinsRole"
 
@@ -1034,6 +1032,8 @@ resource "aws_iam_role" "jenkins" {
     ]
   })
 }
+
+# django
 
 resource "aws_iam_role" "django" {
   name = "DjangoRole"
@@ -1065,24 +1065,7 @@ resource "aws_iam_role" "django" {
   })
 }
 
-## delete
-#resource "aws_iam_role" "prometheus" {
-#  name = "PrometheusRole"
-#
-#  assume_role_policy = jsonencode({
-#    Version = "2012-10-17"
-#    Statement = [
-#      {
-#        Action = "sts:AssumeRole"
-#        Principal = {
-#          Service = "eks.amazonaws.com"
-#        }
-#        Effect = "Allow"
-#        Sid    = ""
-#      }
-#    ]
-#  })
-#}
+# prometheus
 
 resource "aws_iam_role" "prometheus" {
   name = "PrometheusRole"
@@ -1113,6 +1096,8 @@ resource "aws_iam_role" "prometheus" {
     ]
   })
 }
+
+# external secrets
 
 resource "aws_iam_role" "external_secrets" { # check
   name = "ExternalSecretsRole"
@@ -1163,44 +1148,6 @@ output "external_secrets_iam_role_arn" {
 output "django_iam_role_arn" {
   value = aws_iam_role.django.arn
 }
-
-#output "image_updater_role_arn" {
-#  value = aws_iam_role.argocd_image_updater.arn
-#}
-
-## Allow Jenkins to push images to ECR
-#resource "aws_iam_policy" "jenkins_ecr_policy" {
-#  name        = "JenkinsECRAccessPolicy"
-#  path        = "/"
-#  description = "Allows Jenkins to push images to ECR"
-#
-#  policy = <<EOF
-#{
-#    "Version": "2012-10-17",
-#    "Statement": [
-#        {
-#            "Effect": "Allow",
-#            "Action": [
-#                "ecr:GetAuthorizationToken",
-#                "ecr:BatchCheckLayerAvailability",
-#                "ecr:InitiateLayerUpload",
-#                "ecr:UploadLayerPart",
-#                "ecr:CompleteLayerUpload",
-#                "ecr:PutImage"
-#            ],
-#            "Resource": "*"
-#        }
-#    ]
-#}
-#EOF
-#}
-#
-## Attach Jenkins ECR policy to role
-#resource "aws_iam_role_policy_attachment" "jenkins_ecr_policy_attachment" {
-#  role       = aws_iam_role.jenkins.name
-#  policy_arn = aws_iam_policy.jenkins_ecr_policy.arn
-#}
-
 
 ################################################################################
 # VPC
@@ -1389,7 +1336,6 @@ resource "aws_security_group" "remote_access" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-
   egress {
     from_port        = 0
     to_port          = 0
@@ -1401,6 +1347,7 @@ resource "aws_security_group" "remote_access" {
   tags = merge(local.tags, { Name = "${local.name}-remote" })
 }
 
+# check
 resource "aws_iam_policy" "node_additional" {
   name        = "${local.name}-additional"
   description = "Example usage of node additional policy"
@@ -1456,7 +1403,6 @@ provider "kubernetes" {
     args        = ["eks", "get-token", "--cluster-name", module.eks.cluster_name] # var.cluster_name
     command     = "aws"
   }
-  #load_config_file = false
 }
 
 provider "helm" {
@@ -1469,16 +1415,7 @@ provider "helm" {
       command     = "aws"
     }
   }
-  #load_config_file = false
 }
-
-#data "aws_eks_cluster" "cluster" {
-#  name = module.eks.cluster_name
-#}
-#
-#data "aws_eks_cluster_auth" "cluster" {
-#  name = module.eks.cluster_name
-#}
 
 ###############################################################################
 # Load balancer
@@ -1501,11 +1438,6 @@ module "aws_load_balancer_controller_irsa_role" {
     }
   }
 }
-
-#resource "aws_iam_role_policy_attachment" "alb_controller_policy_attachment" {
-#  role       = module.aws_load_balancer_controller_irsa_role.iam_role_name
-#  policy_arn = aws_iam_policy.aws_load_balancer_controller.arn
-#}
 
 # Load balancer controller uses tags to discover subnets in which it can in which in can create load balancers
 resource "helm_release" "aws_load_balancer_controller" {
@@ -1599,25 +1531,6 @@ resource "kubernetes_storage_class_v1" "gp3" {
 }
 
 # Disable GP2 as default to prevent conflicts
-# kubectl patch storageclass gp2 -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"false"}}}'
-
-# Forbidden: updates to provisioner are forbidden., volumeBindingMode: Invalid value: "Immediate": field is immutable
-
-#resource "kubectl_manifest" "update_gp2_storage_class" {
-#  yaml_body = <<-YAML
-#apiVersion: storage.k8s.io/v1
-#kind: StorageClass
-#metadata:
-#  name: gp2
-#  annotations:
-#    storageclass.kubernetes.io/is-default-class: "false"
-#YAML
-#
-#  depends_on = [
-#    module.eks
-#  ]
-#}
-
 # Pending on a cleaner way to do this within the EKS module, or tf resource
 resource "null_resource" "update_gp2" {
   triggers = {
@@ -1748,8 +1661,6 @@ resource "aws_iam_role_policy_attachment" "imageupdater_ecr_attach" {
   role       = aws_iam_role.argocd_image_updater.name
   policy_arn = aws_iam_policy.imageupdater_ecr.arn
 }
-
-
 
 output "repository_name" {
   description = "Name of the repository"
@@ -2143,10 +2054,9 @@ resource "helm_release" "external_dns" {
     #helm_release.aws_load_balancer_controller,
     #module.eks
   ]
-
 }
 
-resource "aws_iam_role" "external_dns" {
+resource "aws_iam_role" "external_dns" { # check
   name = "external-dns"
 
   assume_role_policy = jsonencode({
@@ -2344,6 +2254,7 @@ output "validation_domains" {
 
 ## must be set before tf apply
 # export TF_VAR_CFL_API_TOKEN=123example
+# or have tfvars present
 
 provider "cloudflare" {
   api_token = var.CFL_API_TOKEN
@@ -2387,11 +2298,6 @@ resource "random_password" "django_secretkey" {
   #override_special = "!#$%&'()+,-.=?^_~" # special character whitelist
 }
 
-#############
-
-### must be set before tf apply
-## export TF_VAR_RDS_PASSWORD=123example
-
 module "db" {
   source  = "terraform-aws-modules/rds/aws"
   version = "6.7.0"
@@ -2411,20 +2317,10 @@ module "db" {
   allocated_storage     = 5
   max_allocated_storage = 10
 
-  # NOTE: Do NOT use 'user' as the value for 'username' as it throws:
-  # "Error creating DB Instance: InvalidParameterValue: MasterUsername
-  # user cannot be used as it is a reserved word used by the engine"
   db_name  = local.rds_dbname
   username = local.rds_user
   port     = local.rds_port
 
-  # Setting manage_master_user_password_rotation to false after it
-  # has previously been set to true disables automatic rotation
-  # however using an initial value of false (default) does not disable
-  # automatic rotation and rotation will be handled by RDS.
-  # manage_master_user_password_rotation allows users to configure
-  # a non-default schedule and is not meant to disable rotation
-  # when initially creating / enabling the password management feature
   manage_master_user_password_rotation              = false
   master_user_password_rotate_immediately           = false
   master_user_password_rotation_schedule_expression = "rate(60 days)"
@@ -2576,85 +2472,6 @@ output "db_instance_port" {
   value       = module.db.db_instance_port
 }
 
-#### Create namespace
-#resource "kubernetes_namespace" "global_vars" {
-#  metadata {
-#    name = "globalvars"
-#  }
-#
-#  depends_on = [
-#    #helm_release.argo_cd
-#    module.eks
-#  ]
-#
-#}
-#
-#### pending. `terraform_remote_state` stuff will change when on the same tf (infra and argocd bootstrap should be spun/destroyed without scripts)
-#resource "kubectl_manifest" "aws_account_configmap" { # global variables that come from tf make sense not to be committed to repo, to be consumed by kustomize itself, not pods, through argocd cmp
-#  yaml_body = <<-YAML
-#apiVersion: v1
-#kind: ConfigMap
-#metadata:
-#  name: global-variables
-#  namespace: globalvars
-#data:
-#  TF_ACCOUNT_ID: "${data.aws_caller_identity.current.account_id}"
-#  TF_CLUSTER_NAME: "${local.name}"
-#  TF_REGION: "${local.region}"
-#  TF_ECR_REPO: "${module.ecr.repository_url}"
-#  TF_DOMAIN: "${local.domain}"
-#  YAML
-#  depends_on = [
-#    #helm_release.argo_cd
-#    module.eks
-#  ]
-#}
-
-
-
-#resource "kubectl_manifest" "aws_account_configmap" {
-#  yaml_body = <<-YAML
-#apiVersion: v1
-#kind: ConfigMap
-#metadata:
-#  name: aws-account
-#  namespace: argocd
-#data:
-#  aws-account: "${data.aws_caller_identity.current.account_id}"
-#  YAML
-#
-#  depends_on = [
-#    #module.eks
-#  ]
-#}
-
-#resource "kubectl_manifest" "aws_account_configmap" { # "${data.aws_caller_identity.current.account_id}"
-#  yaml_body = <<-YAML
-#apiVersion: v1
-#kind: ConfigMap
-#metadata:
-#  name: global-variables
-#  namespace: argocd
-#data:
-#  AWS_ACCOUNT_ID: "${data.aws_caller_identity.current.account_id}"
-#  YAML
-#
-#  depends_on = [
-#    #module.eks
-#  ]
-#}
-
-###############################################################################
-# Elasticsearch
-###############################################################################
-
-# Create es random password.
-resource "random_password" "elastic_password" {
-  length           = 28
-  special          = true
-  override_special = "!$%&()+-?_~" # special character whitelist
-}
-
 ###############################################################################
 # RDS - sonarqube
 ###############################################################################
@@ -2681,11 +2498,6 @@ resource "random_password" "sonarqube_token" {
   #override_special = "!#$%&'()+,-.=?^_~" # special character whitelist
 }
 
-#############
-
-### must be set before tf apply
-## export TF_VAR_RDS_PASSWORD=123example
-
 module "db_sonarqube" {
   source  = "terraform-aws-modules/rds/aws"
   version = "6.7.0"
@@ -2705,20 +2517,10 @@ module "db_sonarqube" {
   allocated_storage     = 5
   max_allocated_storage = 10
 
-  # NOTE: Do NOT use 'user' as the value for 'username' as it throws:
-  # "Error creating DB Instance: InvalidParameterValue: MasterUsername
-  # user cannot be used as it is a reserved word used by the engine"
   db_name  = local.sonar_rds_dbname
   username = local.sonar_rds_user
   port     = local.sonar_rds_port
 
-  # Setting manage_master_user_password_rotation to false after it
-  # has previously been set to true disables automatic rotation
-  # however using an initial value of false (default) does not disable
-  # automatic rotation and rotation will be handled by RDS.
-  # manage_master_user_password_rotation allows users to configure
-  # a non-default schedule and is not meant to disable rotation
-  # when initially creating / enabling the password management feature
   manage_master_user_password_rotation              = false
   master_user_password_rotate_immediately           = false
   master_user_password_rotation_schedule_expression = "rate(60 days)"
@@ -2789,9 +2591,17 @@ output "db_sonar_instance_endpoint" {
 
 
 ###############################################################################
-# Jenkins
+# Generate Random Passwords
 ###############################################################################
 
+## Create es random password.
+resource "random_password" "elastic_password" {
+  length           = 28
+  special          = true
+  override_special = "!$%&()+-?_~" # special character whitelist
+}
+
+## Jenkins
 resource "random_password" "jenkins_password" {
   length      = 28
   special     = false
@@ -2799,10 +2609,7 @@ resource "random_password" "jenkins_password" {
   #override_special = "!#$%&'()+,-.=?^_~" # special character whitelist
 }
 
-###############################################################################
-# Grafana
-###############################################################################
-
+## Grafana
 resource "random_password" "grafana_password" {
   length      = 28
   special     = false
@@ -2810,10 +2617,7 @@ resource "random_password" "grafana_password" {
   #override_special = "!#$%&'()+,-.=?^_~" # special character whitelist
 }
 
-###############################################################################
-# ArgoCD
-###############################################################################
-
+## ArgoCD
 resource "random_password" "argocd_password" {
   length      = 28
   special     = false
