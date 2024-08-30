@@ -106,6 +106,7 @@ pipeline {
                 expression { env.BUILD_NEEDED == 'true' && env.SKIP_ALL == 'false' }
             }
             steps {
+                container('jnlp') {
                 script {
                     // Initialize SonarQubeScanner
                     scannerHome = tool 'SonarQubeScanner'
