@@ -119,7 +119,11 @@ agent:
   defaultsProviderTemplate: "" # default: blank # The name of the pod template to use for providing default values
   workingDir: "/home/jenkins/agent" # default
   nodeUsageMode: "NORMAL" # default
-  TTYEnabled: true # check
+
+  TTYEnabled: true # false # check
+  # jenkinsUrl: https://jenkins.example.com
+  # jenkinsTunnel: null
+
   namespace: jenkins # where agents are launched
   privileged: false # Agent privileged container # default: false
 #  nodeSelector: # breaks install. might not be related to ec2 instance, and break agent connection
@@ -146,7 +150,7 @@ agent:
       memory: "512Mi"
       # ephemeralStorage:
     limits:
-      cpu: "1000m"
+      cpu: null # 1000m
       memory: "2Gi"
   additionalContainers: # this adds kaniko to the default pod template (which already has jnlp required by kubernetes plugin)
     - sideContainerName: "kaniko" # is used instead of docker for building the image
