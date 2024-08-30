@@ -83,5 +83,5 @@ kubelet:
   serviceMonitor:
     interval: "30s"
     resource: true
-    resourcePath: "/metrics/resource
+    resourcePath: "/metrics/resource"
 
