@@ -17,7 +17,6 @@ resources:
   - secrets.yaml
 #  - serviceaccount.yaml # using `patches:` instead to leave labels intact
 
-
 patches:
   - target:
       group: ""
