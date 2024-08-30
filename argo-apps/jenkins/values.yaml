@@ -130,8 +130,7 @@ agent:
   yamlMergeStrategy: "merge" # Defines how the raw yaml field gets merged with yaml definitions from inherited pod templates. Possible values: "merge" or "override"
   garbageCollection: # Enables garbage collection of orphan pods for this Kubernetes cloud. (beta)
     enabled: true # When enabled, Jenkins will periodically check for orphan pods that have not been touched for the given timeout period and delete them.
-    # -- Namespaces to look at for garbage collection, in addition to the default namespace defined for the cloud. One namespace per line.
-    namespaces: |-
+    namespaces: |- # Namespaces to look at for garbage collection, in addition to the default namespace defined for the cloud. One namespace per line.
       jenkins
     timeout: 300
 
