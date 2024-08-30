@@ -33,20 +33,20 @@ spec:
                 - argocd-image-updater
                 - sonarqube
         - matchExpressions:
-            - key: syncorder # Label defined in appset template:,metadata:,labels:
+            - key: syncorder
               operator: In
               values:
                 - django
                 - jenkins
         - matchExpressions:
-            - key: syncorder # Label defined in appset template:,metadata:,labels:
+            - key: syncorder
               operator: In
               values:
                 - eck-stack
                 - elastic
                 - prometheus
         - matchExpressions:
-            - key: syncorder # Label defined in appset template:,metadata:,labels:
+            - key: syncorder
               operator: In
               values:
                 - fluent

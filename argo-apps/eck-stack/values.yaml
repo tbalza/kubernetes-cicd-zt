@@ -34,7 +34,7 @@ eck-elasticsearch:
     podTemplate:
       spec:
         nodeSelector:
-          role: "ci-cd" # assigning app nodegroup for POC purposes
+          role: "django" # assigning app nodegroup for POC purposes
         containers:
           - name: elasticsearch
             resources:
