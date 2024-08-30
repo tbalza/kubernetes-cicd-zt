@@ -28,19 +28,28 @@ spec:
                 - argocd
         - matchExpressions:
             - key: syncorder
-              operator: NotIn
+              operator: In
               values:
-                - argocd
-                - fluent
+                - argocd-image-updater
+                - sonarqube
+        - matchExpressions:
+            - key: syncorder # Label defined in appset template:,metadata:,labels:
+              operator: In
+              values:
                 - django
                 - jenkins
         - matchExpressions:
             - key: syncorder # Label defined in appset template:,metadata:,labels:
               operator: In
               values:
+                - eck-stack
+                - elastic
+                - prometheus
+        - matchExpressions:
+            - key: syncorder # Label defined in appset template:,metadata:,labels:
+              operator: In
+              values:
                 - fluent
-                - django
-                - jenkins
   template:
     metadata:
       name: '{{.path.basename}}'
