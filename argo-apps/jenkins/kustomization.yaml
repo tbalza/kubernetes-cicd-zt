@@ -23,4 +23,4 @@ resources:
 configMapGenerator:
   - name: jenkins-scripts
     files:
-    - pipeline.groovy # refer to values.yaml `job-dsl:` for the auto-launch script
+    - pipeline1.groovy # refer to values.yaml `job-dsl:` for the auto-launch script
