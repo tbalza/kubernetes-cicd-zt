@@ -31,7 +31,6 @@ locals {
   # SSM Parameter values
   parameters = {
 
-
     "sonar_rds_user" = {
       value = local.sonar_rds_user
     }
@@ -229,11 +228,6 @@ locals {
 
 
   }
-
-  # argocd "internal" secret, generated randomly and set by default, not related to login passwords, apparently can drift and break the install
-  # kubectl create secret generic argocd-secret --from-literal=server.secretkey=$(openssl rand -base64 32) -n argocd --dry-run=client -o yaml --save-config | kubectl apply -f - secret/argocd-secret configured
-  # might need to be randomly declaratively generated and defined in SSM
-
   tags = {
     Example = local.name
   }
@@ -309,26 +303,16 @@ module "eks" {
   iam_role_use_name_prefix = true
   vpc_id                   = module.vpc.vpc_id
   subnet_ids               = module.vpc.private_subnets
-  #control_plane_subnet_ids = module.vpc.intra_subnets
-  # database subnet ids # check
-
-  #create_delay_dependencies = [for group in module.eks.eks_managed_node_groups : group.node_group_arn] # check eks-blueprints-addons
 
   cluster_endpoint_public_access  = true
   cluster_endpoint_private_access = true
 
-  # Control Plane Logging
-  # logs cloudwatch
-  #cluster_enabled_log_types              = ["api", "audit", "authenticator", "controllerManager", "scheduler"]
-  #cloudwatch_log_group_retention_in_days = 1
-  #cloudwatch_log_group_kms_key_id        = var.kms_key_arn
   create_cloudwatch_log_group = false
   cloudwatch_log_group_class  = "INFREQUENT_ACCESS"
 
   enable_irsa = true
 
-  # To add the current caller identity as an administrator
-  enable_cluster_creator_admin_permissions = true
+  enable_cluster_creator_admin_permissions = true # # To add the current caller identity as an administrator
 
   create_kms_key            = false
   cluster_encryption_config = {}
@@ -362,9 +346,7 @@ module "eks" {
       })
     }
 
-    # pending `kubectl annotate sc gp2 storageclass.kubernetes.io/is-default-class: "false"`
-    # https://github.com/kubernetes-sigs/aws-ebs-csi-driver/blob/master/charts/aws-ebs-csi-driver/values.yaml
-    aws-ebs-csi-driver = {
+    aws-ebs-csi-driver = { # # pending `kubectl annotate sc gp2 storageclass.kubernetes.io/is-default-class: "false"`
       resolve_conflicts_on_update = "OVERWRITE"
       resolve_conflicts_on_create = "OVERWRITE"
       service_account_role_arn    = module.ebs_csi_driver_irsa.iam_role_arn
@@ -390,12 +372,7 @@ module "eks" {
 
   eks_managed_node_group_defaults = {
     ami_type       = "AL2_x86_64"  # This is custom AMI, `enable_bootstrap_user_data` must be set to True (ami_id not ami_type)
-    instance_types = ["t3.medium"] # "m6i.large", "m5.large", "m5n.large", "m5zn.large"
-    #    attach_cluster_primary_security_group = true
-    #    vpc_security_group_ids = [aws_security_group.additional] # Check
-    #    iam_role_additional_policies = {
-    #    additional     = aws_iam_policy.additional.arn
-    #    }
+    instance_types = ["t3.medium"]
   }
 
   cluster_security_group_additional_rules = {
@@ -416,10 +393,6 @@ module "eks" {
       source_node_security_group = true
     }
   }
-
-  #node_security_group_enable_recommended_rules = false
-  #create_node_security_group  = false
-  #node_security_group_id      = aws_security_group.eks_tooling.id
 
   # Enable node to node communication
   node_security_group_additional_rules = {
@@ -453,14 +426,9 @@ module "eks" {
   eks_managed_node_groups = {
 
     ci-cd = { # green #
-
       name = "ci-cd-node-group"
-
       subnet_ids = module.vpc.private_subnets
-
       ami_type = "AL2_x86_64" # AL2_ARM_64 for arm
-      #ami_id                     = data.aws_ami.eks_default.image_id # check pin to specific version
-      #enable_bootstrap_user_data = true # Must be set when using custom AMI i.e. AL2_x86_64, but only if you provide ami_id (not ami_type)
 
       min_size     = 1
       max_size     = 2
@@ -468,42 +436,6 @@ module "eks" {
 
       capacity_type = "SPOT" # "ON_DEMAND" # SPOT instances nodes are created in random AZs without balance
 
-      #      bootstrap_extra_args       = "--kubelet-extra-args '--max-pods=50'"
-      #
-      #      pre_bootstrap_user_data = <<-EOT
-      #        export USE_MAX_PODS=false
-      #      EOT
-
-      # Set max pods to 110 (hardcoded) --max-pods=${var.cluster_max_pods}
-
-      #      pre_bootstrap_user_data = <<-EOT
-      #        #!/bin/bash
-      #        LINE_NUMBER=$(grep -n "KUBELET_EXTRA_ARGS=\$2" /etc/eks/bootstrap.sh | cut -f1 -d:)
-      #        REPLACEMENT="\ \ \ \ \ \ KUBELET_EXTRA_ARGS=\$(echo \$2 | sed -s -E 's/--max-pods=[0-9]+/--max-pods=110/g')"
-      #        sed -i '/KUBELET_EXTRA_ARGS=\$2/d' /etc/eks/bootstrap.sh
-      #        sed -i "$${LINE_NUMBER}i $${REPLACEMENT}" /etc/eks/bootstrap.sh
-      #      EOT
-
-      # before_compute in vpc-cni addon, adds 30 second delay so kubelet can assume ENABLE_PREFIX_DELEGATION = "true", but doesn't work reliably
-      # CNI may well be set, but kubelet_extra_args --max-pods may sometimes not
-      # hence bootstrap might be recommendable as a fail safe
-
-      # !!!!!!
-
-      #      bootstrap_extra_args = <<-EOT
-      #              "max-pods" = 109
-      #            EOT
-
-      # VPC CNI
-      # https://github.com/terraform-aws-modules/terraform-aws-eks/issues/2551
-
-      # For determining which app goes to what nodegroup
-      # taints are not compatible with ebs csi driver out of the box
-      #      taints = [{
-      #        key    = "ci-cd"
-      #        value  = "true"
-      #        effect = "NO_SCHEDULE"
-      #      }]
       labels = {
         role = "ci-cd" # used by k8s/argocd. node selection, scheduling, grouping, policy enforcement
       }
@@ -579,19 +511,6 @@ module "eks" {
 
       capacity_type = "SPOT"
 
-      #      bootstrap_extra_args = <<-EOT
-      #              "max-pods" = 109
-      #            EOT
-
-      # For determining which app goes to what nodegroup
-      # taints are not compatible with ebs csi driver out of the box
-
-      # pending . taints can be now set in kustomize
-      #      taints = [{
-      #        key    = "django"
-      #        value  = "true"
-      #        effect = "NO_SCHEDULE"
-      #      }]
       labels = {
         role = "django" # used by k8s/argocd. node selection, scheduling, grouping, policy enforcement
       }
@@ -698,7 +617,7 @@ module "eks" {
       }
     }
 
-    eck-operator = { # change to eck-stack
+    eck-operator = {
       principal_arn     = aws_iam_role.elastic_operator.arn
       kubernetes_groups = []
 
@@ -866,72 +785,6 @@ module "eks" {
 #}
 
 ## STS
-
-# pending check access entries
-# pending implement workspaces
-# pending implement remote state
-
-# https://stackoverflow.com/questions/77439459/configure-iam-for-fluent-bit-on-aws-eks
-# https://github.com/terraform-aws-modules/terraform-aws-iam/tree/master/examples/iam-role-for-service-accounts-eks
-
-#module "fluentbit_irsa_role" {
-#  source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
-#  version = "5.11.1"
-#
-#  role_name = "fluent_operator" # "company-k8s-fluentbit-cloudwatch-irsa-role-${terraform.workspace}"
-#
-#  oidc_providers = {
-#    main = {
-#      provider_arn               = module.eks.oidc_provider_arn #data.terraform_remote_state.k8s-cluster.outputs.cluster_oidc_provider_arn
-#      namespace_service_accounts = ["fluent:fluent-bit"] # ["${var.fluentbit_namespace}:${var.fluentbit_service_account_name}"]
-#    }
-#  }
-#}
-#
-#module "fluentbit_irsa_role2" {
-#  source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
-#  version = "5.11.1"
-#
-#  role_name = "fluent_operator2" # "company-k8s-fluentbit-cloudwatch-irsa-role-${terraform.workspace}"
-#
-#  oidc_providers = {
-#    main = {
-#      provider_arn               = module.eks.oidc_provider_arn #data.terraform_remote_state.k8s-cluster.outputs.cluster_oidc_provider_arn
-#      namespace_service_accounts = ["fluent:fluent-operator"] # ["${var.fluentbit_namespace}:${var.fluentbit_service_account_name}"]
-#    }
-#  }
-#}
-
-#resource "aws_iam_policy" "fluent_logs_policy" {
-#  name = "fluentbit-policy"
-#
-#  description = "Role use to create logs from K8S to elasticsearch"
-#
-#  policy = jsonencode({
-#    Version = "2012-10-17",
-#    Statement = [
-#      {
-#        Action = [
-#          "ec2:DescribeTags",
-#          "logs:PutLogEvents",
-#          #"cloudwatch:PutMetricData",
-#          "logs:DescribeLogStreams",
-#          "logs:DescribeLogGroups",
-#          "logs:CreateLogStream",
-#          "logs:CreateLogGroup"
-#        ],
-#        Effect   = "Allow",
-#        Resource = "*"
-#      }
-#    ]
-#  })
-#}
-#
-#resource "aws_iam_policy_attachment" "attach_fluent_logs_policy" {
-#  name       = "attach-fluent-logs-policy"
-#  policy_arn = aws_iam_policy.fluent_logs_policy.arn
-#  roles      = [module.fluentbit_irsa_role.iam_role_name]
-#}
 
 #############
 
