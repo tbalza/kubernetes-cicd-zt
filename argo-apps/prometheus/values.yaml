@@ -82,6 +82,6 @@ kubelet:
   namespace: kube-system
   serviceMonitor:
     interval: "30s"
-    resource: true
+    resource: true # disabled by default because container metrics are already exposed by cAdvisor
     resourcePath: "/metrics/resource"
 
