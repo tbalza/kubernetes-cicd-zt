@@ -40,7 +40,7 @@ controller:
     - job-dsl:latest # 1.87
     - pipeline-aws:latest # (displayed as `Pipeline: AWS Steps`) # used to list ECR images. (pending replacement with aws-cli pod template)
     - github:latest # github webhook
-    - pipeline-stage-view:latest # check. not being displayed
+    - pipeline-stage-view:latest # show build graphics
     - pipeline-utility-steps:latest # json parsing test
     - sonar:latest # (displayed as `SonarQube Scanner`) # 2.17.2
   installLatestPlugins: true # set to `false` to attempt it from breaking even when pinning plugin versions (not guaranteed)
