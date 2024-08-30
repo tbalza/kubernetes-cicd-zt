@@ -48,7 +48,6 @@ pipeline {
                     script {
                         def images = ecrListImages(repositoryName: "${ECR_REPO_NAME}")
                         def tagList = []
-
                         if (images) {
                             echo "Images Object: ${images}"
                             images.each { item ->
@@ -60,7 +59,6 @@ pipeline {
                         } else {
                             echo "Images Object is null or unavailable"
                         }
-
                         if (tagList.isEmpty()) {
                             echo "No tagged images found in ECR. Proceeding with build."
                             env.LATEST_ECR_COMMIT = ''
@@ -88,7 +86,7 @@ pipeline {
                             echo "Git diff completed between ${env.LATEST_ECR_COMMIT} and ${env.GIT_COMMIT}."
                             if (changes.isEmpty()) {
                                 echo "No changes in the Django directory since the last ECR image commit. No build needed."
-                                env.BUILD_NEEDED = 'false' // Explicitly marking no build needed
+                                env.BUILD_NEEDED = 'false'
                             } else {
                                 echo "Changes detected in Django. Proceeding with build."
                                 env.BUILD_NEEDED = 'true'
