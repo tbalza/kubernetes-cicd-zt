@@ -17,64 +17,76 @@ resources:
   - secrets.yaml
 #  - serviceaccount.yaml
 
+
 patches:
   - target:
       group: ""
       version: v1
       kind: ServiceAccount
-      name: kube-prometheus-stack-alertmanager
       namespace: prometheus
     patch: |-
       - op: add
         path: /metadata/annotations/eks.amazonaws.com~1role-arn
         value: "arn:aws:iam::${ARGOCD_AWS_ACCOUNT}:role/PrometheusRole"
-  - target:
-      group: ""
-      version: v1
-      kind: ServiceAccount
-      name: kube-prometheus-stack-grafana
-      namespace: prometheus
-    patch: |-
-      - op: add
-        path: /metadata/annotations/eks.amazonaws.com~1role-arn
-        value: "arn:aws:iam::${ARGOCD_AWS_ACCOUNT}:role/PrometheusRole"
-  - target:
-      group: ""
-      version: v1
-      kind: ServiceAccount
-      name: kube-prometheus-stack-kube-state-metrics
-      namespace: prometheus
-    patch: |-
-      - op: add
-        path: /metadata/annotations/eks.amazonaws.com~1role-arn
-        value: "arn:aws:iam::${ARGOCD_AWS_ACCOUNT}:role/PrometheusRole"
-  - target:
-      group: ""
-      version: v1
-      kind: ServiceAccount
-      name: kube-prometheus-stack-operator
-      namespace: prometheus
-    patch: |-
-      - op: add
-        path: /metadata/annotations/eks.amazonaws.com~1role-arn
-        value: "arn:aws:iam::${ARGOCD_AWS_ACCOUNT}:role/PrometheusRole"
-  - target:
-      group: ""
-      version: v1
-      kind: ServiceAccount
-      name: kube-prometheus-stack-prometheus
-      namespace: prometheus
-    patch: |-
-      - op: add
-        path: /metadata/annotations/eks.amazonaws.com~1role-arn
-        value: "arn:aws:iam::${ARGOCD_AWS_ACCOUNT}:role/PrometheusRole"
-  - target:
-      group: ""
-      version: v1
-      kind: ServiceAccount
-      name: kube-prometheus-stack-prometheus-node-exporter
-      namespace: prometheus
-    patch: |-
-      - op: add
-        path: /metadata/annotations/eks.amazonaws.com~1role-arn
-        value: "arn:aws:iam::${ARGOCD_AWS_ACCOUNT}:role/PrometheusRole"
+
+#patches:
+#  - target:
+#      group: ""
+#      version: v1
+#      kind: ServiceAccount
+#      name: kube-prometheus-stack-alertmanager
+#      namespace: prometheus
+#    patch: |-
+#      - op: add
+#        path: /metadata/annotations/eks.amazonaws.com~1role-arn
+#        value: "arn:aws:iam::${ARGOCD_AWS_ACCOUNT}:role/PrometheusRole"
+#  - target:
+#      group: ""
+#      version: v1
+#      kind: ServiceAccount
+#      name: kube-prometheus-stack-grafana
+#      namespace: prometheus
+#    patch: |-
+#      - op: add
+#        path: /metadata/annotations/eks.amazonaws.com~1role-arn
+#        value: "arn:aws:iam::${ARGOCD_AWS_ACCOUNT}:role/PrometheusRole"
+#  - target:
+#      group: ""
+#      version: v1
+#      kind: ServiceAccount
+#      name: kube-prometheus-stack-kube-state-metrics
+#      namespace: prometheus
+#    patch: |-
+#      - op: add
+#        path: /metadata/annotations/eks.amazonaws.com~1role-arn
+#        value: "arn:aws:iam::${ARGOCD_AWS_ACCOUNT}:role/PrometheusRole"
+#  - target:
+#      group: ""
+#      version: v1
+#      kind: ServiceAccount
+#      name: kube-prometheus-stack-operator
+#      namespace: prometheus
+#    patch: |-
+#      - op: add
+#        path: /metadata/annotations/eks.amazonaws.com~1role-arn
+#        value: "arn:aws:iam::${ARGOCD_AWS_ACCOUNT}:role/PrometheusRole"
+#  - target:
+#      group: ""
+#      version: v1
+#      kind: ServiceAccount
+#      name: kube-prometheus-stack-prometheus
+#      namespace: prometheus
+#    patch: |-
+#      - op: add
+#        path: /metadata/annotations/eks.amazonaws.com~1role-arn
+#        value: "arn:aws:iam::${ARGOCD_AWS_ACCOUNT}:role/PrometheusRole"
+#  - target:
+#      group: ""
+#      version: v1
+#      kind: ServiceAccount
+#      name: kube-prometheus-stack-prometheus-node-exporter
+#      namespace: prometheus
+#    patch: |-
+#      - op: add
+#        path: /metadata/annotations/eks.amazonaws.com~1role-arn
+#        value: "arn:aws:iam::${ARGOCD_AWS_ACCOUNT}:role/PrometheusRole"
