@@ -61,7 +61,7 @@ controller:
                   }
                 }
               }
-      sonarqube: # minimal required SonarQube Scanner Plugin configuration # `:9000/` ?
+      sonarqube: |
         unclassified:
           sonarGlobalConfiguration:
             buildWrapperEnabled: true # false ?
