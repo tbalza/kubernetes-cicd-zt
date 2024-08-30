@@ -22,7 +22,7 @@ spec:
     rollingSync:
       steps: # These are executed sequentially from top to bottom. Everything that is labeled `syncorder=argocd` first, then everything that is not `argocd` (NotIn operator) at the same time
         - matchExpressions:
-            - key: syncorder # Label defined in appset template:,metadata:,labels:
+            - key: syncorder # Label defined in appset template:,metadata:,labels: #
               operator: In
               values:
                 - argocd
