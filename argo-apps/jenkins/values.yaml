@@ -117,11 +117,24 @@ agent:
   defaultsProviderTemplate: "" # default: blank # The name of the pod template to use for providing default values
   workingDir: "/home/jenkins/agent" # default
   nodeUsageMode: "NORMAL" # default
-  TTYEnabled: true
+  TTYEnabled: true # check
   namespace: jenkins # where agents are launched
   privileged: false # Agent privileged container # default: false
 #  nodeSelector: # breaks install. might not be related to ec2 instance, and break agent connection
 #    role: ci-cd
+#    jenkins-agent: v1
+
+  customJenkinsLabels: # [] # # Append Jenkins labels to the agent
+    role: ci-cd
+  podLabels: {} # Custom Pod labels (an object with `label-key: label-value` pairs)
+  yamlMergeStrategy: "merge" # Defines how the raw yaml field gets merged with yaml definitions from inherited pod templates. Possible values: "merge" or "override"
+  garbageCollection: # Enables garbage collection of orphan pods for this Kubernetes cloud. (beta)
+    enabled: true # When enabled, Jenkins will periodically check for orphan pods that have not been touched for the given timeout period and delete them.
+    # -- Namespaces to look at for garbage collection, in addition to the default namespace defined for the cloud. One namespace per line.
+    namespaces: |-
+      jenkins
+    timeout: 300
+
   websocket: true # (websocket and directConnection are mutually exclusive)
   directConnection: false #  (websocket and directConnection are mutually exclusive)
   resources:
