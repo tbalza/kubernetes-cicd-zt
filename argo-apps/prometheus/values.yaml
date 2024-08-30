@@ -1,26 +1,12 @@
 alertmanager:
-#  serviceAccount:
-#    create: false # defined via serviceaccount.yaml
-#    annotations:
-#      eks.amazonaws.com/role-arn: "arn:aws:iam::350206045032:role/PrometheusRole" # check , make cluster and account id dynamic
   alertmanagerSpec:
     nodeSelector:
       role: ci-cd
 
-#kubeStateMetrics: # check
-#  serviceAccount:
-#    create: false # defined via serviceaccount.yaml
-#    annotations:
-#      eks.amazonaws.com/role-arn: "arn:aws:iam::350206045032:role/PrometheusRole" # check , make cluster and account id dynamic
-kube-state-metrics: # check
+kube-state-metrics:
   nodeSelector:
     role: ci-cd
 
-#nodeExporter: # check
-#  serviceAccount:
-#    create: false # defined via serviceaccount.yaml
-#    annotations:
-#      eks.amazonaws.com/role-arn: "arn:aws:iam::350206045032:role/PrometheusRole" # check , make cluster and account id dynamic
 prometheus-node-exporter:
   nodeSelector:
     role: ci-cd
@@ -30,33 +16,19 @@ grafana:
     existingSecret: "prometheus-secrets"
     userKey: admin-user # key in secrets.yaml, not actual password
     passwordKey: admin-password # key in secrets.yaml, not actual password
-#  serviceAccount:
-#    create: false # defined via serviceaccount.yaml
-#    name: kube-prometheus-stack-grafana # used for secrets
-#    automountServiceAccountToken: true
   nodeSelector:
     role: ci-cd
-####
 
 prometheus:
-#  serviceAccount:
-#    create: false # defined via serviceaccount.yaml
-#    annotations:
-#      eks.amazonaws.com/role-arn: "arn:aws:iam::350206045032:role/PrometheusRole" # check , make cluster and account id dynamic
   prometheusSpec:
     nodeSelector:
       role: ci-cd
 
 prometheusOperator:
-#  admissionWebhooks:
-#    deployment:
-#      serviceAccount:
-#        create: false # defined via serviceaccount.yaml
-#    #      annotations:
-#    #        eks.amazonaws.com/role-arn: "arn:aws:iam::350206045032:role/PrometheusRole" # check , make cluster and account id dynamic
-#    failurePolicy: Ignore # check
-#    patch:
-#      ttlSecondsAfterFinished: 120 # prometheus-kube-stack sync fix
+  admissionWebhooks:
+    failurePolicy: Ignore # prometheus-kube-stack sync fix
+    patch:
+      ttlSecondsAfterFinished: 120 # prometheus-kube-stack sync fix
   nodeSelector:
       role: ci-cd
 
