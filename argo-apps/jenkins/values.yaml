@@ -112,6 +112,8 @@ persistence:
     name: jenkins-groovy-scripts # arbitrary name
     readOnly: true
 agent:
+  #podLabels:
+  #  linux: true
   podName: default # refer to Jenkinsfile.groovy argent/kubernetes/inheritFrom `default` # Agent Pod base name
   args: "" # must leave blank as kubernetes plugin provides these as env variables. default populated values break this setup
   defaultsProviderTemplate: "" # default: blank # The name of the pod template to use for providing default values
@@ -125,8 +127,10 @@ agent:
 #    jenkins-agent: v1
 
   customJenkinsLabels: # [] # # Append Jenkins labels to the agent
-    role: ci-cd
-  podLabels: {} # Custom Pod labels (an object with `label-key: label-value` pairs)
+    - role: ci-cd
+
+  #podLabels: # Custom Pod labels (an object with `label-key: label-value` pairs)
+  #  linux: true
   yamlMergeStrategy: "merge" # Defines how the raw yaml field gets merged with yaml definitions from inherited pod templates. Possible values: "merge" or "override"
   garbageCollection: # Enables garbage collection of orphan pods for this Kubernetes cloud. (beta)
     enabled: true # When enabled, Jenkins will periodically check for orphan pods that have not been touched for the given timeout period and delete them.
