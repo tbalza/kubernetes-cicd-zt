@@ -1,0 +1,28 @@
+# resources define the container resource limits for the operator.
+resources:
+  limits:
+    cpu: 1
+    memory: 1Gi
+  requests:
+    cpu: 100m
+    memory: 150Mi
+
+config:
+  logVerbosity: "-2" # -2 errors only, -1 Errors and warnings, 0 Errors, warnings, and information
+  metrics:
+    port: "0" # Set to 0 to disable metrics reporting.
+  # array of regular expressions of node labels which are allowed to be copied as annotations on Elasticsearch Pods.
+  exposedNodeLabels: [ "topology.kubernetes.io/.*", "failure-domain.beta.kubernetes.io/.*" ]
+
+telemetry:
+  disabled: true
+
+nodeSelector:
+  role: "ci-cd"
+
+automountServiceAccountToken: true # Automount API credentials for the Service Account into the pod.
+
+serviceAccount:
+  create: false
+  automountServiceAccountToken: true # Specifies whether a service account should automount API credentials.
+  name: "elastic-operator"
