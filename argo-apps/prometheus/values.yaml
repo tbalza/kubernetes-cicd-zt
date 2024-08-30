@@ -1,62 +1,62 @@
 alertmanager:
   serviceAccount:
-    annotations:
-      eks.amazonaws.com/role-arn: "arn:aws:iam::350206045032:role/PrometheusRole" # check , make cluster and account id dynamic
+    create: false # defined via serviceaccount.yaml
+#    annotations:
+#      eks.amazonaws.com/role-arn: "arn:aws:iam::350206045032:role/PrometheusRole" # check , make cluster and account id dynamic
   alertmanagerSpec:
     nodeSelector:
       role: ci-cd
 
 kubeStateMetrics:
   serviceAccount:
-    annotations:
-      eks.amazonaws.com/role-arn: "arn:aws:iam::350206045032:role/PrometheusRole" # check , make cluster and account id dynamic
+    create: false # defined via serviceaccount.yaml
+#    annotations:
+#      eks.amazonaws.com/role-arn: "arn:aws:iam::350206045032:role/PrometheusRole" # check , make cluster and account id dynamic
 kube-state-metrics:
   nodeSelector:
     role: ci-cd
 
 nodeExporter: # check service account not needed
   serviceAccount: # check service account not needed
-    annotations:
-      eks.amazonaws.com/role-arn: "arn:aws:iam::350206045032:role/PrometheusRole" # check , make cluster and account id dynamic
+    create: false # defined via serviceaccount.yaml
+#    annotations:
+#      eks.amazonaws.com/role-arn: "arn:aws:iam::350206045032:role/PrometheusRole" # check , make cluster and account id dynamic
 prometheus-node-exporter:
   nodeSelector:
     role: ci-cd
 
-####
-# https://github.com/prometheus-community/helm-charts/issues/4755
-# https://github.com/grafana/helm-charts/blob/main/charts/grafana/values.yaml
 grafana:
   admin:
     existingSecret: "prometheus-secrets"
     userKey: admin-user # key in secrets.yaml, not actual password
     passwordKey: admin-password # key in secrets.yaml, not actual password
-  #adminPassword: test123
   serviceAccount:
-    create: false
+    create: false # defined via serviceaccount.yaml
     name: kube-prometheus-stack-grafana # used for secrets
     automountServiceAccountToken: true
-#    annotations:
-#      eks.amazonaws.com/role-arn: "arn:aws:iam::350206045032:role/PrometheusRole" # check , make cluster and account id dynamic
   nodeSelector:
     role: ci-cd
 ####
 
 prometheus:
   serviceAccount:
-    annotations:
-      eks.amazonaws.com/role-arn: "arn:aws:iam::350206045032:role/PrometheusRole" # check , make cluster and account id dynamic
+    create: false # defined via serviceaccount.yaml
+#    annotations:
+#      eks.amazonaws.com/role-arn: "arn:aws:iam::350206045032:role/PrometheusRole" # check , make cluster and account id dynamic
   prometheusSpec:
     nodeSelector:
       role: ci-cd
 
 prometheusOperator:
   serviceAccount:
-    annotations:
-      eks.amazonaws.com/role-arn: "arn:aws:iam::350206045032:role/PrometheusRole" # check , make cluster and account id dynamic
+    create: false # defined via serviceaccount.yaml
+#    annotations:
+#      eks.amazonaws.com/role-arn: "arn:aws:iam::350206045032:role/PrometheusRole" # check , make cluster and account id dynamic
   deployment:
     serviceAccount:
-      annotations:
-        eks.amazonaws.com/role-arn: "arn:aws:iam::350206045032:role/PrometheusRole" # check , make cluster and account id dynamic
+      create: false # defined via serviceaccount.yaml
+#      annotations:
+#        eks.amazonaws.com/role-arn: "arn:aws:iam::350206045032:role/PrometheusRole" # check , make cluster and account id dynamic
   admissionWebhooks:
     failurePolicy: Ignore # check
     patch:
