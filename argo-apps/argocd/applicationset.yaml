@@ -42,8 +42,7 @@ spec:
             - key: syncorder
               operator: In
               values:
-                - elastic
-                #- eck-stack
+                - eck-stack
                 #- elastic
                 - prometheus
         - matchExpressions:

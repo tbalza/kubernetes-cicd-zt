@@ -2,6 +2,45 @@ provider "aws" {
   region = local.region
 }
 
+###############################################################################
+# Providers
+###############################################################################
+
+# kubectl can wait till eks is ready, and then apply yaml
+provider "kubectl" {
+  host                   = module.eks.cluster_endpoint
+  cluster_ca_certificate = base64decode(module.eks.cluster_certificate_authority_data)
+  load_config_file       = false
+  exec {
+    api_version = "client.authentication.k8s.io/v1beta1" # /v1alpha1"
+    args        = ["eks", "get-token", "--cluster-name", module.eks.cluster_name]
+    command     = "aws"
+  }
+}
+
+# kubernetes provider cannot wait until eks is provisioned before applying yaml
+provider "kubernetes" {
+  host                   = module.eks.cluster_endpoint                                 # var.cluster_endpoint
+  cluster_ca_certificate = base64decode(module.eks.cluster_certificate_authority_data) # var.cluster_ca_cert
+  exec {
+    api_version = "client.authentication.k8s.io/v1beta1"                          # /v1alpha1"
+    args        = ["eks", "get-token", "--cluster-name", module.eks.cluster_name] # var.cluster_name
+    command     = "aws"
+  }
+}
+
+provider "helm" {
+  kubernetes {
+    host                   = module.eks.cluster_endpoint                                 # var.cluster_endpoint
+    cluster_ca_certificate = base64decode(module.eks.cluster_certificate_authority_data) # var.cluster_ca_cert
+    exec {
+      api_version = "client.authentication.k8s.io/v1beta1" # /v1alpha1"
+      args        = ["eks", "get-token", "--cluster-name", module.eks.cluster_name]
+      command     = "aws"
+    }
+  }
+}
+
 data "aws_caller_identity" "current" {}
 data "aws_availability_zones" "available" {}
 
@@ -900,7 +939,7 @@ resource "aws_iam_role" "elastic_operator" {
         },
         Condition = {
           StringEquals = {
-            "${replace(module.eks.cluster_oidc_issuer_url, "https://", "")}:sub" : "system:serviceaccount:elastic:eck-pass" # eck-stack:eck-pass" # "namespace:service-account-name"
+            "${replace(module.eks.cluster_oidc_issuer_url, "https://", "")}:sub" : "system:serviceaccount:eck-stack:eck-pass" # eck-stack:eck-pass" # "namespace:service-account-name"
           }
         }
       },
