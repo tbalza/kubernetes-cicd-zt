@@ -18,8 +18,6 @@ resources:
   - secrets2.yaml
   - ingress.yaml
   - rbac.yaml
-#  - serviceaccount.yaml # annotation is bootstrapped in tf with helm resource
-#  - applicationset.yaml
 
 patches:
   - path: init-container.yaml
@@ -29,5 +27,3 @@ patches:
       kind: Deployment
       name: argo-cd-argocd-repo-server
       namespace: argocd
-#    options:
-#      patchType: merge

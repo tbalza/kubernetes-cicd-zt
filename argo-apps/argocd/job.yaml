@@ -24,6 +24,3 @@ spec:
           kubectl rollout restart deployment argo-cd-argocd-applicationset-controller -n argocd;
           sleep 1
       restartPolicy: Never
-# kubectl rollout restart deployment argo-cd-argocd-repo-server -n argocd;
-# kubectl rollout restart deployment argo-cd-argocd-applicationset-controller -n argocd
-# kubectl rollout restart deployment argo-cd-argocd-server -n argocd;

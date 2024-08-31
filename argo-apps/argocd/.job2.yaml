@@ -1,5 +1,4 @@
-# pending, pod logs will show password on API call `processing: sonarqube-sonarqube.sonarqube.svc.cluster.local:9000/api/users/change_password?login=admin&previousPassword=pass&password=`
-# might end up in elasticsearch
+# placeholder for changing argocd admin password
 apiVersion: batch/v1
 kind: Job
 metadata:

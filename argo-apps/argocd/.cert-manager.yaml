@@ -1,3 +1,4 @@
+# placeholder for cert manager
 ## Cert manager is not currently supported. Waiting on an AWS feature request to allow it to import custom certs via api
 #apiVersion: cert-manager.io/v1
 #kind: Certificate
