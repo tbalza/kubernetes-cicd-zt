@@ -1,14 +1,14 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
-namespace: elastic
+namespace: eck-stack
 
 helmCharts:
   - name: eck-stack
     repo: https://helm.elastic.co # https://github.com/elastic/cloud-on-k8s
     version: 0.12.0 # Chart 0.12.0, App 0.12.0
-    releaseName: elastic # eck-stack
-    namespace: elastic
+    releaseName: eck-stack
+    namespace: eck-stack
     includeCRDs: true
     valuesFile: values.yaml
 
