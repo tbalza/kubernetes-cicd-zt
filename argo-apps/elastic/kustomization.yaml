@@ -7,7 +7,7 @@ helmCharts:
   - name: eck-stack
     repo: https://helm.elastic.co # https://github.com/elastic/cloud-on-k8s
     version: 0.12.0 # Chart 0.12.0, App 0.12.0
-    releaseName: eck-stack
+    releaseName: elastic # eck-stack
     namespace: elastic
     includeCRDs: true
     valuesFile: values.yaml
