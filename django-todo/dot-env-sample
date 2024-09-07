@@ -1,0 +1,12 @@
+# this mimics a a sample `.env` file for local development
+
+DB_NAME=dbname
+DB_USERNAME=
+DB_PASSWORD=
+DB_HOST=postgres # local uses postgres in docker-compose. remote uses rds endpoint
+DB_PORT=5432
+SECRET_KEY=
+DEBUG="True"
+STATIC_ROOT=/static
+
+DOMAIN="*" # allowed hosts

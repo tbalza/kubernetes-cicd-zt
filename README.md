@@ -1,147 +1,161 @@
-jenkins webhook
+# Zero-Touch Provisioning & Deployment of Kubernetes CI/CD Pipeline
 
-helm repo update
+<img src="diagram.drawio.png" alt="Your image description" width="852"/>
 
-tree -I '.terraform|venv'
+A Proof of Concept (PoC) that provisions a fully operational EKS cluster using terraform, and deploys a complete Django application along with an interconnected CI/CD stack made of ArgoCD, Jenkins, Prometheus, Grafana, Elasticsearch, Fluentbit, and Kibana.
 
-sudo dscacheutil -flushcache; sudo killall -HUP mDNSResponder
+All with dynamic configuration values, CNAME entries, secure credentials, and requires no manual intervention after issuing one terraform apply command.
 
-rm ~/.kube/config
+A full breakdown can be found at my [blogpost](https://tbalza.net/zero-touch-provisioning-deployment-of-kubernetes-ci/cd-pipeline/)
 
-docker run --rm --platform linux/amd64 tbalza/envsubst2:latest envsubst --version
-docker buildx build --platform linux/amd64 -t tbalza/envsubst2:latest --push .
+> **Warning**: Creating resources in AWS will incur costs. Remember to use the `terraform destroy` command at the end to remove all resources after you're finished.
 
-set Cloudflare API token as an environment variable (that will be used by ExternalDNS)
-# export TF_VAR_CFL_API_TOKEN=123example
-set Cloudflare Zone ID as an environment variable (that will be used by ACM)
-# export TF_VAR_CFL_ZONE_ID=123example
+## Requirements
+Install the necessary CLI tools,
 
-# ArgoCD Image Updater GitHub Personal Access Token
-export TF_VAR_ARGOCD_GITHUB_TOKEN=123example
-export TF_VAR_ARGOCD_GITHUB_USER=123user
+with [Homebrew](https://docs.brew.sh/Installation): (Mac)
 
-# Django local vars
+```bash
+brew install terraform
+brew install aws-cli
+brew install helm
+brew install kubectl
+```
 
-.env
-DB_NAME=postgres
-DB_USERNAME=user
-DB_PASSWORD=pass
-DB_HOST=postgres-service
-DB_PORT=5432
+Configure the [AWS CLI tool](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) with your account. Optionally create an [Isolated Testing Account](https://docs.aws.amazon.com/organizations/latest/userguide/orgs_tutorials_basic.html) for more granular access control and budget limits.
 
-check "TODO" django
+## Setting up DNS, and Generating CloudFlare & GitHub Tokens
+[Setup Cloudflare DNS Nameservers](https://www.namecheap.com/support/knowledgebase/article.aspx/9607/2210/how-to-set-up-dns-records-for-your-domain-in-a-cloudflare-account/). (ExternalDNS supports Route53, GKE, DigitalOcean, GoDaddy etc. but currently this PoC is configured to work with CloudFlare DNS Service out of the box)
 
-export STATIC_ROOT=/data/static
+[Create Cloudflare API Token](https://developers.cloudflare.com/fundamentals/api/get-started/create-token/) and set env vars,
+```bash
+export TF_VAR_CFL_API_TOKEN = "your-cloudflare-token"
+export TF_VAR_CFL_ZONE_ID = "your-cloudflare-zoneid"
+```
 
-ALLOWED_HOSTS
-Debug=0 (in production)
+[Create GitHub Personal Access Token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens/) and set env vars,
 
+```bash
+export TF_VAR_ARGOCD_GITHUB_TOKEN = "you-github-token" # token and login password are two different things
+export TF_VAR_ARGOCD_GITHUB_USER = "your-github-user"
+```
 
-# cmp envsubst
-https://github.com/a8m/envsubst/releases/download/v1.4.2/envsubst-Linux-x86_64
+Alternatively you can create a `/terraform/01-eks-cluster/terraform.tfvars` file after cloning the repository, where Terraform won't depend on the terminal session's ENV vars, and the repo will be already configured to not not commit these credentials to the codebase via `.gitignore`
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY =
+```bash
+cat <<EOF >terraform.tfvars # ENV vars within terraform.tfvars should not include the `TF_VAR_` prefix
+CFL_API_TOKEN = "your-cloudflare-token"
+CFL_ZONE_ID = "your-cloudflare-zoneid"
+ARGOCD_GITHUB_TOKEN = "you-github-token"
+ARGOCD_GITHUB_USER = "your-github-user"
+EOF
+```
 
-you are better off separating your infrastructure from your applications.
-this would be two different statefiles, and you would need to explicitly handle the removal of the applications running on the cluster first, before destroying the cluster
-# Necessary to avoid removing Terraform's permissions too soon before its finished
-# cleaning up the resources it deployed inside the cluster
-terraform state rm 'module.eks.aws_eks_access_entry.this["cluster_creator"]' || true
-terraform state rm 'module.eks.aws_eks_access_policy_association.this["cluster_creator_admin"]' || true
+## Cloning the Repository
 
-https://github.com/terraform-aws-modules/terraform-aws-eks/issues/2923
+```bash
+git clone https://github.com/tbalza/kubernetes-cicd-zt.git
+cd kubernetes-cicd-zt && export KCICD_HOME=$(pwd) # set project's home directory
+```
 
-Solution
+## Creating GitHub Webhooks
 
-output "cluster_endpoint" {
-  description = "Endpoint for your Kubernetes API server"
-  value       = try(aws_eks_cluster.this[0].endpoint, null)
+In your cloned GH repo settings create 2 [webhooks](https://docs.github.com/en/webhooks/using-webhooks/creating-webhooks):
 
-  depends_on = [
-    aws_eks_access_entry.this,
-    aws_eks_access_policy_association.this,
-  ]
-}
-output "cluster_certificate_authority_data" {
-  description = "Base64 encoded certificate data required to communicate with the cluster"
-  value       = try(aws_eks_cluster.this[0].certificate_authority[0].data, null)
+First, go to
 
-  depends_on = [
-    aws_eks_access_entry.this,
-    aws_eks_access_policy_association.this,
-  ]
-}
-
-----
-
-Before destroy
-export KUBECONFIG=~/.kube/config
-tf refresh
-
-#helm
-kubectl apply -f service_account.yml
-helm install app eks/app
-
-#before deploying ingress, run logs in separate terminal
-kubectl logs -f -n kube-system \
--l app.kubernetes.io/name=aws-load-balancer-controller
-
-export KUBERNETES_MASTER=https://FAA89D5CCB710D5F4E6AB4F6408A1D25.gr7.us-east-1.eks.amazonaws.com
-export KUBECONFIG=~/.kube/config
-export KUBE_CONFIG_PATH=~/.kube/config
-export DISABLE_TELEMETRY=true #cloud nuke
-
-#consider using aws-iam-authenticator
-
-export TF_LOG=TRACE # most detailed
-export TF_LOG=DEBUG # less detailed
-export TF_LOG_PATH=terraform.log
-
-kubectl describe svc argo-cd-argocd-server -n argocd
-kubectl logs -n kube-system -l app.kubernetes.io/name=aws-load-balancer-controller
-
---
-#argo default pass
-                        kubectl get secret argocd-initial-admin-secret -n argocd -o jsonpath="{.data.password}" | base64 --decode
-#admin, pass node name complete
-
-kubectl get svc -n argocd
-
-Access argocd cli tool: port-forwarded the argo server to localhost port 8080
-                            kubectl port-forward svc/argo-cd-argocd-server -n argocd 8080:443
-
-                            #jenkins main (http://localhost:8181)
-                            kubectl port-forward svc/jenkins -n jenkins 8181:8080
+`https://github.com/<your-username>/kubernetes-cicd-zt/settings/hooks`
 
 
-                        argocd login localhost:8080 --username admin --password PASSWORD
 
-                        argocd login localhost:8080 --username admin --password $(kubectl get secret argocd-initial-admin-secret -n argocd -o jsonpath="{.data.password}" | base64 --decode) --plaintext
+Via the UI console create 2 entries, with the `application/json` content-type,
 
-WARNING: server certificate had error: x509: “Argo CD” certificate is not trusted. Proceed insecurely (y/n)? y
-'admin:login' logged in successfully
+`https://jenkins.<your-domain.com>/github-webhook/`
 
---
-#check ENV
-kubectl describe pod -n argocd -l app.kubernetes.io/name=argocd-server
+`https://argocd.<your-domain.com>/api/webhook`
 
-#Access Entry
-https://github.com/terraform-aws-modules/terraform-aws-eks/issues/2968
+The rest of the settings are left default.
 
-#ApplicationSet
--ArgoCD itself? auto manage
+## Configuring Cluster Settings
+Edit your domain and repo URL in Terraform, the rest can be left unchanged:
+```bash
+open /terraform/01-eks-cluster/set_up_eks_cluster.tf 
+```
+```hcl
+locals {
+  name            = "django-production" # cluster name
+  region          = "us-east-1"
+  domain          = "<your-domain>.com"
+  repo_url        = "https://github.com/<your-user>/kubernetes-cicd-zt.git"
+```
+Edit the repoURL value in ArgoCD's 'ApplicationSet':
+```bash
+open /argo-apps/argocd/applicationset.yaml 
+```
+```yaml
+spec: # add sed/yq command
+  generators:
+    - git:
+        repoURL: https://github.com/<your-user>/kubernetes-cicd-zt.git
+```
+And finally commit and push saved changes
+```bash
+git add .
+git commit -m "configuration complete"
+git push origin main
+```
 
-ArgoCD +helm/manifest would create the ServiceAccount with the role in the annotations.
-In your manifest, just annotate your ServiceAccount with the IAM role arn. 
+## Provisioning the Cluster
 
-#pending
--External DNS
--SSL
--Secrets
--finalizers
---move argo ingress outside tf
+Before you apply changes the first time, you need to initialize TF working directories, download plugins and modules and set up backend for storing your infrastructure's state usig the `init` command:
+```bash
+terraform -chdir="$KCICD_HOME/terraform/01-eks-cluster/" init && terraform -chdir="$KCICD_HOME/terraform/02-argocd/" init
+```
 
-roles
--assumed role to run tf
-https://github.com/terraform-aws-modules/terraform-aws-eks/issues/3020
+Provision and deploy all apps with single compound `apply` command:
+```bash
+terraform -chdir="$KCICD_HOME/terraform/01-eks-cluster/" apply -auto-approve && terraform terraform -chdir="$KCICD_HOME/terraform/02-argocd/" apply -auto-approve
+```
+
+> `terraform/01-eks-cluser` Provisions infrastructure, and core addons that don't change often. While `terraform/02-argocd` Bootstraps ArgoCD via helm, which will in turn deploy the rest of the apps. Separating these stages into two TF state files reduces future maintenance issues
+
+## Final Results
+
+### Provisioning
+After executing `terraform apply -auto-approve`, the provisioning stage will set up the EKS cluster with Node Groups, Access Entries, along with its core addons (CoreDNS, Kube-Proxy, VPC-CNI, EBS CSI Driver, AWS Load Balancer Controller, ExternalDNS, External Secrets Operator) and resources like IAM Policies/Roles/Security Groups, ACM, VPC, RDS, SSM, Application Load Balancer, and ECR.
+
+This provisioning cycle takes about ~25 minutes.
+
+### Deployment
+
+After the first stage succeeds, Terraform will automatically bootstrap ArgoCD using values generated dynamically while provisioning, where it will now "take over" and deploy Sonarqube, Jenkins, ArgoCD Image Updater, Django, ElasticSearch, Fluentbit, Kibana, Prometheus and Grafana.
+
+After around ~10 minutes you'll be able to access all of the app console UIs via their subdomain:
+
+- django.yourdomain.com
+- argocd.yourdomain.com
+- sonarqube.yourdomain.com
+- jenkins.yourdomain.com
+- kibana.yourdomain.com
+- grafana.yourdomain.com
+
+The dynamically generated passwords will be available via the SSM Parameter Store console in AWS. 
+
+## Remove Resources
+
+After you're done, you can run this command to delete all resources.
+
+```bash
+terraform terraform -chdir="$KCICD_HOME/terraform/02-argocd/" destroy ; terraform -chdir="$KCICD_HOME/terraform/01-eks-cluster/" destroy
+```
+
+## Roadmap
+Future enhancements include:
+
+- **Security:** Scope Access Entries, IAM Policies/Roles/Security Groups, SSM, to follow the principle of least privilege. Non-root Django container
+- **CI:** Code linting. CI tests
+- **Multi Environment Setup:** Implement TF workspaces with .tfvars to enable Dev, Staging, QA, Prod, environments
+- **SSO:** Configure Single Sign On for user management, and integrate with IAM permissions
+- **Software Development Life Cycle:** Implement examples with trunk-based development and tags
+- **Repo Structure:** Fix long .tf files, create directories for customer facing apps along with corresponding ApplicationSets.
+- **Crucial Addons:** Install backup/DR solutions, autoscaling, cost tracking, etc.

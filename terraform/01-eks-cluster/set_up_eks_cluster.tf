@@ -1,71 +1,24 @@
-provider "aws" {
-  region = local.region
-}
-
-###############################################################################
-# Providers
-###############################################################################
-
-# kubectl can wait till eks is ready, and then apply yaml
-provider "kubectl" {
-  host                   = module.eks.cluster_endpoint
-  cluster_ca_certificate = base64decode(module.eks.cluster_certificate_authority_data)
-  load_config_file       = false
-  exec {
-    api_version = "client.authentication.k8s.io/v1beta1" # /v1alpha1"
-    args        = ["eks", "get-token", "--cluster-name", module.eks.cluster_name]
-    command     = "aws"
-  }
-}
-
-# kubernetes provider cannot wait until eks is provisioned before applying yaml
-provider "kubernetes" {
-  host                   = module.eks.cluster_endpoint                                 # var.cluster_endpoint
-  cluster_ca_certificate = base64decode(module.eks.cluster_certificate_authority_data) # var.cluster_ca_cert
-  exec {
-    api_version = "client.authentication.k8s.io/v1beta1"                          # /v1alpha1"
-    args        = ["eks", "get-token", "--cluster-name", module.eks.cluster_name] # var.cluster_name
-    command     = "aws"
-  }
-}
-
-provider "helm" {
-  kubernetes {
-    host                   = module.eks.cluster_endpoint                                 # var.cluster_endpoint
-    cluster_ca_certificate = base64decode(module.eks.cluster_certificate_authority_data) # var.cluster_ca_cert
-    exec {
-      api_version = "client.authentication.k8s.io/v1beta1" # /v1alpha1"
-      args        = ["eks", "get-token", "--cluster-name", module.eks.cluster_name]
-      command     = "aws"
-    }
-  }
-}
-
-data "aws_caller_identity" "current" {}
-data "aws_availability_zones" "available" {}
-
 # local helm v3.14.4
 # local kubectl v1.29.3
 # aws kubernetes v1.29
 
 locals {
-  name            = "django-production" # cluster name
-  cluster_version = "1.29"              # 1.29
-  region          = "us-east-1"
-  domain          = "tbalza.net"
+  name     = "django-production" # cluster name
+  region   = "us-east-1"
+  domain   = "tbalza.net"
+  repo_url = "https://github.com/tbalza/kubernetes-cicd-zt.git"
 
+  cluster_version = "1.29" # 1.29
   vpc_cidr = "10.0.0.0/16" # ~65k IPs
   azs      = slice(data.aws_availability_zones.available.names, 0, 3)
 
-  rds_user   = "django" # django rds
+  rds_user   = "django"   # django rds
   rds_dbname = "postgres" # django rds
-  rds_port   = 5432 # postgres default # django rds
+  rds_port   = 5432       # postgres default # django rds
 
-  sonar_rds_user = "sonarqube"
+  sonar_rds_user   = "sonarqube"
   sonar_rds_dbname = "postgres"
-  sonar_rds_port = 5432
-
-  repo_url   = "https://github.com/tbalza/kubernetes-cicd-zt.git"
+  sonar_rds_port   = 5432
 
   # SSM Parameter values
   parameters = {
@@ -296,6 +249,53 @@ output "domain" {
 }
 
 ###############################################################################
+# Providers
+###############################################################################
+
+provider "aws" {
+  region = local.region
+}
+
+# kubectl can wait till eks is ready, and then apply yaml
+provider "kubectl" {
+  host                   = module.eks.cluster_endpoint
+  cluster_ca_certificate = base64decode(module.eks.cluster_certificate_authority_data)
+  load_config_file       = false
+  exec {
+    api_version = "client.authentication.k8s.io/v1beta1" # /v1alpha1"
+    args        = ["eks", "get-token", "--cluster-name", module.eks.cluster_name]
+    command     = "aws"
+  }
+}
+
+# kubernetes provider cannot wait until eks is provisioned before applying yaml
+provider "kubernetes" {
+  host                   = module.eks.cluster_endpoint                                 # var.cluster_endpoint
+  cluster_ca_certificate = base64decode(module.eks.cluster_certificate_authority_data) # var.cluster_ca_cert
+  exec {
+    api_version = "client.authentication.k8s.io/v1beta1"                          # /v1alpha1"
+    args        = ["eks", "get-token", "--cluster-name", module.eks.cluster_name] # var.cluster_name
+    command     = "aws"
+  }
+}
+
+provider "helm" {
+  kubernetes {
+    host                   = module.eks.cluster_endpoint                                 # var.cluster_endpoint
+    cluster_ca_certificate = base64decode(module.eks.cluster_certificate_authority_data) # var.cluster_ca_cert
+    exec {
+      api_version = "client.authentication.k8s.io/v1beta1" # /v1alpha1"
+      args        = ["eks", "get-token", "--cluster-name", module.eks.cluster_name]
+      command     = "aws"
+    }
+  }
+}
+
+data "aws_caller_identity" "current" {}
+data "aws_availability_zones" "available" {}
+
+
+###############################################################################
 # SSM Parameter
 ###############################################################################
 
@@ -411,7 +411,7 @@ module "eks" {
   }
 
   eks_managed_node_group_defaults = {
-    ami_type       = "AL2_x86_64"  # This is custom AMI, `enable_bootstrap_user_data` must be set to True (ami_id not ami_type)
+    ami_type       = "AL2_x86_64" # This is custom AMI, `enable_bootstrap_user_data` must be set to True (ami_id not ami_type)
     instance_types = ["t3.medium"]
   }
 
@@ -466,9 +466,9 @@ module "eks" {
   eks_managed_node_groups = {
 
     ci-cd = { # green #
-      name = "ci-cd-node-group"
+      name       = "ci-cd-node-group"
       subnet_ids = module.vpc.private_subnets
-      ami_type = "AL2_x86_64" # AL2_ARM_64 for arm
+      ami_type   = "AL2_x86_64" # AL2_ARM_64 for arm
 
       min_size     = 1
       max_size     = 2
@@ -539,9 +539,9 @@ module "eks" {
 
     django = {
 
-      name = "django-node-group"
+      name       = "django-node-group"
       subnet_ids = module.vpc.private_subnets
-      ami_type = "AL2_x86_64" # AL2_ARM_64 for arm
+      ami_type   = "AL2_x86_64" # AL2_ARM_64 for arm
 
       min_size     = 1
       max_size     = 3
