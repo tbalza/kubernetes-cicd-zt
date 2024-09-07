@@ -1,6 +1,6 @@
 # Zero-Touch Provisioning & Deployment of Kubernetes CI/CD Pipeline
 
-<img src="diagram.drawio.png" alt="Your image description" width="852"/>
+<img src="diagram.png" alt="Your image description" width="852"/>
 
 A Proof of Concept (PoC) that provisions a fully operational EKS cluster using terraform, and deploys a complete Django application along with an interconnected CI/CD stack made of ArgoCD, Jenkins, Prometheus, Grafana, Elasticsearch, Fluentbit, and Kibana.
 
@@ -9,6 +9,39 @@ All with dynamic configuration values, CNAME entries, secure credentials, and re
 A full breakdown can be found at my [blogpost](https://tbalza.net/zero-touch-provisioning-deployment-of-kubernetes-ci/cd-pipeline/)
 
 > **Warning**: Creating resources in AWS will incur costs. Remember to use the `terraform destroy` command at the end to remove all resources after you're finished.
+
+## Project File Structure
+
+```bash
+┌── argo-apps                       # Deployment Stage Addons
+│   ├── argocd
+│   ├── argocd-image-updater
+│   ├── django
+│   ├── eck-stack
+│   ├── fluent
+│   ├── jenkins
+│   ├── prometheus
+│   └── sonarqube
+├── django-todo                     # Main App
+│   ├── Dockerfile
+│   ├── django_tailwind_todo
+│   ├── docker-compose.yaml
+│   ├── dot-env-sample
+│   ├── entrypoint.sh
+│   ├── manage.py
+│   ├── nginx
+│   ├── requirements.txt
+│   └── todo
+└── terraform
+    ├── 01-eks-cluster              # Terraform Infra Provisioning Stage
+    │   ├── outputs.tf
+    │   ├── providers.tf
+    │   ├── set_up_eks_cluster.tf
+    │   └── terraform.tfvars
+    └── 02-argocd                   # Terraform ArgoCD Boostrap Stage
+        ├── deploy_argocd.tf
+        └── providers.tf
+```
 
 ## Requirements
 Install the necessary CLI tools,
