@@ -57,18 +57,6 @@ export TF_VAR_CFL_ZONE_ID = "your-cloudflare-zoneid"
 export TF_VAR_ARGOCD_GITHUB_TOKEN = "you-github-token" # token and login password are two different things
 export TF_VAR_ARGOCD_GITHUB_USER = "your-github-user"
 ```
-
-Alternatively you can create a `/terraform/01-eks-cluster/terraform.tfvars` file after cloning the repository, where Terraform won't depend on the terminal session's ENV vars, and the repo will be already configured to not not commit these credentials to the codebase via `.gitignore`
-
-```bash
-cat <<EOF >terraform.tfvars # ENV vars within terraform.tfvars should not include the `TF_VAR_` prefix
-CFL_API_TOKEN = "your-cloudflare-token"
-CFL_ZONE_ID = "your-cloudflare-zoneid"
-ARGOCD_GITHUB_TOKEN = "you-github-token"
-ARGOCD_GITHUB_USER = "your-github-user"
-EOF
-```
-
 ## Cloning the Repository
 
 ```bash
