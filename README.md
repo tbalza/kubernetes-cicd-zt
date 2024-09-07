@@ -23,24 +23,9 @@ A full breakdown can be found at my [blogpost](https://tbalza.net/zero-touch-pro
 │   ├── prometheus
 │   └── sonarqube
 ├── django-todo                     # Main App Developement
-│   ├── Dockerfile
-│   ├── django_tailwind_todo
-│   ├── docker-compose.yaml
-│   ├── dot-env-sample
-│   ├── entrypoint.sh
-│   ├── manage.py
-│   ├── nginx
-│   ├── requirements.txt
-│   └── todo
 └── terraform
     ├── 01-eks-cluster              # Terraform Infra Provisioning Stage
-    │   ├── outputs.tf
-    │   ├── providers.tf
-    │   ├── set_up_eks_cluster.tf
-    │   └── terraform.tfvars
     └── 02-argocd                   # Terraform ArgoCD Boostrap Stage
-        ├── deploy_argocd.tf
-        └── providers.tf
 ```
 
 ## Requirements
