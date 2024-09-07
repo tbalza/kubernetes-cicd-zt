@@ -127,7 +127,8 @@ git push origin main
 
 Before you apply changes the first time, you need to initialize TF working directories, download plugins and modules and set up backend for storing your infrastructure's state usig the `init` command:
 ```bash
-terraform -chdir="$KCICD_HOME/terraform/01-eks-cluster/" init && terraform -chdir="$KCICD_HOME/terraform/02-argocd/" init
+terraform -chdir="$KCICD_HOME/terraform/01-eks-cluster/" init
+terraform -chdir="$KCICD_HOME/terraform/02-argocd/" init
 ```
 
 Provision and deploy all apps with single compound `apply` command:
