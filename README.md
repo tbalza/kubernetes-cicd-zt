@@ -146,7 +146,7 @@ This provisioning cycle takes about ~25 minutes.
 
 ### Deployment
 
-After the first stage succeeds, Terraform will automatically bootstrap ArgoCD using values generated dynamically while provisioning, where it will now "take over" and deploy Sonarqube, Jenkins, ArgoCD Image Updater, Django, ElasticSearch, Fluentbit, Kibana, Prometheus and Grafana.
+After the first stage succeeds, Terraform will automatically bootstrap ArgoCD using values generated dynamically while provisioning, where it will now "take over" and deploy a fully configured and interconnected CI/CD pipeline with Sonarqube, Jenkins, ArgoCD Image Updater, Django, ElasticSearch, Fluentbit, Kibana, Prometheus and Grafana.
 
 After around ~10 minutes you'll be able to access all of the app console UIs via their subdomain:
 
