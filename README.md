@@ -68,13 +68,7 @@ cd kubernetes-cicd-zt && export KCICD_HOME=$(pwd) # set project's home directory
 
 In your cloned GH repo settings create 2 [webhooks](https://docs.github.com/en/webhooks/using-webhooks/creating-webhooks):
 
-First, go to
-
-`https://github.com/<your-username>/kubernetes-cicd-zt/settings/hooks`
-
-
-
-Via the UI console create 2 entries, with the `application/json` content-type,
+Via the UI console create entries with the `application/json` content-type,
 
 `https://jenkins.<your-domain.com>/github-webhook/`
 
