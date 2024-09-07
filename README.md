@@ -14,14 +14,14 @@ A full breakdown can be found at my [blogpost](https://tbalza.net/zero-touch-pro
 
 ```bash
 ┌── argo-apps                       # Deployment Stage Addons/Apps
-│   ├── argocd                      # CD
-│   ├── argocd-image-updater          # CI/CD
-│   ├── django                        # Main App Deployment
-│   ├── eck-stack                     # Obs.
-│   ├── fluent                        # Obs.
-│   ├── jenkins                       # CI
-│   ├── prometheus                    # Obs.
-│   └── sonarqube                     # Static Code Analysis
+│   ├── argocd                        CD
+│   ├── argocd-image-updater          CI/CD
+│   ├── django                        Main App Deployment
+│   ├── eck-stack                     Obs.
+│   ├── fluent                        Obs.
+│   ├── jenkins                       CI
+│   ├── prometheus                    Obs.
+│   └── sonarqube                     Static Code Analysis
 ├── django-todo                     # Main App Developement
 │   ├── Dockerfile
 │   ├── django_tailwind_todo
