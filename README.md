@@ -13,16 +13,16 @@ A full breakdown can be found at my [blogpost](https://tbalza.net/zero-touch-pro
 ## Directory Structure
 
 ```bash
-┌── argo-apps                       # Deployment Stage Addons
-│   ├── argocd
-│   ├── argocd-image-updater
-│   ├── django
-│   ├── eck-stack
-│   ├── fluent
-│   ├── jenkins
-│   ├── prometheus
-│   └── sonarqube
-├── django-todo                     # Main App
+┌── argo-apps                       # Deployment Stage Addons/Apps
+│   ├── argocd                      # CD
+│   ├── argocd-image-updater          # CI/CD
+│   ├── django                        # Main App Deployment
+│   ├── eck-stack                     # Obs.
+│   ├── fluent                        # Obs.
+│   ├── jenkins                       # CI
+│   ├── prometheus                    # Obs.
+│   └── sonarqube                     # Static Code Analysis
+├── django-todo                     # Main App Developement
 │   ├── Dockerfile
 │   ├── django_tailwind_todo
 │   ├── docker-compose.yaml
