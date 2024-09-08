@@ -147,7 +147,7 @@ The dynamically generated passwords to access each service will be available via
 After you're done, you can run this command to delete all resources.
 
 ```bash
-terraform terraform -chdir="$KCICD_HOME/terraform/02-argocd/" destroy ; terraform -chdir="$KCICD_HOME/terraform/01-eks-cluster/" destroy
+terraform -chdir="$KCICD_HOME/terraform/02-argocd/" destroy ; terraform -chdir="$KCICD_HOME/terraform/01-eks-cluster/" destroy
 ```
 
 ## Roadmap
