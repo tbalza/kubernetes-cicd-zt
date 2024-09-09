@@ -161,9 +161,9 @@ terraform -chdir="$KCICD_HOME/terraform/02-argocd/" destroy ; terraform -chdir="
 Future enhancements include:
 
 - **Security:** Scope Access Entries, IAM Policies/Roles/Security Groups, SSM, to follow the principle of least privilege. Non-root Django container
-- **CI:** Code linting. CI tests
-- **Multi Environment Setup:** Implement TF workspaces with .tfvars to enable Dev, Staging, QA, Prod, environments. Implement remote state management.
+- **CI:** Code linting. CI tests. ECR Docker Caching
+- **Multi Environment Setup:** Implement TF workspaces with .tfvars to enable Dev, Staging, QA, Prod, environments. Implement remote state management
 - **SSO:** Configure Single Sign On for user management, and integrate with IAM permissions
 - **Software Development Life Cycle:** Implement examples with trunk-based development and tags
-- **Repo Structure:** Fix long .tf files, create directories for customer facing apps along with corresponding ApplicationSets.
+- **Repo Structure:** Fix long .tf files, create directories for customer facing apps along with corresponding ApplicationSets
 - **Crucial Addons:** Install backup/DR solutions, autoscaling, cost tracking, etc.
