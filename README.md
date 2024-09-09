@@ -29,18 +29,25 @@ A full breakdown can be found at my [blogpost](https://tbalza.net/zero-touch-pro
 ```
 
 ## Requirements
-Install the necessary CLI tools,
-
-with [Homebrew](https://docs.brew.sh/Installation): (Mac)
-
+With [Homebrew](https://docs.brew.sh/Installation) (Mac):
 ```bash
-brew install terraform
-brew install aws-cli
-brew install helm
-brew install kubectl
+/bin/bash -c “$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+```
+Install the necessary CLI tools,
+```bash
+brew install brew tap hashicorp/tap && brew install hashicorp/tap/terraform # terraform
+brew install awscli # aws-cli
+brew install helm # helm
+brew install kubectl # kubectl
 ```
 
-Configure the [AWS CLI tool](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) with your account. Optionally create an [Isolated Testing Account](https://docs.aws.amazon.com/organizations/latest/userguide/orgs_tutorials_basic.html) for more granular access control and budget limits.
+Configure the [AWS CLI tool](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) with your user. Optionally create an [Isolated Testing Account](https://docs.aws.amazon.com/organizations/latest/userguide/orgs_tutorials_basic.html) for more granular access control and budget limits.
+
+This assumes you have the credentials that contain your `aws_access_key_id` and your `aws_secret_access_key` for your IAM User with required permissions.
+
+```bash
+aws configure
+```
 
 ## Setting up DNS, and Generating CloudFlare & GitHub Tokens
 [Setup Cloudflare DNS Nameservers](https://www.namecheap.com/support/knowledgebase/article.aspx/9607/2210/how-to-set-up-dns-records-for-your-domain-in-a-cloudflare-account/). (ExternalDNS supports Route53, GKE, DigitalOcean, GoDaddy etc. but currently this PoC is configured to work with CloudFlare DNS Service out of the box)
