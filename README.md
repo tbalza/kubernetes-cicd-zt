@@ -35,12 +35,14 @@ With [Homebrew](https://docs.brew.sh/Installation) (Mac):
 ```
 Install the necessary CLI tools,
 ```bash
+brew install git # git
+brew install gh # github cli
 brew install brew tap hashicorp/tap && brew install hashicorp/tap/terraform # terraform
 brew install awscli # aws-cli
 brew install helm # helm
 brew install kubectl # kubectl
 ```
-
+### AWS CLI
 Configure the [AWS CLI tool](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) with your user. Optionally create an [Isolated Testing Account](https://docs.aws.amazon.com/organizations/latest/userguide/orgs_tutorials_basic.html) for more granular access control and budget limits.
 
 This assumes you have the credentials that contain your `aws_access_key_id` and your `aws_secret_access_key` for your IAM User with required permissions.
@@ -49,66 +51,115 @@ This assumes you have the credentials that contain your `aws_access_key_id` and 
 aws configure
 ```
 
-## Setting up DNS, and Generating CloudFlare & GitHub Tokens
-[Setup Cloudflare DNS Nameservers](https://www.namecheap.com/support/knowledgebase/article.aspx/9607/2210/how-to-set-up-dns-records-for-your-domain-in-a-cloudflare-account/). (ExternalDNS supports Route53, GKE, DigitalOcean, GoDaddy etc. but currently this PoC is configured to work with CloudFlare DNS Service out of the box)
-
-[Create Cloudflare API Token](https://developers.cloudflare.com/fundamentals/api/get-started/create-token/) and set env vars,
+### Git
+Configure git cli username and email of your existing [GitHub account](https://github.com/login):
 ```bash
-export TF_VAR_CFL_API_TOKEN = "your-cloudflare-token"
-export TF_VAR_CFL_ZONE_ID = "your-cloudflare-zoneid"
+git config --global user.name "your-username"
+git config --global user.email "your@email.com"
 ```
 
-[Create GitHub Personal Access Token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens/) and set env vars,
+Create SSH key pair, and paste public key in https://github.com/settings/keys (Click 'New SSH Key', Paste and save):
 
 ```bash
-export TF_VAR_ARGOCD_GITHUB_TOKEN = "you-github-token" # token and login password are two different things
-export TF_VAR_ARGOCD_GITHUB_USER = "your-github-user"
+cd ~/.ssh
+ssh-keygen -t rsa -b 4096 -C "your@email.com" -f "github-personal"
+ssh-add -K ~/.ssh/github-personal # `-K` argument is used only for storing the passphrase in the keychain which is optional 
+pbcopy < ~/.ssh/github-personal.pub # https://github.com/settings/keys (New SSH Key, Paste)
 ```
-## Cloning the Repository
+### GitHub CLI
+
+Run the `gh` command below, in the options choose SSH, your previously created public key, copy the generated one-time code, and paste the code in the resulting browser window to authenticate:
+```bash
+gh auth login -w -p ssh -s repo,read:org,gist,admin:public_key,admin:repo_hook && \
+gh config set pager cat # disables vim console after command execution
+```
+
+
+
+## Setting up DNS, and Generating Cloudflare & GitHub Tokens
+[Setup Cloudflare DNS Nameservers](https://www.namecheap.com/support/knowledgebase/article.aspx/9607/2210/how-to-set-up-dns-records-for-your-domain-in-a-cloudflare-account/).
+If you bought your domain with another registrar, you can point to Cloudflare's nameservers and have access to their DNS services and API.
+
+(ExternalDNS supports Route53, GKE, DigitalOcean, GoDaddy etc. This PoC is configured to work with Cloudflare DNS Service out of the box, but can be adapted to use most major services)
+
+[Create Cloudflare API Token](https://dash.cloudflare.com/profile/api-tokens) with "All accounts, All Zones" permissions and set env vars. The "Zone ID" is found in the Overview page
+```bash
+export TF_VAR_CFL_API_TOKEN="your-cloudflare-token"
+export TF_VAR_CFL_ZONE_ID="your-cloudflare-zoneid"
+```
+
+[Create GitHub Personal Access Token](https://github.com/settings/tokens/). Click on "Generate new token (Classic)", tick "repo" permissions, and save. Set env vars,
 
 ```bash
-git clone https://github.com/tbalza/kubernetes-cicd-zt.git
+export TF_VAR_ARGOCD_GITHUB_TOKEN="you-github-token" # token and login password are two different things
+export TF_VAR_ARGOCD_GITHUB_USER="your-github-user"
+```
+Optionally you can rename/edit `/terraform/01-eks-cluster/sample-dot-tfvars` to avoid having to set ENV vars on each terminal session (credentials won't be committed due to .gitignore)
+
+## Creating GitHub Repo and Webhooks
+
+Create repo:
+```bash
+gh repo create kubernetes-cicd-zt.git --public
+```
+
+To create 2 [webhooks](https://docs.github.com/en/webhooks/using-webhooks/creating-webhooks) you can define your domain,
+```bash
+export KCICD_DOMAIN="yourdomain.com"
+```
+and execute this whole command in terminal:
+
+```bash
+export KCICD_USER="$(git config --global user.name)" && \
+echo '{
+  "name": "web",
+  "active": true,
+  "events": ["push"],
+  "config": {
+    "url": "https://jenkins.'"$KCICD_DOMAIN"'/github-webhook/",
+    "content_type": "json"
+  }
+}' | gh api /repos/"$KCICD_USER"/kubernetes-cicd-zt/hooks --input - && \
+echo '{
+  "name": "web",
+  "active": true,
+  "events": ["push"],
+  "config": {
+    "url": "https://argocd.'"$KCICD_DOMAIN"'/api/webhook/",
+    "content_type": "json"
+  }
+}' | gh api /repos/"$KCICD_USER"/kubernetes-cicd-zt/hooks --input -
+```
+
+## Configuring Cluster Settings
+
+### Cloning the Repository
+```bash
+git clone https://github.com/tbalza/kubernetes-cicd-zt.git && \
 cd kubernetes-cicd-zt && export KCICD_HOME=$(pwd) # set project's home directory
 ```
 
-## Creating GitHub Webhooks
-
-In your cloned GH repo settings create 2 [webhooks](https://docs.github.com/en/webhooks/using-webhooks/creating-webhooks):
-
-Via the UI console create entries with the `application/json` content-type,
-
-`https://jenkins.<your-domain.com>/github-webhook/`
-
-`https://argocd.<your-domain.com>/api/webhook`
-
-The rest of the settings are left default.
-
-## Configuring Cluster Settings
-Edit your domain and repo URL in Terraform, the rest can be left unchanged:
-```bash
-open /terraform/01-eks-cluster/set_up_eks_cluster.tf 
-```
+### Terraform
+Edit your domain and repo URL in `/terraform/01-eks-cluster/env-.auto.tfvars`, the rest can be left unchanged:
 ```hcl
-locals {
-  name            = "django-production" # cluster name
-  region          = "us-east-1"
-  domain          = "<your-domain>.com"
-  repo_url        = "https://github.com/<your-user>/kubernetes-cicd-zt.git"
+TF_DOMAIN      = "yourdomain.com"
+TF_REPO_URL    = "https://github.com/youruser/kubernetes-cicd-zt.git"
 ```
-Edit the repoURL value in ArgoCD's 'ApplicationSet':
-```bash
-open /argo-apps/argocd/applicationset.yaml 
-```
+
+Edit the repoURL value in ArgoCD's 'ApplicationSet' `/argo-apps/argocd/applicationset.yaml`:
 ```yaml
 spec: # add sed/yq command
   generators:
     - git:
         repoURL: https://github.com/<your-user>/kubernetes-cicd-zt.git
 ```
-And finally commit and push saved changes
+
+## Push Configuration Changes
+Commit changes, create repo, and push changes:
 ```bash
-git add .
-git commit -m "configuration complete"
+git add . && \
+git commit -m "configuration complete" && \
+git remote add origin git@github.com:"$KCICD_USER"/kubernetes-cicd-zt.git && \
 git push origin main
 ```
 
@@ -116,13 +167,14 @@ git push origin main
 
 Before you apply changes the first time, you need to initialize TF working directories, download plugins and modules and set up backend for storing your infrastructure's state usig the `init` command:
 ```bash
-terraform -chdir="$KCICD_HOME/terraform/01-eks-cluster/" init
+terraform -chdir="$KCICD_HOME/terraform/01-eks-cluster/" init && \
 terraform -chdir="$KCICD_HOME/terraform/02-argocd/" init
 ```
 
 Provision and deploy all apps with single compound `apply` command:
 ```bash
-terraform -chdir="$KCICD_HOME/terraform/01-eks-cluster/" apply -auto-approve && terraform terraform -chdir="$KCICD_HOME/terraform/02-argocd/" apply -auto-approve
+terraform -chdir="$KCICD_HOME/terraform/01-eks-cluster/" apply -auto-approve && \
+terraform -chdir="$KCICD_HOME/terraform/02-argocd/" apply -auto-approve
 ```
 
 > `terraform/01-eks-cluser` Provisions infrastructure, and core addons that don't change often. While `terraform/02-argocd` Bootstraps ArgoCD via helm, which will in turn deploy the rest of the apps. Separating these stages into two TF state files reduces future maintenance issues

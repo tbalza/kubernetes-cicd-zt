@@ -3,14 +3,14 @@
 # aws kubernetes v1.29
 
 locals {
-  name     = "django-production" # cluster name
-  region   = "us-east-1"
-  domain   = "tbalza.net"
-  repo_url = "https://github.com/tbalza/kubernetes-cicd-zt.git"
+  name     = "django-${var.TF_ENVIRONMENT}" # cluster name
+  region   = var.TF_REGION
+  domain   = var.TF_DOMAIN
+  repo_url = var.TF_REPO_URL
 
-  cluster_version = "1.29" # 1.29
-  vpc_cidr = "10.0.0.0/16" # ~65k IPs
-  azs      = slice(data.aws_availability_zones.available.names, 0, 3)
+  cluster_version = "1.29"        # 1.29
+  vpc_cidr        = "10.0.0.0/16" # ~65k IPs
+  azs             = slice(data.aws_availability_zones.available.names, 0, 3)
 
   rds_user   = "django"   # django rds
   rds_dbname = "postgres" # django rds
@@ -223,6 +223,24 @@ locals {
   tags = {
     Example = local.name
   }
+}
+
+## Import non-sensitive environment variables as TF variable
+variable "TF_ENVIRONMENT" {
+  description = "Environment"
+  type        = string
+}
+variable "TF_DOMAIN" {
+  description = "Cluster domain name"
+  type        = string
+}
+variable "TF_REPO_URL" {
+  description = "Cluster repo"
+  type        = string
+}
+variable "TF_REGION" {
+  description = "Cluster region"
+  type        = string
 }
 
 ## ArgoCD ImageUpdater Github App Token

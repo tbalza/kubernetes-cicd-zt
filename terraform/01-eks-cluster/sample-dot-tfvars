@@ -1,0 +1,8 @@
+# Rename to `terraform.tfvars` to avoid having to set ENV on each terminal session
+# Files that don't begin `env-*.tfvars` (such as terraform.tfvars) will NOT be committed to repo as configured in .gitignore
+# Here variables are not prefixed with `TF_VAR_` as they would be with `export`
+
+CFL_API_TOKEN       = "1111111111111111111111111111111111111111"
+CFL_ZONE_ID         = "11111111111111111111111111111111"
+ARGOCD_GITHUB_TOKEN = "1111111111111111111111111111111111111111"
+ARGOCD_GITHUB_USER  = "111111"
