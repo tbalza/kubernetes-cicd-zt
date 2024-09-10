@@ -145,7 +145,7 @@ terraform -chdir="/terraform/01-eks-cluster/" apply -auto-approve && \
 terraform -chdir="/terraform/02-argocd/" apply -auto-approve
 ```
 
-> `terraform/01-eks-cluser` Provisions infrastructure, and core addons that don't change often. While `terraform/02-argocd` Bootstraps ArgoCD via helm, which will in turn deploy the rest of the apps.
+> `terraform/01-eks-cluser` Provisions infrastructure, and deploys core addons that don't change often. While `terraform/02-argocd` Bootstraps ArgoCD, which will in turn deploy the rest of the apps.
 
 ## Removing Resources
 
