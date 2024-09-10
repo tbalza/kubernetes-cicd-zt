@@ -146,7 +146,7 @@ Edit your domain and repo URL in `/terraform/01-eks-cluster/env-.auto.tfvars`, t
 TF_DOMAIN      = "yourdomain.com"
 TF_REPO_URL    = "https://github.com/youruser/kubernetes-cicd-zt.git"
 ```
-
+### ArgoCD
 Edit the repoURL value in ArgoCD's 'ApplicationSet' `/argo-apps/argocd/applicationset.yaml`:
 ```yaml
 spec: # add sed/yq command
@@ -166,7 +166,14 @@ git push origin main
 
 ## Provisioning the Cluster
 
-Before you apply changes the first time, you need to initialize TF working directories, download plugins and modules and set up backend for storing your infrastructure's state usig the `init` command:
+```bash
+# TF Directory Structure
+└── terraform
+    ├── 01-eks-cluster              # Terraform Infra Provisioning Stage
+    └── 02-argocd                   # Terraform ArgoCD Boostrap Stage
+```
+
+Before you apply changes the first time, you need to initialize TF working directories, which downloads plugins, modules and sets up the backend for storing your infrastructure's state by using the `init` command:
 ```bash
 terraform -chdir="/terraform/01-eks-cluster/" init && \
 terraform -chdir="/terraform/02-argocd/" init
@@ -207,7 +214,8 @@ The dynamically generated passwords to access each service will be available via
 After you're done, you can run this command to delete all resources.
 
 ```bash
-terraform -chdir="/terraform/02-argocd/" destroy ; terraform -chdir="/terraform/01-eks-cluster/" destroy
+terraform -chdir="/terraform/02-argocd/" destroy ; \
+terraform -chdir="/terraform/01-eks-cluster/" destroy
 ```
 
 ## Roadmap
