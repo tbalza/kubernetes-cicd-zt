@@ -200,9 +200,7 @@ After around ~10 minutes you'll be able to access all of the app console UIs via
 - kibana.yourdomain.com
 - grafana.yourdomain.com
 
-The dynamically generated secrets to access each service will be available via the SSM Parameter Store console in AWS. 
-
-From then on, any changes made in `/django-todo` will trigger Jenkins to build and push a new Docker image to ECR. This new image will be detected by ArgoCD Image Updater, which will update the tag in `/django-todo/kustomization.yaml` and trigger ArgoCD to deploy the new Django update. Static code analysis, metrics, and logs will be accessible in SonarQube, Grafana and Kibana respectively.
+The dynamically generated secrets to access each service will be available via the SSM Parameter Store console in AWS.
 
 ## Remove Resources
 
