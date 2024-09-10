@@ -2,7 +2,7 @@
 
 <img src="diagram.png" alt="Your image description" width="852"/>
 
-A Proof of Concept (PoC) that provisions a fully operational EKS cluster using terraform, and deploys a sample full-stack Django application along with an interconnected CI/CD pipeline made of ArgoCD, Jenkins, Prometheus, Grafana, Elasticsearch, Fluentbit, and Kibana.
+A Proof of Concept (PoC) that provisions an EKS cluster using terraform, and deploys a sample full-stack Django application with a working CI/CD pipeline.
 
 A full breakdown can be found at my [blogpost](https://tbalza.net/zero-touch-provisioning-deployment-of-kubernetes-ci/cd-pipeline/)
 
@@ -28,12 +28,12 @@ A full breakdown can be found at my [blogpost](https://tbalza.net/zero-touch-pro
 
 Install the necessary CLI tools using [Homebrew](https://docs.brew.sh/Installation) (Mac):
 ```bash
-brew install git # git
+brew install git
 brew install gh # github cli
 brew install brew tap hashicorp/tap && brew install hashicorp/tap/terraform # terraform
-brew install awscli # aws-cli
-brew install helm # helm
-brew install kubectl # kubectl
+brew install awscli
+brew install helm
+brew install kubectl
 ```
 ### AWS CLI
 Configure the [AWS CLI tool](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) with your admin IAM User's `aws_access_key_id` and `aws_secret_access_key`
