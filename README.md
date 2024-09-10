@@ -57,18 +57,11 @@ If you bought your domain with another registrar, you can point to Cloudflare's 
 (ExternalDNS supports Route53, GKE, DigitalOcean, GoDaddy etc. This PoC is configured to work with Cloudflare DNS Service out of the box, but can be adapted to use most major services)
 
 [Create Cloudflare API Token](https://dash.cloudflare.com/profile/api-tokens) with "All accounts, All Zones" permissions and set env vars. The "Zone ID" is found in the Overview page
-```bash
-export TF_VAR_CFL_API_TOKEN="your-cloudflare-token"
-export TF_VAR_CFL_ZONE_ID="your-cloudflare-zoneid"
-```
 
-[Create GitHub Personal Access Token](https://github.com/settings/tokens/). Click on "Generate new token (Classic)", tick "repo" permissions, and save. Set env vars,
+[Create GitHub Personal Access Token](https://github.com/settings/tokens/). Click on "Generate new token (Classic)", tick "repo" permissions, and save
 
-```bash
-export TF_VAR_ARGOCD_GITHUB_TOKEN="you-github-token" # token and login password are two different things
-export TF_VAR_ARGOCD_GITHUB_USER="your-github-user"
-```
-Optionally you can rename/edit `/terraform/01-eks-cluster/sample-dot-tfvars` to avoid having to set ENV vars on each terminal session (credentials won't be committed due to .gitignore)
+
+Edit `/terraform/01-eks-cluster/sample-dot-tfvars` with the tokens, and rename to `terraform.vars` (credentials won't be committed due to .gitignore)
 
 ## Creating GitHub Repo and Webhooks
 
