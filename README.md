@@ -76,7 +76,7 @@ gh config set pager cat # disables vim console after command execution
 
 
 
-## Setting up DNS, and Generating Cloudflare & GitHub Tokens
+## Configuring DNS & GitHub Tokens
 [Setup Cloudflare DNS Nameservers](https://www.namecheap.com/support/knowledgebase/article.aspx/9607/2210/how-to-set-up-dns-records-for-your-domain-in-a-cloudflare-account/).
 If you bought your domain with another registrar, you can point to Cloudflare's nameservers and have access to their DNS services and API.
 
@@ -155,8 +155,8 @@ spec: # add sed/yq command
         repoURL: https://github.com/<your-user>/kubernetes-cicd-zt.git
 ```
 
-## Push Configuration Changes
-Commit changes, create repo, and push changes:
+## Pushing Configuration Changes
+Commit changes, link to your own repo, and push changes:
 ```bash
 git add . && \
 git commit -m "configuration complete" && \
@@ -189,7 +189,7 @@ This provisioning cycle takes about ~25 minutes.
 
 ### Deployment
 
-After the first stage succeeds, Terraform will automatically bootstrap ArgoCD using values generated dynamically while provisioning, where it will now "take over" and deploy a fully configured and interconnected CI/CD pipeline with Sonarqube, Jenkins, ArgoCD Image Updater, Django, ElasticSearch, Fluentbit, Kibana, Prometheus and Grafana.
+After the first stage succeeds, Terraform will automatically bootstrap ArgoCD which will then "take over" and deploy and manage a fully configured and interconnected CI/CD pipeline with Sonarqube, Jenkins, ArgoCD Image Updater, Django, ElasticSearch, Fluentbit, Kibana, Prometheus and Grafana.
 
 After around ~10 minutes you'll be able to access all of the app console UIs via their subdomain:
 
@@ -200,7 +200,9 @@ After around ~10 minutes you'll be able to access all of the app console UIs via
 - kibana.yourdomain.com
 - grafana.yourdomain.com
 
-The dynamically generated passwords to access each service will be available via the SSM Parameter Store console in AWS. 
+The dynamically generated secrets to access each service will be available via the SSM Parameter Store console in AWS. 
+
+From then on, any changes made in `/django-todo` will trigger Jenkins to build and push a new Docker image to ECR. This new image will be detected by ArgoCD Image Updater, which will update the tag in `/django-todo/kustomization.yaml` and trigger ArgoCD to deploy the new Django update. Static code analysis, metrics, and logs will be accessible in SonarQube, Grafana and Kibana respectively.
 
 ## Remove Resources
 
