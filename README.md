@@ -135,8 +135,9 @@ echo '{
 
 ### Cloning the Repository
 ```bash
+cd ~
 git clone https://github.com/tbalza/kubernetes-cicd-zt.git && \
-cd kubernetes-cicd-zt && export KCICD_HOME=$(pwd) # set project's home directory
+cd kubernetes-cicd-zt # commands and paths are relative to ~/kubernetes-cicd-zt/
 ```
 
 ### Terraform
@@ -167,14 +168,14 @@ git push origin main
 
 Before you apply changes the first time, you need to initialize TF working directories, download plugins and modules and set up backend for storing your infrastructure's state usig the `init` command:
 ```bash
-terraform -chdir="$KCICD_HOME/terraform/01-eks-cluster/" init && \
-terraform -chdir="$KCICD_HOME/terraform/02-argocd/" init
+terraform -chdir="/terraform/01-eks-cluster/" init && \
+terraform -chdir="/terraform/02-argocd/" init
 ```
 
 Provision and deploy all apps with single compound `apply` command:
 ```bash
-terraform -chdir="$KCICD_HOME/terraform/01-eks-cluster/" apply -auto-approve && \
-terraform -chdir="$KCICD_HOME/terraform/02-argocd/" apply -auto-approve
+terraform -chdir="/terraform/01-eks-cluster/" apply -auto-approve && \
+terraform -chdir="/terraform/02-argocd/" apply -auto-approve
 ```
 
 > `terraform/01-eks-cluser` Provisions infrastructure, and core addons that don't change often. While `terraform/02-argocd` Bootstraps ArgoCD via helm, which will in turn deploy the rest of the apps. Separating these stages into two TF state files reduces future maintenance issues
@@ -206,7 +207,7 @@ The dynamically generated passwords to access each service will be available via
 After you're done, you can run this command to delete all resources.
 
 ```bash
-terraform -chdir="$KCICD_HOME/terraform/02-argocd/" destroy ; terraform -chdir="$KCICD_HOME/terraform/01-eks-cluster/" destroy
+terraform -chdir="/terraform/02-argocd/" destroy ; terraform -chdir="/terraform/01-eks-cluster/" destroy
 ```
 
 ## Roadmap
