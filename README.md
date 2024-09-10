@@ -103,7 +103,7 @@ Create repo:
 gh repo create kubernetes-cicd-zt.git --public
 ```
 
-To create 2 [webhooks](https://docs.github.com/en/webhooks/using-webhooks/creating-webhooks) you can define your domain,
+To create 2 [webhooks](https://docs.github.com/en/webhooks/using-webhooks/creating-webhooks). You can define your domain first with,
 ```bash
 export KCICD_DOMAIN="yourdomain.com"
 ```
