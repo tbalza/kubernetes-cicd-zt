@@ -166,13 +166,6 @@ git push origin main
 
 ## Provisioning the Cluster
 
-```bash
-# TF Directory Structure
-└── terraform
-    ├── 01-eks-cluster              # Terraform Infra Provisioning Stage
-    └── 02-argocd                   # Terraform ArgoCD Boostrap Stage
-```
-
 Before you apply changes the first time, you need to initialize TF working directories, which downloads plugins, modules and sets up the backend for storing your infrastructure's state by using the `init` command:
 ```bash
 terraform -chdir="/terraform/01-eks-cluster/" init && \
