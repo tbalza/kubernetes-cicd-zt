@@ -102,7 +102,7 @@ echo '{
 
 ### Cloning the Repository
 ```bash
-cd ~
+cd ~ && \
 git clone https://github.com/tbalza/kubernetes-cicd-zt.git && \
 cd kubernetes-cicd-zt # commands and paths are relative to ~/kubernetes-cicd-zt/
 ```
