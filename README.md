@@ -25,11 +25,8 @@ A full breakdown can be found at my [blogpost](https://tbalza.net/zero-touch-pro
 ```
 
 ## Requirements
-With [Homebrew](https://docs.brew.sh/Installation) (Mac):
-```bash
-/bin/bash -c “$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-```
-Install the necessary CLI tools,
+
+Install the necessary CLI tools using [Homebrew](https://docs.brew.sh/Installation) (Mac):
 ```bash
 brew install git # git
 brew install gh # github cli
@@ -39,29 +36,12 @@ brew install helm # helm
 brew install kubectl # kubectl
 ```
 ### AWS CLI
-Configure the [AWS CLI tool](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) with your user. Optionally create an [Isolated Testing Account](https://docs.aws.amazon.com/organizations/latest/userguide/orgs_tutorials_basic.html) for more granular access control and budget limits.
-
-This assumes you have the credentials that contain your `aws_access_key_id` and your `aws_secret_access_key` for your IAM User with required permissions.
+Configure the [AWS CLI tool](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) with your admin IAM User's `aws_access_key_id` and `aws_secret_access_key`
 
 ```bash
 aws configure
 ```
 
-### Git
-Configure git cli username and email of your existing [GitHub account](https://github.com/login):
-```bash
-git config --global user.name "your-username"
-git config --global user.email "your@email.com"
-```
-
-Create SSH key pair, and paste public key in https://github.com/settings/keys (Click 'New SSH Key', Paste and save):
-
-```bash
-cd ~/.ssh
-ssh-keygen -t rsa -b 4096 -C "your@email.com" -f "github-personal"
-ssh-add -K ~/.ssh/github-personal # `-K` argument is used only for storing the passphrase in the keychain which is optional 
-pbcopy < ~/.ssh/github-personal.pub # https://github.com/settings/keys (New SSH Key, Paste)
-```
 ### GitHub CLI
 
 Run the `gh` command below, in the options choose SSH, your previously created public key, copy the generated one-time code, and paste the code in the resulting browser window to authenticate:
@@ -69,8 +49,6 @@ Run the `gh` command below, in the options choose SSH, your previously created p
 gh auth login -w -p ssh -s repo,read:org,gist,admin:public_key,admin:repo_hook && \
 gh config set pager cat # disables vim console after command execution
 ```
-
-
 
 ## Configuring DNS & GitHub Tokens
 [Setup Cloudflare DNS Nameservers](https://www.namecheap.com/support/knowledgebase/article.aspx/9607/2210/how-to-set-up-dns-records-for-your-domain-in-a-cloudflare-account/).
@@ -152,7 +130,7 @@ spec: # add sed/yq command
 ```
 
 ## Pushing Configuration Changes
-Commit changes, link to your own repo, and push changes:
+Commit changes, link project directory to your own repo, and push changes:
 ```bash
 git add . && \
 git commit -m "configuration complete" && \
@@ -162,7 +140,7 @@ git push origin main
 
 ## Provisioning the Cluster
 
-Before you apply changes the first time, you need to initialize TF working directories, which downloads plugins, modules and sets up the backend for storing your infrastructure's state by using the `init` command:
+Initialize TF working directories to downloads plugins, modules and set up the state backend:
 ```bash
 terraform -chdir="/terraform/01-eks-cluster/" init && \
 terraform -chdir="/terraform/02-argocd/" init
@@ -174,11 +152,11 @@ terraform -chdir="/terraform/01-eks-cluster/" apply -auto-approve && \
 terraform -chdir="/terraform/02-argocd/" apply -auto-approve
 ```
 
-> `terraform/01-eks-cluser` Provisions infrastructure, and core addons that don't change often. While `terraform/02-argocd` Bootstraps ArgoCD via helm, which will in turn deploy the rest of the apps. Separating these stages into two TF state files reduces future maintenance issues
+> `terraform/01-eks-cluser` Provisions infrastructure, and core addons that don't change often. While `terraform/02-argocd` Bootstraps ArgoCD via helm, which will in turn deploy the rest of the apps.
 
 ## Remove Resources
 
-After you're done, you can run this command to delete all resources.
+Creating AWS resources will incur costs. After you're done, you can run this command to delete everything:
 
 ```bash
 terraform -chdir="/terraform/02-argocd/" destroy ; \
