@@ -180,28 +180,6 @@ terraform -chdir="/terraform/02-argocd/" apply -auto-approve
 
 > `terraform/01-eks-cluser` Provisions infrastructure, and core addons that don't change often. While `terraform/02-argocd` Bootstraps ArgoCD via helm, which will in turn deploy the rest of the apps. Separating these stages into two TF state files reduces future maintenance issues
 
-## Final Results
-
-### Provisioning
-After executing `terraform apply -auto-approve`, the provisioning stage will set up the EKS cluster with Node Groups, Access Entries, along with its core addons (CoreDNS, Kube-Proxy, VPC-CNI, EBS CSI Driver, AWS Load Balancer Controller, ExternalDNS, External Secrets Operator) and resources like IAM Policies/Roles/Security Groups, ACM, VPC, RDS, SSM, Application Load Balancer, and ECR.
-
-This provisioning cycle takes about ~25 minutes.
-
-### Deployment
-
-After the first stage succeeds, Terraform will automatically bootstrap ArgoCD which will then "take over" and deploy and manage a fully configured and interconnected CI/CD pipeline with Sonarqube, Jenkins, ArgoCD Image Updater, Django, ElasticSearch, Fluentbit, Kibana, Prometheus and Grafana.
-
-After around ~10 minutes you'll be able to access all of the app console UIs via their subdomain:
-
-- django.yourdomain.com
-- argocd.yourdomain.com
-- sonarqube.yourdomain.com
-- jenkins.yourdomain.com
-- kibana.yourdomain.com
-- grafana.yourdomain.com
-
-The dynamically generated secrets to access each service will be available via the SSM Parameter Store console in AWS.
-
 ## Remove Resources
 
 After you're done, you can run this command to delete all resources.
