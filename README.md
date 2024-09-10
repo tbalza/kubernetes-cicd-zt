@@ -215,7 +215,7 @@ terraform -chdir="/terraform/01-eks-cluster/" destroy
 
 ## Roadmap
 Future enhancements include:
-
+- **GitHub Actions**: Automate initial project setup (not just Provisioning and Deployment)
 - **Security:** Scope Access Entries, IAM Policies/Roles/Security Groups, SSM, to follow the principle of least privilege. Non-root Django container
 - **CI:** Code linting. CI tests. ECR Docker Caching
 - **Multi Environment Setup:** Implement TF workspaces with .tfvars to enable Dev, Staging, QA, Prod, environments. Implement remote state management
