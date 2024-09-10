@@ -146,7 +146,7 @@ terraform -chdir="/terraform/01-eks-cluster/" init && \
 terraform -chdir="/terraform/02-argocd/" init
 ```
 
-Provision and deploy all apps with single compound `apply` command:
+Provision infra and trigger deployment:
 ```bash
 terraform -chdir="/terraform/01-eks-cluster/" apply -auto-approve && \
 terraform -chdir="/terraform/02-argocd/" apply -auto-approve
