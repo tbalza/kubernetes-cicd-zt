@@ -202,8 +202,6 @@ After around ~10 minutes you'll be able to access all of the app console UIs via
 
 The dynamically generated secrets to access each service will be available via the SSM Parameter Store console in AWS.
 
-Any changes in `/django-todo` will automatically trigger the CI/CD pipeline.
-
 ## Remove Resources
 
 After you're done, you can run this command to delete all resources.
