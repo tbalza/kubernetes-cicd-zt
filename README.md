@@ -4,8 +4,6 @@
 
 A Proof of Concept (PoC) that provisions a fully operational EKS cluster using terraform, and deploys a sample full-stack Django application along with an interconnected CI/CD pipeline made of ArgoCD, Jenkins, Prometheus, Grafana, Elasticsearch, Fluentbit, and Kibana.
 
-All with dynamic configuration values, CNAME entries, secure credentials, and requires no manual intervention after issuing a `terraform apply` command only once.
-
 A full breakdown can be found at my [blogpost](https://tbalza.net/zero-touch-provisioning-deployment-of-kubernetes-ci/cd-pipeline/)
 
 > **Warning**: Creating resources in AWS will incur costs. Remember to use the `terraform destroy` command at the end to remove all resources after you're finished.
