@@ -88,8 +88,6 @@ Setting Git Global User
 git config --global user.name "<your-username-main>"
 git config --global user.email "email-id-main@gmail.com"
 ```
-(Anybody have the skills to send a PR to https://github.com/git/git to streamline this common use case?)
-
 
 ### AWS CLI
 Configure the [AWS CLI tool](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) with your admin IAM User's `aws_access_key_id` and `aws_secret_access_key`
