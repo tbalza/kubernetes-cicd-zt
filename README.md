@@ -120,6 +120,10 @@ spec: # add sed/yq command
   generators:
     - git:
         repoURL: https://github.com/<your-user>/kubernetes-cicd-zt.git
+  template:
+    spec:
+      source:
+        repoURL: https://github.com/<your-user>/kubernetes-cicd-zt.git
 ```
 
 ## Pushing Configuration Changes

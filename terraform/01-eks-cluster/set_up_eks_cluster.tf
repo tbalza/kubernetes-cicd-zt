@@ -341,10 +341,7 @@ module "ssm-parameter" {
 
   depends_on = [
     module.eks,
-    #    module.db, # check dependency loop
-    #    module.ecr,
   ]
-
 }
 
 ################################################################################
