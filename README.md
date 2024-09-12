@@ -35,6 +35,62 @@ brew install awscli
 brew install helm
 brew install kubectl
 ```
+
+### Git
+> This step can be ignored if you already have Git set up
+
+Generate SSH keys (Mac)
+```bash
+# Main
+ssh-keygen -t rsa -b 4096 -C "email-id-main@gmail.com" -f ~/.ssh/github-personal
+ssh-add -K ~/.ssh/github-personal
+pbcopy < ~/.ssh/github-personal.pub # https://github.com/settings/keys (New SSH Key, Paste)
+
+# Collab
+ssh-keygen -t rsa -b 4096 -C "email-id-collab@gmail.com" -f ~/.ssh/github-personal-collab
+ssh-add -K ~/.ssh/github-personal-collab
+pbcopy < ~/.ssh/github-personal-collab.pub # https://github.com/settings/keys (New SSH Key, Paste)
+```
+GitHub Repo Origin Configuration
+```bash
+## Main Account
+# New Repo
+git remote add origin git@github.com:<your-username-main>/kubernetes-cicd-zt.git
+# Existing Repo
+git remote set-url origin git@github.com:<your-username>/kubernetes-cicd-zt.git
+
+## Collab Account
+# New Repo
+git remote add origin git@github-collab.com:<your-username-collab>/kubernetes-cicd-zt.git
+# Existing Repo
+git remote set-url origin git@github.com-collab:<your-username-collab>/kubernetes-cicd-zt.git
+```
+Managing Multiple Accounts
+```bash
+mkdir -p ~/.ssh && cat << EOF > ~/.ssh/config
+# Default account `git@github.com`
+Host github.com
+     HostName github.com
+     User git
+     IdentityFile ~/.ssh/github-personal
+     IdentitiesOnly yes
+
+# Alternate personat account `git@github.com-collab`
+Host github.com-collab
+     HostName github.com
+     User git
+     IdentityFile ~/.ssh/github-personal-collab
+     IdentitiesOnly yes
+EOF
+```
+Setting Git Global User
+```bash
+git config --global user.name "<your-username-main>"
+git config --global user.email "email-id-main@gmail.com"
+```
+(Anybody have the skills to send a PR to https://github.com/git/git to streamline this common use case?)
+
+
 ### AWS CLI
 Configure the [AWS CLI tool](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) with your admin IAM User's `aws_access_key_id` and `aws_secret_access_key`
 
