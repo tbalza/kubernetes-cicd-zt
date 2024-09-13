@@ -155,7 +155,7 @@ Follow the links bellow to create the tokens to update `terraform.tfvars` with:
   - All accounts - Access: Mutual TLS Certificates:Edit, Account Settings:Edit
   -  All zones - Zone Settings:Edit, Zone:Edit, SSL and Certificates:Edit, DNS:Edit
 
-- [Create GitHub Personal Access Token](https://github.com/settings/tokens/). Click on "Generate new token (Classic)", tick "repo" permissions, and save.
+- [Create GitHub Personal Access Token](https://github.com/settings/tokens/) Click on "Generate new token (Classic)", tick "repo" permissions, and save.
 
 ### Terraform
 Edit your domain and repo URL in `/terraform/01-eks-cluster/env-.auto.tfvars`, the rest can be left unchanged:
@@ -253,7 +253,7 @@ DEBUG="True"
 STATIC_ROOT=/static
 DOMAIN="*" # allowed hosts
 ```
-Use `docker-compose.yaml` to mimic the deployment setup with RDS locally:
+Use [docker-compose](https://docs.docker.com/desktop/install/mac-install/) to mimic the deployment setup with RDS locally:
 ```bash
 cd ~/kubernetes-cicd-zt/django-todo && \
 docker-compose up
