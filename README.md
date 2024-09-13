@@ -54,7 +54,7 @@ brew install kubectl
   ```
 - Managing Multiple Accounts
   ```bash
-  mkdir -p ~/.ssh && cat << EOF > ~/.ssh/config
+  mkdir -p ~/.ssh && cat << 'EOF' > ~/.ssh/config
   # Default account `git@github.com` # current GH user: tbalza-collab
   Host github.com
        HostName github.com
@@ -141,7 +141,7 @@ cd kubernetes-cicd-zt # commands and paths are relative to ~/kubernetes-cicd-zt/
 Create a `terraform.tfvars` template (Credentials won't be committed due to .gitignore)
 
   ```bash
-  cat << EOF > /terraform/01-eks-cluster/terraform.tfvars
+  cat << 'EOF' > /terraform/01-eks-cluster/terraform.tfvars
   CFL_API_TOKEN       = ""
   CFL_ZONE_ID         = ""
   ARGOCD_GITHUB_TOKEN = ""
@@ -249,7 +249,7 @@ terraform -chdir="/terraform/01-eks-cluster/" destroy
 
 Create `.env` file with the following variables:
 ```bash
-cat << EOF > ~/kubernetes-cicd-zt/django-todo/.env
+cat << 'EOF' > ~/kubernetes-cicd-zt/django-todo/.env
 DB_NAME=dbname
 DB_USERNAME=user
 DB_PASSWORD=password
