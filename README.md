@@ -141,7 +141,7 @@ cd kubernetes-cicd-zt # commands and paths are relative to ~/kubernetes-cicd-zt/
 Create a `terraform.tfvars` template (Credentials won't be committed due to .gitignore)
 
   ```bash
-  cat << 'EOF' > /terraform/01-eks-cluster/terraform.tfvars
+  cat << 'EOF' > terraform/01-eks-cluster/terraform.tfvars
   CFL_API_TOKEN       = ""
   CFL_ZONE_ID         = ""
   ARGOCD_GITHUB_TOKEN = ""
