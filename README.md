@@ -185,6 +185,7 @@ git commit -m "configuration complete" && \
 git remote add origin git@github.com:"$KCICD_USER"/kubernetes-cicd-zt.git && \
 git push origin main
 # git remote set-url origin git@github.com-collab:<username>/kubernetes-cicd-zt.git # to edit
+# git remote -v # to check
 ```
 
 ## Provisioning the Cluster
