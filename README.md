@@ -151,7 +151,7 @@ Create a `terraform.tfvars` template (Credentials won't be committed due to .git
 
 Follow the links bellow to create the tokens to update `terraform.tfvars` with:
 
-- [Create Cloudflare API Token](https://dash.cloudflare.com/profile/api-tokens) The "Zone ID" and "Create your API token" are found scrolling down in the Overview page.
+- [Create Cloudflare API Token](https://dash.cloudflare.com/profile/api-tokens) The "Zone ID" and "Create your API token" are found scrolling down in the Overview page. Create a "Custom token" with the following permissions:
   - All accounts
     - Access: Mutual TLS Certificates:Edit
     - Account Settings:Edit
