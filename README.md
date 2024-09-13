@@ -161,7 +161,7 @@ Follow the links bellow to create the tokens to update `terraform.tfvars` with:
     - SSL and Certificates:Edit
     - DNS:Edit
 
-- [Create GitHub Personal Access Token](https://github.com/settings/tokens/) Click on "Generate new token (Classic)", tick "repo" permissions, and save.
+- [Create GitHub Personal Access Token](https://github.com/settings/tokens/) Click on "Generate new token (Classic)", tick "repo" permissions, and "Generate token" at the bottom.
 
 ### Terraform
 Edit your domain and repo URL in `/terraform/01-eks-cluster/env-.auto.tfvars`, the rest can be left unchanged:
