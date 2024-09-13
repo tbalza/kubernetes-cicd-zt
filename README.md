@@ -151,9 +151,11 @@ Create a `terraform.tfvars` template (Credentials won't be committed due to .git
 
 Follow the links bellow to create the tokens to update `terraform.tfvars` with:
 
-- [Create Cloudflare API Token](https://dash.cloudflare.com/profile/api-tokens) The "Zone ID" is found in the Overview page. Create token with "All accounts, All Zones" permissions.
+- [Create Cloudflare API Token](https://dash.cloudflare.com/profile/api-tokens) The "Zone ID" and "Create your API token" are found scrolling down in the Overview page.
+  - All accounts - Access: Mutual TLS Certificates:Edit, Account Settings:Edit
+  -  All zones - Zone Settings:Edit, Zone:Edit, SSL and Certificates:Edit, DNS:Edit
 
-- [Create GitHub Personal Access Token](https://github.com/settings/tokens/). Click on "Generate new token (Classic)", tick "repo" permissions, and save
+- [Create GitHub Personal Access Token](https://github.com/settings/tokens/). Click on "Generate new token (Classic)", tick "repo" permissions, and save.
 
 ### Terraform
 Edit your domain and repo URL in `/terraform/01-eks-cluster/env-.auto.tfvars`, the rest can be left unchanged:
