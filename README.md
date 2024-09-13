@@ -164,7 +164,7 @@ Follow the links bellow to create the tokens to update `terraform.tfvars` with:
 - [Create GitHub Personal Access Token](https://github.com/settings/tokens/) Click on "Generate new token (Classic)", tick "repo" permissions, and "Generate token" at the bottom.
 
 ### Terraform
-Edit your domain and repo URL in `/terraform/01-eks-cluster/env-.auto.tfvars`, the rest can be left unchanged:
+Edit your domain and repo URL in `terraform/01-eks-cluster/env-.auto.tfvars`, the rest can be left unchanged:
 ```hcl
 TF_DOMAIN      = "yourdomain.com"
 TF_REPO_URL    = "https://github.com/youruser/kubernetes-cicd-zt.git"
@@ -198,14 +198,14 @@ git push origin main
 
 Initialize TF working directories to downloads plugins, modules and set up the state backend:
 ```bash
-terraform -chdir="/terraform/01-eks-cluster/" init && \
-terraform -chdir="/terraform/02-argocd/" init
+terraform -chdir="terraform/01-eks-cluster/" init && \
+terraform -chdir="terraform/02-argocd/" init
 ```
 
 Provision infra and trigger deployment:
 ```bash
-terraform -chdir="/terraform/01-eks-cluster/" apply -auto-approve && \
-terraform -chdir="/terraform/02-argocd/" apply -auto-approve
+terraform -chdir="terraform/01-eks-cluster/" apply -auto-approve && \
+terraform -chdir="terraform/02-argocd/" apply -auto-approve
 ```
 
 - Useful Commands During Deployment
@@ -241,8 +241,8 @@ terraform -chdir="/terraform/02-argocd/" apply -auto-approve
 Creating AWS resources will incur costs. After you're done, you can run this command to delete everything:
 
 ```bash
-terraform -chdir="/terraform/02-argocd/" destroy ; \
-terraform -chdir="/terraform/01-eks-cluster/" destroy
+terraform -chdir="terraform/02-argocd/" destroy ; \
+terraform -chdir="terraform/01-eks-cluster/" destroy
 ```
 
 ## Local Django Development
