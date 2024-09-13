@@ -259,6 +259,7 @@ SECRET_KEY="your_secret_key_here"
 DEBUG="True"
 STATIC_ROOT=/static
 DOMAIN="*" # allowed hosts
+EOF
 ```
 Use [docker-compose](https://docs.docker.com/desktop/install/mac-install/) to mimic the deployment setup with RDS locally:
 ```bash
