@@ -42,53 +42,39 @@ brew install kubectl
 - Generate SSH keys (Mac)
   ```bash
   # Main
-  ssh-keygen -t rsa -b 4096 -C "email-id-main@gmail.com" -f ~/.ssh/github-personal
-  ssh-add -K ~/.ssh/github-personal
+  ssh-keygen -t rsa -b 4096 -C "tomas.balza@gmail.com" -f ~/.ssh/github-personal && \
+  ssh-add -K ~/.ssh/github-personal && \
   pbcopy < ~/.ssh/github-personal.pub # https://github.com/settings/keys (New SSH Key, Paste)
-  
-  # Collab
-  ssh-keygen -t rsa -b 4096 -C "email-id-collab@gmail.com" -f ~/.ssh/github-personal-collab
-  ssh-add -K ~/.ssh/github-personal-collab
-  pbcopy < ~/.ssh/github-personal-collab.pub # https://github.com/settings/keys (New SSH Key, Paste)
   ```
-- GitHub Repo Origin Configuration
   ```bash
-  ## Main Account
-  # New Repo
-  git remote add origin git@github.com:<your-username-main>/kubernetes-cicd-zt.git
-  # Existing Repo
-  git remote set-url origin git@github.com:<your-username>/kubernetes-cicd-zt.git
-  
-  ## Collab Account
-  # New Repo
-  git remote add origin git@github-collab.com:<your-username-collab>/kubernetes-cicd-zt.git
-  # Existing Repo
-  git remote set-url origin git@github.com-collab:<your-username-collab>/kubernetes-cicd-zt.git
+  # Collab
+  ssh-keygen -t rsa -b 4096 -C "tomas.balza+github.collab@gmail.com" -f ~/.ssh/github-personal-collab && \
+  ssh-add -K ~/.ssh/github-personal-collab && \
+  pbcopy < ~/.ssh/github-personal-collab.pub # https://github.com/settings/keys (New SSH Key, Paste)
   ```
 - Managing Multiple Accounts
   ```bash
   mkdir -p ~/.ssh && cat << EOF > ~/.ssh/config
-  # Default account `git@github.com`
+  # Default account `git@github.com` # current GH user: tbalza-collab
   Host github.com
        HostName github.com
        User git
-       IdentityFile ~/.ssh/github-personal
+       IdentityFile ~/.ssh/github-personal-collab
        IdentitiesOnly yes
   
-  # Alternate personat account `git@github.com-collab`
+  # Alternate account `git@github.com-collab` # current GH user: tbalza
   Host github.com-collab
        HostName github.com
        User git
-       IdentityFile ~/.ssh/github-personal-collab
+       IdentityFile ~/.ssh/github-personal
        IdentitiesOnly yes
   EOF
   ```
 - Setting Git Global User
   ```bash
-  git config --global user.name "<your-username-main>"
-  git config --global user.email "email-id-main@gmail.com"
+  git config --global user.name "tbalza-collab" && \
+  git config --global user.email "tomas.balza+github.collab@gmail.com"
   ```
-
 </details>
 
 ### AWS CLI
@@ -106,19 +92,6 @@ gh auth login -w -p ssh -s repo,read:org,gist,admin:public_key,admin:repo_hook &
 gh config set pager cat # disables vim console after command execution
 ```
 
-## Configuring DNS & GitHub Tokens
-[Setup Cloudflare DNS Nameservers](https://www.namecheap.com/support/knowledgebase/article.aspx/9607/2210/how-to-set-up-dns-records-for-your-domain-in-a-cloudflare-account/).
-If you bought your domain with another registrar, you can point to Cloudflare's nameservers and have access to their DNS services and API.
-
-(ExternalDNS supports Route53, GKE, DigitalOcean, GoDaddy etc. This PoC is configured to work with Cloudflare DNS Service out of the box, but can be adapted to use most major services)
-
-[Create Cloudflare API Token](https://dash.cloudflare.com/profile/api-tokens) with "All accounts, All Zones" permissions and set env vars. The "Zone ID" is found in the Overview page
-
-[Create GitHub Personal Access Token](https://github.com/settings/tokens/). Click on "Generate new token (Classic)", tick "repo" permissions, and save
-
-
-Edit `/terraform/01-eks-cluster/sample-dot-tfvars` with the tokens, and rename to `terraform.vars` (credentials won't be committed due to .gitignore)
-
 ## Creating GitHub Repo and Webhooks
 
 Create repo:
@@ -128,7 +101,7 @@ gh repo create kubernetes-cicd-zt.git --public
 
 To create 2 [webhooks](https://docs.github.com/en/webhooks/using-webhooks/creating-webhooks). You can define your domain first with,
 ```bash
-export KCICD_DOMAIN="yourdomain.com"
+export KCICD_DOMAIN="tbalza.net" # (replace with your domain)
 ```
 and execute this whole command in terminal:
 
@@ -156,12 +129,31 @@ echo '{
 
 ## Configuring Cluster Settings
 
+The following is the minimal configuration required. (All the other manifests and pipeline scripts are dynamic)
+
 ### Cloning the Repository
 ```bash
 cd ~ && \
 git clone https://github.com/tbalza/kubernetes-cicd-zt.git && \
-cd kubernetes-cicd-zt # commands and paths are relative to ~/kubernetes-cicd-zt/
+cd kubernetes-cicd-zt # commands and paths are relative to ~/kubernetes-cicd-zt/ # open # pycharm
 ```
+### Configuring DNS & GitHub Tokens
+Create a `terraform.tfvars` template (Credentials won't be committed due to .gitignore)
+
+  ```bash
+  cat << EOF > /terraform/01-eks-cluster/terraform.tfvars
+  CFL_API_TOKEN       = ""
+  CFL_ZONE_ID         = ""
+  ARGOCD_GITHUB_TOKEN = ""
+  ARGOCD_GITHUB_USER  = ""
+  EOF
+  ```
+
+Follow the links bellow to create the tokens to update `terraform.tfvars` with:
+
+- [Create Cloudflare API Token](https://dash.cloudflare.com/profile/api-tokens) The "Zone ID" is found in the Overview page. Create token with "All accounts, All Zones" permissions.
+
+- [Create GitHub Personal Access Token](https://github.com/settings/tokens/). Click on "Generate new token (Classic)", tick "repo" permissions, and save
 
 ### Terraform
 Edit your domain and repo URL in `/terraform/01-eks-cluster/env-.auto.tfvars`, the rest can be left unchanged:
@@ -190,6 +182,7 @@ git add . && \
 git commit -m "configuration complete" && \
 git remote add origin git@github.com:"$KCICD_USER"/kubernetes-cicd-zt.git && \
 git push origin main
+# git remote set-url origin git@github.com-collab:<username>/kubernetes-cicd-zt.git # to edit
 ```
 
 ## Provisioning the Cluster
@@ -206,8 +199,7 @@ terraform -chdir="/terraform/01-eks-cluster/" apply -auto-approve && \
 terraform -chdir="/terraform/02-argocd/" apply -auto-approve
 ```
 
-- Useful Commands During Provisioning/Deployment
-  List ArgoCD's pods
+- Useful Commands During Deployment
   ```bash
   # Get ArgoCD's pods
   kubectl get pods -n argocd
@@ -223,16 +215,16 @@ terraform -chdir="/terraform/02-argocd/" apply -auto-approve
   ````
 
   ```yaml 
-  # SSM Parameter Store
+  # SSM Parameter Store (Contains Generated Passwords)
   https://us-east-1.console.aws.amazon.com/systems-manager/parameters?region=us-east-1
   
   # Domains
-  argocd.tbalza.net
-  jenkins.tbalza.net
-  django.tbalza.net
-  sonarqube.tbalza.net
-  grafana.tbalza.net
-  kibana.tbalza.net
+  argocd.tbalza.net # admin
+  jenkins.tbalza.net # admin
+  django.tbalza.net # admin
+  sonarqube.tbalza.net # sonar
+  grafana.tbalza.net # admin
+  kibana.tbalza.net # admin
   ```
 
 ## Removing Resources
@@ -243,6 +235,29 @@ Creating AWS resources will incur costs. After you're done, you can run this com
 terraform -chdir="/terraform/02-argocd/" destroy ; \
 terraform -chdir="/terraform/01-eks-cluster/" destroy
 ```
+
+## Local Django Development
+
+Create `.env` file with the following variables:
+```bash
+cat << EOF > ~/kubernetes-cicd-zt/django-todo/.env
+DB_NAME=dbname
+DB_USERNAME=user
+DB_PASSWORD=password
+DB_HOST=postgres # local uses postgres in docker-compose. remote uses rds endpoint
+DB_PORT=5432
+SECRET_KEY="your_secret_key_here"
+DEBUG="True"
+STATIC_ROOT=/static
+DOMAIN="*" # allowed hosts
+```
+Use `docker-compose.yaml` to mimic the deployment setup with RDS locally:
+```bash
+cd ~/kubernetes-cicd-zt/django-todo && \
+docker-compose up
+```
+
+Browse `http://0.0.0.0:8000/` to acces the Django "to-do" app that connects to a local Postgres DB and uses Tailwind for the front-end.
 
 ## Roadmap
 Future enhancements include:
