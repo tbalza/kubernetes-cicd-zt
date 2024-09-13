@@ -184,14 +184,14 @@ spec: # add sed/yq command
 ```
 
 ## Pushing Configuration Changes
-Commit changes, link project directory to your own repo, and push changes:
+Link project directory to your own repo, commit and push changes:
 ```bash
+export KCICD_USER="$(git config --global user.name)" && \
+git remote set-url origin git@github.com:"$KCICD_USER"/kubernetes-cicd-zt.git && \
 git add . && \
 git commit -m "configuration complete" && \
-git remote add origin git@github.com:"$KCICD_USER"/kubernetes-cicd-zt.git && \
 git push origin main
-# git remote set-url origin git@github.com-collab:<username>/kubernetes-cicd-zt.git # to edit
-# git remote -v # to check
+# git remote -v # to check origin
 ```
 
 ## Provisioning the Cluster
