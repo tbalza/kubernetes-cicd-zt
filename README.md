@@ -36,8 +36,8 @@ brew install helm
 brew install kubectl
 ```
 
-### Git
-> This step can be ignored if you already have Git set up
+<details>
+<summary>### Git</summary> (This step can be ignored if you already have Git set up)
 
 Generate SSH keys (Mac)
 ```bash
@@ -88,6 +88,8 @@ Setting Git Global User
 git config --global user.name "<your-username-main>"
 git config --global user.email "email-id-main@gmail.com"
 ```
+
+</details>
 
 ### AWS CLI
 Configure the [AWS CLI tool](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) with your admin IAM User's `aws_access_key_id` and `aws_secret_access_key`
@@ -154,19 +156,19 @@ echo '{
 
 ## Configuring Cluster Settings
 
-### Cloning the Repository
-```bash
-cd ~ && \
-git clone https://github.com/tbalza/kubernetes-cicd-zt.git && \
-cd kubernetes-cicd-zt # commands and paths are relative to ~/kubernetes-cicd-zt/
-```
+- ### Cloning the Repository
+  ```bash
+  cd ~ && \
+  git clone https://github.com/tbalza/kubernetes-cicd-zt.git && \
+  cd kubernetes-cicd-zt # commands and paths are relative to ~/kubernetes-cicd-zt/
+  ```
 
-### Terraform
-Edit your domain and repo URL in `/terraform/01-eks-cluster/env-.auto.tfvars`, the rest can be left unchanged:
-```hcl
-TF_DOMAIN      = "yourdomain.com"
-TF_REPO_URL    = "https://github.com/youruser/kubernetes-cicd-zt.git"
-```
+- ### Terraform
+  Edit your domain and repo URL in `/terraform/01-eks-cluster/env-.auto.tfvars`, the rest can be left unchanged:
+  ```hcl
+  TF_DOMAIN      = "yourdomain.com"
+  TF_REPO_URL    = "https://github.com/youruser/kubernetes-cicd-zt.git"
+  ```
 ### ArgoCD
 Edit the repoURL value in ArgoCD's 'ApplicationSet' `/argo-apps/argocd/applicationset.yaml`:
 ```yaml
@@ -204,6 +206,12 @@ terraform -chdir="/terraform/02-argocd/" apply -auto-approve
 ```
 
 > `terraform/01-eks-cluser` Provisions infrastructure, and deploys core addons that don't change often. While `terraform/02-argocd` Bootstraps ArgoCD, which will in turn deploy the rest of the apps.
+
+### Useful Commands During Provisioning/Deployment
+List ArgoCD's pods
+```bash
+kubectl get pods -n argocd
+````
 
 ## Removing Resources
 
