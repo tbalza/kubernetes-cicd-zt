@@ -37,57 +37,57 @@ brew install kubectl
 ```
 
 <details>
-<summary>### Git</summary> (This step can be ignored if you already have Git set up)
+<summary><h3 style="display: inline;">Git</h3> (This step can be ignored if you already have Git set up)</summary>
 
-Generate SSH keys (Mac)
-```bash
-# Main
-ssh-keygen -t rsa -b 4096 -C "email-id-main@gmail.com" -f ~/.ssh/github-personal
-ssh-add -K ~/.ssh/github-personal
-pbcopy < ~/.ssh/github-personal.pub # https://github.com/settings/keys (New SSH Key, Paste)
-
-# Collab
-ssh-keygen -t rsa -b 4096 -C "email-id-collab@gmail.com" -f ~/.ssh/github-personal-collab
-ssh-add -K ~/.ssh/github-personal-collab
-pbcopy < ~/.ssh/github-personal-collab.pub # https://github.com/settings/keys (New SSH Key, Paste)
-```
-GitHub Repo Origin Configuration
-```bash
-## Main Account
-# New Repo
-git remote add origin git@github.com:<your-username-main>/kubernetes-cicd-zt.git
-# Existing Repo
-git remote set-url origin git@github.com:<your-username>/kubernetes-cicd-zt.git
-
-## Collab Account
-# New Repo
-git remote add origin git@github-collab.com:<your-username-collab>/kubernetes-cicd-zt.git
-# Existing Repo
-git remote set-url origin git@github.com-collab:<your-username-collab>/kubernetes-cicd-zt.git
-```
-Managing Multiple Accounts
-```bash
-mkdir -p ~/.ssh && cat << EOF > ~/.ssh/config
-# Default account `git@github.com`
-Host github.com
-     HostName github.com
-     User git
-     IdentityFile ~/.ssh/github-personal
-     IdentitiesOnly yes
-
-# Alternate personat account `git@github.com-collab`
-Host github.com-collab
-     HostName github.com
-     User git
-     IdentityFile ~/.ssh/github-personal-collab
-     IdentitiesOnly yes
-EOF
-```
-Setting Git Global User
-```bash
-git config --global user.name "<your-username-main>"
-git config --global user.email "email-id-main@gmail.com"
-```
+- Generate SSH keys (Mac)
+  ```bash
+  # Main
+  ssh-keygen -t rsa -b 4096 -C "email-id-main@gmail.com" -f ~/.ssh/github-personal
+  ssh-add -K ~/.ssh/github-personal
+  pbcopy < ~/.ssh/github-personal.pub # https://github.com/settings/keys (New SSH Key, Paste)
+  
+  # Collab
+  ssh-keygen -t rsa -b 4096 -C "email-id-collab@gmail.com" -f ~/.ssh/github-personal-collab
+  ssh-add -K ~/.ssh/github-personal-collab
+  pbcopy < ~/.ssh/github-personal-collab.pub # https://github.com/settings/keys (New SSH Key, Paste)
+  ```
+- GitHub Repo Origin Configuration
+  ```bash
+  ## Main Account
+  # New Repo
+  git remote add origin git@github.com:<your-username-main>/kubernetes-cicd-zt.git
+  # Existing Repo
+  git remote set-url origin git@github.com:<your-username>/kubernetes-cicd-zt.git
+  
+  ## Collab Account
+  # New Repo
+  git remote add origin git@github-collab.com:<your-username-collab>/kubernetes-cicd-zt.git
+  # Existing Repo
+  git remote set-url origin git@github.com-collab:<your-username-collab>/kubernetes-cicd-zt.git
+  ```
+- Managing Multiple Accounts
+  ```bash
+  mkdir -p ~/.ssh && cat << EOF > ~/.ssh/config
+  # Default account `git@github.com`
+  Host github.com
+       HostName github.com
+       User git
+       IdentityFile ~/.ssh/github-personal
+       IdentitiesOnly yes
+  
+  # Alternate personat account `git@github.com-collab`
+  Host github.com-collab
+       HostName github.com
+       User git
+       IdentityFile ~/.ssh/github-personal-collab
+       IdentitiesOnly yes
+  EOF
+  ```
+- Setting Git Global User
+  ```bash
+  git config --global user.name "<your-username-main>"
+  git config --global user.email "email-id-main@gmail.com"
+  ```
 
 </details>
 
@@ -156,19 +156,20 @@ echo '{
 
 ## Configuring Cluster Settings
 
-- ### Cloning the Repository
-  ```bash
-  cd ~ && \
-  git clone https://github.com/tbalza/kubernetes-cicd-zt.git && \
-  cd kubernetes-cicd-zt # commands and paths are relative to ~/kubernetes-cicd-zt/
-  ```
+### Cloning the Repository
+```bash
+cd ~ && \
+git clone https://github.com/tbalza/kubernetes-cicd-zt.git && \
+cd kubernetes-cicd-zt # commands and paths are relative to ~/kubernetes-cicd-zt/
+```
 
-- ### Terraform
-  Edit your domain and repo URL in `/terraform/01-eks-cluster/env-.auto.tfvars`, the rest can be left unchanged:
-  ```hcl
-  TF_DOMAIN      = "yourdomain.com"
-  TF_REPO_URL    = "https://github.com/youruser/kubernetes-cicd-zt.git"
-  ```
+### Terraform
+Edit your domain and repo URL in `/terraform/01-eks-cluster/env-.auto.tfvars`, the rest can be left unchanged:
+```hcl
+TF_DOMAIN      = "yourdomain.com"
+TF_REPO_URL    = "https://github.com/youruser/kubernetes-cicd-zt.git"
+```
+
 ### ArgoCD
 Edit the repoURL value in ArgoCD's 'ApplicationSet' `/argo-apps/argocd/applicationset.yaml`:
 ```yaml
@@ -205,13 +206,34 @@ terraform -chdir="/terraform/01-eks-cluster/" apply -auto-approve && \
 terraform -chdir="/terraform/02-argocd/" apply -auto-approve
 ```
 
-> `terraform/01-eks-cluser` Provisions infrastructure, and deploys core addons that don't change often. While `terraform/02-argocd` Bootstraps ArgoCD, which will in turn deploy the rest of the apps.
+- Useful Commands During Provisioning/Deployment
+  List ArgoCD's pods
+  ```bash
+  # Get ArgoCD's pods
+  kubectl get pods -n argocd
+  
+  # Portforward ArgoCD to https://localhost:8080
+  kubectl port-forward svc/argo-cd-argocd-server -n argocd 8080:443
+  
+  # Portforward Jenkins to http://localhost:8181
+  kubectl port-forward svc/jenkins -n jenkins 8181:8080
+  
+  # Check DNS propagation status
+  dig +short argocd.tbalza.net
+  ````
 
-### Useful Commands During Provisioning/Deployment
-List ArgoCD's pods
-```bash
-kubectl get pods -n argocd
-````
+  ```yaml 
+  # SSM Parameter Store
+  https://us-east-1.console.aws.amazon.com/systems-manager/parameters?region=us-east-1
+  
+  # Domains
+  argocd.tbalza.net
+  jenkins.tbalza.net
+  django.tbalza.net
+  sonarqube.tbalza.net
+  grafana.tbalza.net
+  kibana.tbalza.net
+  ```
 
 ## Removing Resources
 
