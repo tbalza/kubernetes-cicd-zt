@@ -93,7 +93,7 @@ brew install kubectl
   ```
   ```bash
   └── ~
-      ├── config
+      ├── .config
       │   └── git
       │       ├── github-tbalza-collab.config
       │       └── github-tbalza.config
