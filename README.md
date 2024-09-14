@@ -65,12 +65,12 @@ brew install kubectl
       editor = nano
   [credential]
       helper = osxkeychain
-  [includeIf "gitdir:~/PycharmProjects/github/tbalza/"]
-      path = ~/.config/git/github-tbalza.config
-  [includeIf "gitdir:~/PycharmProjects/github/tbalza-collab/"]
-      path = ~/.config/git/github-tbalza-collab.config
+  [includeIf "gitdir:~/PycharmProjects/github/tbalza"]
+      path = "~/.config/git/github-tbalza.config"
+  [includeIf "gitdir:~/PycharmProjects/github/tbalza-collab"]
+      path = "~/.config/git/github-tbalza-collab.config"
   EOF
-  
+
   # Create SSH config for github user `tbalza` on `~/PycharmProjects/github/tbalza/`
   mkdir -p ~/.config/git && \
   cat << 'EOF' > ~/.config/git/github-tbalza.config
@@ -125,14 +125,14 @@ Create repo:
 gh repo create kubernetes-cicd-zt.git --public
 ```
 
-To create 2 [webhooks](https://docs.github.com/en/webhooks/using-webhooks/creating-webhooks). You can define your domain first with,
+To create 2 [webhooks](https://docs.github.com/en/webhooks/using-webhooks/creating-webhooks). You can define your GH user and domain first with,
 ```bash
-export KCICD_DOMAIN="tbalza.net" # (replace with your domain)
+export KCICD_DOMAIN="tbalza.net" && \
+export KCICD_USER="tbalza-collab"
 ```
 and execute this whole command in terminal:
 
 ```bash
-export KCICD_USER="$(git config --global user.name)" && \
 echo '{
   "name": "web",
   "active": true,
@@ -159,15 +159,15 @@ The following is the minimal configuration required. (All the other manifests an
 
 ### Cloning the Repository
 ```bash
-cd ~ && \
+cd ~/PycharmProjects/github/tbalza-collab/ && \
 git clone https://github.com/tbalza/kubernetes-cicd-zt.git && \
-cd kubernetes-cicd-zt # commands and paths are relative to ~/kubernetes-cicd-zt/ # open # pycharm
+cd kubernetes-cicd-zt # commands and paths are relative to ~/PycharmProjects/github/tbalza-collab/kubernetes-cicd-zt/ # open # pycharm
 ```
 ### Configuring DNS & GitHub Tokens
 Create a `terraform.tfvars` template (Credentials won't be committed due to .gitignore)
 
   ```bash
-  cat << 'EOF' > ~/kubernetes-cicd-zt/terraform/01-eks-cluster/terraform.tfvars
+  cat << 'EOF' > ~/PycharmProjects/github/tbalza-collab/kubernetes-cicd-zt/terraform/01-eks-cluster/terraform.tfvars
   CFL_API_TOKEN       = ""
   CFL_ZONE_ID         = ""
   ARGOCD_GITHUB_TOKEN = ""
@@ -212,7 +212,6 @@ spec: # add sed/yq command
 ## Pushing Configuration Changes
 Link project directory to your own repo, commit and push changes:
 ```bash
-export KCICD_USER="$(git config --global user.name)" && \
 git remote set-url origin git@github.com:"$KCICD_USER"/kubernetes-cicd-zt.git && \
 git add . && \
 git commit -m "configuration complete" && \
