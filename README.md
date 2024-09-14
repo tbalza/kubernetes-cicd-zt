@@ -56,9 +56,10 @@ brew install kubectl
   ```bash
   # Back up original `~/.gitconfig`
   cp ~/.gitconfig ~/.gitconfig.bak && \
+  
   # Create new `.gitconfig` without a global user and that
   # points to project layout: `~/PycharmProjects/github/owner/repo`
-  rm ~/.gitconfig && \
+  rm ~/.gitconfig && \ 
   cat << 'EOF' > ~/.gitconfig
   [core]
       editor = nano
@@ -69,6 +70,7 @@ brew install kubectl
   [includeIf "gitdir:~/PycharmProjects/github/tbalza-collab/"]
       path = ~/.config/git/github-tbalza-collab.config
   EOF
+  
   # Create SSH config for github user `tbalza` on `~/PycharmProjects/github/tbalza/`
   mkdir -p ~/.config/git && \
   cat << 'EOF' > ~/.config/git/github-tbalza.config
@@ -78,6 +80,7 @@ brew install kubectl
   [core]
       sshCommand = "ssh -i ~/.ssh/github-tbalza"
   EOF
+  
   # Create SSH config for github user `tbalza-collab` on `~/PycharmProjects/github/tbalza-collab/`
   mkdir -p ~/.config/git && \
   cat << 'EOF' > ~/.config/git/github-tbalza-collab.config
