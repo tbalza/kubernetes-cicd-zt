@@ -121,7 +121,7 @@ echo '{
   "active": true,
   "events": ["push"],
   "config": {
-    "url": "https://argocd.'"$KCICD_DOMAIN"'/api/webhook/",
+    "url": "https://argocd.'"$KCICD_DOMAIN"'/api/webhook",
     "content_type": "json"
   }
 }' | gh api /repos/"$KCICD_USER"/kubernetes-cicd-zt/hooks --input -
@@ -231,9 +231,9 @@ terraform -chdir="terraform/02-argocd/" apply -auto-approve
   argocd.tbalza.net # admin
   jenkins.tbalza.net # admin
   django.tbalza.net # admin
-  sonarqube.tbalza.net # sonar
+  sonarqube.tbalza.net # admin
   grafana.tbalza.net # admin
-  kibana.tbalza.net # admin
+  kibana.tbalza.net # elastic
   ```
 
 ## Removing Resources
