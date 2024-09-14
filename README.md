@@ -241,8 +241,8 @@ terraform -chdir="terraform/02-argocd/" apply -auto-approve
 Creating AWS resources will incur costs. After you're done, you can run this command to delete everything:
 
 ```bash
-terraform -chdir="terraform/02-argocd/" destroy ; \
-terraform -chdir="terraform/01-eks-cluster/" destroy
+terraform -chdir="terraform/02-argocd/" destroy -auto-approve; \
+terraform -chdir="terraform/01-eks-cluster/" destroy -auto-approve
 ```
 
 ## Local Django Development
