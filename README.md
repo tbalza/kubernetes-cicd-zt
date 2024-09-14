@@ -37,44 +37,67 @@ brew install kubectl
 ```
 
 <details>
-<summary><h3 style="display: inline;">Git</h3> (This step can be ignored if you already have Git set up)</summary>
+<summary><h3 style="display: inline;">Multiple Git Accounts</h3> (This step can be ignored if you already have Git set up)</summary>
 
 - Generate SSH keys (Mac)
   ```bash
   # Main
-  ssh-keygen -t rsa -b 4096 -C "tomas.balza@gmail.com" -f ~/.ssh/github-personal && \
-  ssh-add -K ~/.ssh/github-personal && \
-  pbcopy < ~/.ssh/github-personal.pub # https://github.com/settings/keys (New SSH Key, Paste)
+  ssh-keygen -t rsa -b 4096 -C "tomas.balza@gmail.com" -f ~/.ssh/github-tbalza && \
+  ssh-add -K ~/.ssh/github-tbalza && \
+  pbcopy < ~/.ssh/github-tbalza.pub # https://github.com/settings/keys (New SSH Key, Paste)
   ```
   ```bash
   # Collab
-  ssh-keygen -t rsa -b 4096 -C "tomas.balza+github.collab@gmail.com" -f ~/.ssh/github-personal-collab && \
-  ssh-add -K ~/.ssh/github-personal-collab && \
-  pbcopy < ~/.ssh/github-personal-collab.pub # https://github.com/settings/keys (New SSH Key, Paste)
+  ssh-keygen -t rsa -b 4096 -C "tomas.balza+github.collab@gmail.com" -f ~/.ssh/github-tbalza-collab && \
+  ssh-add -K ~/.ssh/github-tbalza-collab && \
+  pbcopy < ~/.ssh/github-tbalza-collab.pub # https://github.com/settings/keys (New SSH Key, Paste)
   ```
 - Managing Multiple Accounts
   ```bash
-  mkdir -p ~/.ssh && cat << 'EOF' > ~/.ssh/config
-  # Default account `git@github.com` # current GH user: tbalza-collab
-  Host github.com
-       HostName github.com
-       User git
-       IdentityFile ~/.ssh/github-personal-collab
-       IdentitiesOnly yes
-  
-  # Alternate account `git@github.com-collab` # current GH user: tbalza
-  Host github.com-collab
-       HostName github.com
-       User git
-       IdentityFile ~/.ssh/github-personal
-       IdentitiesOnly yes
+  # Back up original `~/.gitconfig`
+  cp ~/.gitconfig ~/.gitconfig.bak && \
+  # Create new `.gitconfig` without a global user and that
+  # points to project layout: `~/PycharmProjects/github/owner/repo`
+  rm ~/.gitconfig && \
+  cat << 'EOF' > ~/.gitconfig
+  [core]
+      editor = nano
+  [credential]
+      helper = osxkeychain
+  [includeIf "gitdir:~/PycharmProjects/github/tbalza/"]
+      path = ~/.config/git/github-tbalza.config
+  [includeIf "gitdir:~/PycharmProjects/github/tbalza-collab/"]
+      path = ~/.config/git/github-tbalza-collab.config
+  EOF
+  # Create SSH config for github user `tbalza` on `~/PycharmProjects/github/tbalza/`
+  mkdir -p ~/.config/git && \
+  cat << 'EOF' > ~/.config/git/github-tbalza.config
+  [user]
+      name = tbalza
+      email = tomas.balza@gmail.com
+  [core]
+      sshCommand = "ssh -i ~/.ssh/github-tbalza"
+  EOF
+  # Create SSH config for github user `tbalza-collab` on `~/PycharmProjects/github/tbalza-collab/`
+  mkdir -p ~/.config/git && \
+  cat << 'EOF' > ~/.config/git/github-tbalza-collab.config
+  [user]
+      name = tbalza-collab
+      email = tomas.balza+github.collab@gmail.com
+  [core]
+      sshCommand = "ssh -i ~/.ssh/github-tbalza-collab"
   EOF
   ```
-- Setting Git Global User
   ```bash
-  git config --global user.name "tbalza-collab" && \
-  git config --global user.email "tomas.balza+github.collab@gmail.com"
+  └── ~
+      ├── config
+      │   └── git
+      │       ├── github-tbalza-collab.config
+      │       └── github-tbalza.config
+      └── .gitconfig
   ```
+  Using the `includeIf` clause and the project layout `~/PycharmProjects/github/owner/repo` Git will automatically apply the right SSH key and user details based on the directory you're working in. This makes it simpler to manage, as you won't need to manually select which account to use—just clone the repository into the designated directory. Additionally, cloning functions smoothly without any extra tweaks.
+
 </details>
 
 ### AWS CLI
