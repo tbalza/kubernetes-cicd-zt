@@ -65,10 +65,10 @@ brew install kubectl
       editor = nano
   [credential]
       helper = osxkeychain
-  [includeIf "gitdir:~/PycharmProjects/github/tbalza"]
-      path = "~/.config/git/github-tbalza.config"
-  [includeIf "gitdir:~/PycharmProjects/github/tbalza-collab"]
-      path = "~/.config/git/github-tbalza-collab.config"
+  [includeIf "gitdir:~/PycharmProjects/github/tbalza/"]
+      path = ~/.config/git/github-tbalza.config
+  [includeIf "gitdir:~/PycharmProjects/github/tbalza-collab/"]
+      path = ~/.config/git/github-tbalza-collab.config
   EOF
 
   # Create SSH config for github user `tbalza` on `~/PycharmProjects/github/tbalza/`
