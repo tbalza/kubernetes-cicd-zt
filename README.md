@@ -155,13 +155,13 @@ echo '{
 
 ## Configuring Cluster Settings
 
-The following is the minimal configuration required. (All the other manifests and pipeline scripts are dynamic)
+Here is the required minimal configuration. All other settings, like manifests and scripts, adjust dynamically.
 
 ### Cloning the Repository
 ```bash
 cd ~/PycharmProjects/github/tbalza-collab/ && \
 git clone https://github.com/tbalza/kubernetes-cicd-zt.git && \
-cd kubernetes-cicd-zt # commands and paths are relative to ~/PycharmProjects/github/tbalza-collab/kubernetes-cicd-zt/ # open # pycharm
+cd kubernetes-cicd-zt # commands and paths are relative to ~/PycharmProjects/github/tbalza-collab/kubernetes-cicd-zt/
 ```
 ### Configuring DNS & GitHub Tokens
 Create a `terraform.tfvars` template (Credentials won't be committed due to .gitignore)
@@ -212,7 +212,7 @@ spec: # add sed/yq command
 ## Pushing Configuration Changes
 Link project directory to your own repo, commit and push changes:
 ```bash
-git remote set-url origin git@github.com:"$KCICD_USER"/kubernetes-cicd-zt.git && \
+git remote set-url origin git@github.com:tbalza-collab/kubernetes-cicd-zt.git && \
 git add . && \
 git commit -m "configuration complete" && \
 git push origin main
@@ -274,7 +274,7 @@ terraform -chdir="terraform/01-eks-cluster/" destroy -auto-approve
 
 Create `.env` file with the following variables:
 ```bash
-cat << 'EOF' > ~/kubernetes-cicd-zt/django-todo/.env
+cat << 'EOF' > ~/PycharmProjects/github/tbalza-collab/kubernetes-cicd-zt/django-todo/.env
 DB_NAME=dbname
 DB_USERNAME=user
 DB_PASSWORD=password
@@ -288,11 +288,11 @@ EOF
 ```
 Use [docker-compose](https://docs.docker.com/desktop/install/mac-install/) to mimic the deployment setup with RDS locally:
 ```bash
-cd ~/kubernetes-cicd-zt/django-todo && \
+cd ~/PycharmProjects/github/tbalza-collab/kubernetes-cicd-zt/django-todo && \
 docker-compose up
 ```
 
-Browse `http://0.0.0.0:8000/` to acces the Django "to-do" app that connects to a local Postgres DB and uses Tailwind for the front-end.
+Browse `http://0.0.0.0:8000/` to access the Django "to-do" app that connects to a local Postgres DB and uses Tailwind for the front-end.
 
 ## Roadmap
 Future enhancements include:
