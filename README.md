@@ -82,7 +82,7 @@ brew install kubectl
   EOF
   
   # Create SSH config for github user `tbalza-collab` on `~/PycharmProjects/github/tbalza-collab/`
-  mkdir -p ~/.config/git \
+  mkdir -p ~/.config/git && \
   cat << 'EOF' > ~/.config/git/github-tbalza-collab.config
   [user]
       name = tbalza-collab
