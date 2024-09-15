@@ -82,7 +82,7 @@ brew install kubectl
   EOF
   
   # Create SSH config for github user `tbalza-collab` on `~/PycharmProjects/github/tbalza-collab/`
-  mkdir -p ~/.config/git && \
+  mkdir -p ~/.config/git \
   cat << 'EOF' > ~/.config/git/github-tbalza-collab.config
   [user]
       name = tbalza-collab
@@ -160,7 +160,7 @@ Here is the required minimal configuration. All other settings, like manifests a
 ### Cloning the Repository
 ```bash
 cd ~/PycharmProjects/github/tbalza-collab/ && \
-git clone https://github.com/tbalza/kubernetes-cicd-zt.git && \
+git clone git@github.com:tbalza/kubernetes-cicd-zt.git && \
 cd kubernetes-cicd-zt # commands and paths are relative to ~/PycharmProjects/github/tbalza-collab/kubernetes-cicd-zt/
 ```
 ### Configuring DNS & GitHub Tokens
