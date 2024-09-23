@@ -240,7 +240,7 @@ terraform -chdir="terraform/02-argocd/" apply -auto-approve
   # Get ArgoCD's pods
   kubectl get pods -n argocd
   
-  # Portforward ArgoCD to https://localhost:8080
+  # Portforward ArgoCD to http://localhost:8080
   kubectl port-forward svc/argo-cd-argocd-server -n argocd 8080:443
   
   # Portforward Jenkins to http://localhost:8181
