@@ -211,6 +211,15 @@ spec: # add sed/yq command
         repoURL: https://github.com/<your-user>/kubernetes-cicd-zt.git
 ```
 
+### Kustomization
+Clear/delete previous `images:` definition in `argo-apps/django/kustomization.yaml` to avoid Image Updater errors on the first deployment. (only needs to be done the first time)
+```yaml
+images:
+- name: django-production-kustomize
+  newName: 123.dkr.ecr.us-east-1.amazonaws.com/django-prod
+  newTag: e7b32b9974784dcff50dac007d863eeef6f611d4
+```
+
 ## Pushing Configuration Changes
 Link project directory to your own repo, commit and push changes:
 ```bash
